@@ -2,9 +2,22 @@ import subprocess
 from typing import List
 from ..logger import logger
 
+from sqlmodel import Session
+from ..db import engine
+from ..models import SystemSettings
+
 class FFmpegWrapper:
     @staticmethod
     def run(input_file: str, output_file: str, args: List[str]) -> bool:
+        ffmpeg_cmd = "ffmpeg"
+        try:
+            with Session(engine) as session:
+                settings = session.get(SystemSettings, 1)
+                if settings and settings.ffmpeg_path:
+                    ffmpeg_cmd = settings.ffmpeg_path
+        except Exception as e:
+            logger.warning(f"Could not load ffmpeg path from DB: {e}")
+
         """
         Run FFmpeg with given arguments.
 
@@ -14,7 +27,7 @@ class FFmpegWrapper:
         :return: True if successful, False otherwise.
         """
         # Command syntax: ffmpeg -y -i input_file [args] output_file
-        command = ["ffmpeg", "-y", "-i", input_file] + args + [output_file]
+        command = [ffmpeg_cmd, "-y", "-i", input_file] + args + [output_file]
         try:
             result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
             return True

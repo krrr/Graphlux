@@ -1,8 +1,132 @@
 <div class="editor-container">
   <div class="toolbar">
     <button (click)="executeDag()">Execute DAG</button>
+    <button (click)="saveDag()">Save DAG</button>
+
+    <label style="margin-left: 20px;">Load DAG:</label>
+    <select [(ngModel)]="selectedDagId" (change)="loadDag()">
+      <option [ngValue]="null">-- Select DAG --</option>
+      <option *ngFor="let d of savedDags" [ngValue]="d.id">{{ d.name }}</option>
+    </select>
   </div>
-  <div class="rete-area" #rete></div>
+  <div class="main-content">
+    <div class="node-palette">
+      <h3>Node Types</h3>
+      <ul>
+        <li *ngFor="let nodeType of availableNodes" (click)="addNode(nodeType.type)">
+          {{ nodeType.label }}
+        </li>
+      </ul>
+    </div>
+    <div class="rete-area" #rete></div>
+
+    <div class="property-editor" *ngIf="selectedNode">
+      <h3>Node Properties</h3>
+      <p><strong>ID:</strong> {{ selectedNode.id }}</p>
+      <p><strong>Type:</strong> {{ selectedNode.label }}</p>
+
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" [(ngModel)]="nodeConfigs[selectedNode.id].name" placeholder="Node Name">
+      </div>
+
+      <h4>Configuration</h4>
+
+      <!-- Dynamic Form Based on Node Type -->
+
+      <!-- ReadInputNode Config -->
+      <div *ngIf="selectedNode.label === 'ReadInputNode'">
+         <div class="form-group">
+            <label>Check Tag</label>
+            <input type="text" [(ngModel)]="nodeConfigs[selectedNode.id].config.check_tag" placeholder="e.g. XMP:ProcessingStatus">
+         </div>
+         <div class="form-group">
+            <label>Skip Value</label>
+            <input type="text" [(ngModel)]="nodeConfigs[selectedNode.id].config.skip_value" placeholder="e.g. Processed=True">
+         </div>
+      </div>
+
+      <!-- ConvertNode Config -->
+      <div *ngIf="selectedNode.label === 'ConvertNode'">
+        <div class="form-group">
+          <label>Tool</label>
+          <select [(ngModel)]="nodeConfigs[selectedNode.id].config.tool">
+            <option value="imagemagick">ImageMagick</option>
+            <option value="ffmpeg">FFmpeg</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Target Extension</label>
+          <input type="text" [(ngModel)]="nodeConfigs[selectedNode.id].config.target_extension" placeholder=".avif">
+        </div>
+        <div class="form-group">
+          <label>Arguments (JSON Array string)</label>
+          <input type="text" [ngModel]="nodeConfigs[selectedNode.id].config.args | json" (ngModelChange)="updateArgs($event, selectedNode.id)" placeholder='["-quality", "85"]'>
+        </div>
+      </div>
+
+      <!-- ConditionNode Config -->
+      <div *ngIf="selectedNode.label === 'ConditionNode'">
+        <div class="form-group">
+          <label>Variable</label>
+          <input type="text" [(ngModel)]="nodeConfigs[selectedNode.id].config.variable" placeholder="compression_ratio">
+        </div>
+        <div class="form-group">
+          <label>Operator</label>
+          <select [(ngModel)]="nodeConfigs[selectedNode.id].config.operator">
+            <option value="<"><</option>
+            <option value=">">></option>
+            <option value="==">==</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Threshold (Number)</label>
+          <input type="number" [(ngModel)]="nodeConfigs[selectedNode.id].config.threshold">
+        </div>
+      </div>
+
+      <!-- FileOperationNode Config -->
+      <div *ngIf="selectedNode.label === 'FileOperationNode'">
+        <div class="form-group">
+          <label>Action</label>
+          <select [(ngModel)]="nodeConfigs[selectedNode.id].config.action">
+            <option value="overwrite">Overwrite / Move</option>
+            <option value="cleanup">Cleanup</option>
+          </select>
+        </div>
+        <div class="form-group" *ngIf="nodeConfigs[selectedNode.id].config.action === 'overwrite'">
+          <label>Target Extension (Optional, for rename)</label>
+          <input type="text" [(ngModel)]="nodeConfigs[selectedNode.id].config.target_extension" placeholder=".avif">
+        </div>
+      </div>
+
+      <!-- MetadataWriteNode Config -->
+      <div *ngIf="selectedNode.label === 'MetadataWriteNode'">
+        <div class="form-group">
+          <label>Write To Original File</label>
+          <input type="checkbox" [(ngModel)]="nodeConfigs[selectedNode.id].config.write_to_original">
+        </div>
+        <div class="form-group">
+          <label>Tags (JSON Key-Value string)</label>
+          <textarea [ngModel]="nodeConfigs[selectedNode.id].config.tags | json" (ngModelChange)="updateTags($event, selectedNode.id)" rows="4" placeholder='{"XMP:ProcessingStatus": "LowCompression_Skipped"}'></textarea>
+        </div>
+      </div>
+
+      <!-- FFmpegActionNode Config -->
+      <div *ngIf="selectedNode.label === 'FFmpegActionNode'">
+        <div class="form-group">
+          <label>Arguments (String format)</label>
+          <input type="text" [(ngModel)]="nodeConfigs[selectedNode.id].config.args" placeholder="-map 0:v -c:v copy">
+        </div>
+        <div class="form-group">
+          <label>Target Extension</label>
+          <input type="text" [(ngModel)]="nodeConfigs[selectedNode.id].config.extension" placeholder=".mp4">
+        </div>
+      </div>
+
+    </div>
+
+  </div>
   <div class="console">
     <h3>Console Logs</h3>
     <div class="logs-container">

@@ -1,0 +1,57 @@
+<div class="tasks-container">
+  <h2>Tasks Manager</h2>
+
+  <div class="create-task">
+    <h3>Create New Task</h3>
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" [(ngModel)]="newTask.name" placeholder="Task Name">
+    </div>
+    <div class="form-group">
+      <label>Target DAG</label>
+      <select [(ngModel)]="newTask.dag_id">
+        <option [ngValue]="null">-- Select DAG --</option>
+        <option *ngFor="let dag of dags" [ngValue]="dag.id">{{ dag.name }}</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Watch Folder (Absolute path)</label>
+      <input type="text" [(ngModel)]="newTask.watch_folder" placeholder="/path/to/folder">
+    </div>
+    <button (click)="createTask()">Create Task</button>
+  </div>
+
+  <div class="task-list">
+    <h3>Active Tasks</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>DAG</th>
+          <th>Watch Folder</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let task of tasks">
+          <td>{{ task.id }}</td>
+          <td>{{ task.name }}</td>
+          <td>{{ getDagName(task.dag_id) }}</td>
+          <td>{{ task.watch_folder }}</td>
+          <td>{{ task.status }}</td>
+          <td>
+            <button (click)="toggleTaskStatus(task)">
+              {{ task.status === 'active' ? 'Pause' : 'Resume' }}
+            </button>
+            <button (click)="deleteTask(task.id)" class="delete-btn">Delete</button>
+          </td>
+        </tr>
+        <tr *ngIf="tasks.length === 0">
+          <td colspan="6">No tasks found.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

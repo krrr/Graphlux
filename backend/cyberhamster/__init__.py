@@ -7,8 +7,21 @@ import asyncio
 import os
 
 from cyberhamster.engine.executor import DAGExecutor
+from cyberhamster.db import init_db, get_session
+from cyberhamster.api import router as api_router
+from sqlmodel import Session
+from cyberhamster.task_manager import task_manager
 
 app = FastAPI(title="CyberHamster Backend")
+
+@app.on_event("startup")
+def on_startup():
+    init_db()
+    task_manager.start()
+
+@app.on_event("shutdown")
+def on_shutdown():
+    task_manager.stop()
 
 # In-memory store for connected websocket clients for logs
 class ConnectionManager:
@@ -28,22 +41,38 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
+app.include_router(api_router, prefix="/api")
+
 class ExecutionRequest(BaseModel):
-    dag: Dict[str, Any]
+    dag: Dict[str, Any] = None
+    dag_id: int = None
     file_path: str
 
 @app.post("/api/execute")
-async def execute_dag(request: ExecutionRequest):
+async def execute_dag_endpoint(request: ExecutionRequest):
     """
     Endpoint to trigger DAG execution.
     """
     if not os.path.exists(request.file_path):
         return JSONResponse(status_code=400, content={"error": "File not found"})
 
+    dag_json = request.dag
+    if request.dag_id is not None:
+        from cyberhamster.db import engine
+        from cyberhamster.models import DAGDefinition
+        with Session(engine) as session:
+            dag_obj = session.get(DAGDefinition, request.dag_id)
+            if not dag_obj:
+                return JSONResponse(status_code=404, content={"error": "DAG not found"})
+            dag_json = dag_obj.json_data
+
+    if not dag_json:
+        return JSONResponse(status_code=400, content={"error": "No DAG provided"})
+
     # Send a log message via websocket
     await manager.broadcast(f"Starting execution for: {request.file_path}")
     
-    executor = DAGExecutor(request.dag)
+    executor = DAGExecutor(dag_json)
     
     # Run in threadpool to not block the asyncio loop
     loop = asyncio.get_event_loop()

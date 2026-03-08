@@ -1,0 +1,22 @@
+<div class="settings-container">
+  <h2>System Settings</h2>
+
+  <div class="form-group">
+    <label>FFmpeg Path</label>
+    <input type="text" [(ngModel)]="settings.ffmpeg_path">
+    <small>Absolute path to ffmpeg executable or 'ffmpeg' if in PATH</small>
+  </div>
+
+  <div class="form-group">
+    <label>ImageMagick Path</label>
+    <input type="text" [(ngModel)]="settings.imagemagick_path">
+    <small>Absolute path to magick executable or 'magick' if in PATH</small>
+  </div>
+
+  <div class="form-group">
+    <label>ExifTool Path (Currently PyExiv2 used internally)</label>
+    <input type="text" [(ngModel)]="settings.exiftool_path" disabled>
+  </div>
+
+  <button (click)="saveSettings()">Save Settings</button>
+</div>

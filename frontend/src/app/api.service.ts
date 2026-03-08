@@ -11,8 +11,52 @@ export class ApiService {
 
   constructor(private http: HttpClient) {}
 
-  executeDag(dag: any, filePath: string): Observable<any> {
-    return this.http.post('/api/execute', { dag, file_path: filePath });
+  executeDag(dag: any, filePath: string, dagId?: number): Observable<any> {
+    return this.http.post('/api/execute', { dag, dag_id: dagId, file_path: filePath });
+  }
+
+  getDags(): Observable<any[]> {
+    return this.http.get<any[]>('/api/dags');
+  }
+
+  getDag(id: number): Observable<any> {
+    return this.http.get<any>(`/api/dags/${id}`);
+  }
+
+  createDag(dag: any): Observable<any> {
+    return this.http.post('/api/dags', dag);
+  }
+
+  updateDag(id: number, dag: any): Observable<any> {
+    return this.http.put(`/api/dags/${id}`, dag);
+  }
+
+  deleteDag(id: number): Observable<any> {
+    return this.http.delete(`/api/dags/${id}`);
+  }
+
+  getTasks(): Observable<any[]> {
+    return this.http.get<any[]>('/api/tasks');
+  }
+
+  createTask(task: any): Observable<any> {
+    return this.http.post('/api/tasks', task);
+  }
+
+  updateTask(id: number, task: any): Observable<any> {
+    return this.http.put(`/api/tasks/${id}`, task);
+  }
+
+  deleteTask(id: number): Observable<any> {
+    return this.http.delete(`/api/tasks/${id}`);
+  }
+
+  getSettings(): Observable<any> {
+    return this.http.get<any>('/api/settings');
+  }
+
+  updateSettings(settings: any): Observable<any> {
+    return this.http.put('/api/settings', settings);
   }
 
   connectLogsWebSocket(): void {
