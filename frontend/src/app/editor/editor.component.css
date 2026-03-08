@@ -1,0 +1,27 @@
+.editor-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.toolbar {
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #ccc;
+}
+.rete-area {
+  flex-grow: 1;
+  position: relative;
+  overflow: hidden;
+}
+.console {
+  height: 200px;
+  background-color: #1e1e1e;
+  color: #fff;
+  padding: 10px;
+  overflow-y: auto;
+  border-top: 1px solid #333;
+}
+.logs-container div {
+  font-family: monospace;
+  margin-bottom: 5px;
+}

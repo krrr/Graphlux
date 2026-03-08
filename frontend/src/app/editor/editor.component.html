@@ -1,0 +1,12 @@
+<div class="editor-container">
+  <div class="toolbar">
+    <button (click)="executeDag()">Execute DAG</button>
+  </div>
+  <div class="rete-area" #rete></div>
+  <div class="console">
+    <h3>Console Logs</h3>
+    <div class="logs-container">
+      <div *ngFor="let log of logs">{{ log }}</div>
+    </div>
+  </div>
+</div>
