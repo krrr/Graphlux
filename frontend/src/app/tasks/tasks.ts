@@ -2,14 +2,14 @@ import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../api.service';
 import { Router } from '@angular/router';
-import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
-import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { NzTagModule } from 'ng-zorro-antd/tag';
-import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzGridModule } from 'ng-zorro-antd/grid';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { COMMON_IMPORTS } from '../shared-imports';
 
 @Component({
@@ -17,13 +17,13 @@ import { COMMON_IMPORTS } from '../shared-imports';
   standalone: true,
   imports: [
     FormsModule,
-    NzTableModule,
+    NzCardModule,
     NzModalModule,
     NzFormModule,
     NzInputModule,
-    NzPopconfirmModule,
-    NzTagModule,
-    NzDividerModule,
+    NzIconModule,
+    NzGridModule,
+    NzDropDownModule,
     ...COMMON_IMPORTS
   ],
   templateUrl: './tasks.html',
@@ -31,6 +31,7 @@ import { COMMON_IMPORTS } from '../shared-imports';
 })
 export class TasksComponent implements OnInit {
   tasks = signal<any[]>([]);
+  folders = signal<any[]>([]);
 
   isModalVisible = signal(false);
   isEditing = signal(false);
@@ -38,8 +39,7 @@ export class TasksComponent implements OnInit {
 
   taskForm = signal({
     name: '',
-    watch_folder: '',
-    status: 'active'
+    description: ''
   });
 
   constructor(
@@ -50,6 +50,7 @@ export class TasksComponent implements OnInit {
 
   ngOnInit() {
     this.loadTasks();
+    this.loadFolders();
   }
 
   loadTasks() {
@@ -58,19 +59,28 @@ export class TasksComponent implements OnInit {
     });
   }
 
+  loadFolders() {
+    this.apiService.getFolders().subscribe(folders => {
+      this.folders.set(folders);
+    });
+  }
+
+  getAssociatedFolders(taskId: number): any[] {
+    return this.folders().filter(f => f.task_id === taskId);
+  }
+
   showModal(task?: any) {
     if (task) {
       this.isEditing.set(true);
       this.editingTaskId.set(task.id);
       this.taskForm.set({
         name: task.name,
-        watch_folder: task.watch_folder,
-        status: task.status
+        description: task.description || ''
       });
     } else {
       this.isEditing.set(false);
       this.editingTaskId.set(null);
-      this.taskForm.set({ name: '', watch_folder: '', status: 'active' });
+      this.taskForm.set({ name: '', description: '' });
     }
     this.isModalVisible.set(true);
   }
@@ -81,8 +91,8 @@ export class TasksComponent implements OnInit {
 
   handleOk() {
     const currentForm = this.taskForm();
-    if (!currentForm.name || !currentForm.watch_folder) {
-      this.message.warning("Please fill all required fields");
+    if (!currentForm.name) {
+      this.message.warning("Please fill the task name");
       return;
     }
 
@@ -93,39 +103,33 @@ export class TasksComponent implements OnInit {
         this.isModalVisible.set(false);
       });
     } else {
-      // Create empty DAG first
-      const dagPayload = {
-        name: `${currentForm.name} DAG`,
-        description: `DAG for task ${currentForm.name}`,
+      const taskPayload = {
+        name: currentForm.name,
+        description: currentForm.description,
         json_data: { nodes: {}, edges: [], start_node: null }
       };
 
-      this.apiService.createDag(dagPayload).subscribe(newDag => {
-        const newTask = {
-          ...currentForm,
-          dag_id: newDag.id
-        };
-        this.apiService.createTask(newTask).subscribe(() => {
-          this.message.success('Task created');
-          this.loadTasks();
-          this.isModalVisible.set(false);
-        });
+      this.apiService.createTask(taskPayload).subscribe(() => {
+        this.message.success('Task created');
+        this.loadTasks();
+        this.isModalVisible.set(false);
       });
     }
   }
 
   deleteTask(id: number) {
-    this.apiService.deleteTask(id).subscribe(() => {
-      this.message.success('Task deleted');
-      this.loadTasks();
-    });
-  }
-
-  toggleTaskStatus(task: any) {
-    const newStatus = task.status === 'active' ? 'paused' : 'active';
-    this.apiService.updateTask(task.id, { status: newStatus }).subscribe(() => {
-      this.message.success(`Task ${newStatus === 'active' ? 'resumed' : 'paused'}`);
-      this.loadTasks();
+    this.apiService.deleteTask(id).subscribe({
+      next: () => {
+        this.message.success('Task deleted');
+        this.loadTasks();
+      },
+      error: (err) => {
+        if (err.status === 400) {
+          this.message.error(err.error.detail || 'Cannot delete task used by folders');
+        } else {
+          this.message.error('Failed to delete task');
+        }
+      }
     });
   }
 

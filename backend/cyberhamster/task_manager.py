@@ -1,19 +1,21 @@
 import os
 import time
 import asyncio
+import re
+import threading
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from sqlmodel import Session, select
 from typing import Dict, Any, Optional
 
 from .db import engine
-from .models import Task, DAGDefinition
-from .engine.executor import DAGExecutor
+from .models import Task, Folder
+from .engine.executor import TaskExecutor
 from .logger import logger
 
-class TaskEventHandler(FileSystemEventHandler):
-    def __init__(self, task_id: int):
-        self.task_id = task_id
+class FolderEventHandler(FileSystemEventHandler):
+    def __init__(self, folder_id: int):
+        self.folder_id = folder_id
         # Simple debounce to prevent multiple triggers for the same file rapidly
         self.recently_processed: Dict[str, float] = {}
 
@@ -27,30 +29,28 @@ class TaskEventHandler(FileSystemEventHandler):
         if file_path in self.recently_processed and now - self.recently_processed[file_path] < 5:
             return
 
-        self.recently_processed[file_path] = now
-
-        logger.info(f"Task {self.task_id} detected change for: {file_path}")
-
-        # We need to run the executor in an asyncio event loop context or a new thread
-        # Because watchdog handlers run in their own thread, we'll use a thread/async approach
-        try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-
-        # Get DAG definition for this task
+        # Get Task definition for this folder
         with Session(engine) as session:
-            task = session.get(Task, self.task_id)
-            if not task or task.status != "active":
+            folder = session.get(Folder, self.folder_id)
+            if not folder or folder.status != "active":
                 return
-            dag_obj = session.get(DAGDefinition, task.dag_id)
-            if not dag_obj:
-                logger.error(f"DAG {task.dag_id} not found for task {self.task_id}")
-                return
-            dag_json = dag_obj.json_data
 
-        executor = DAGExecutor(dag_json)
+            # Check regex
+            if folder.filename_regex:
+                filename = os.path.basename(file_path)
+                if not re.search(folder.filename_regex, filename):
+                    return
+
+            self.recently_processed[file_path] = now
+            logger.info(f"Folder {self.folder_id} detected change for: {file_path}")
+
+            task_obj = session.get(Task, folder.task_id)
+            if not task_obj:
+                logger.error(f"Task {folder.task_id} not found for folder {self.folder_id}")
+                return
+            task_json = task_obj.json_data
+
+        executor = TaskExecutor(task_json)
 
         # Fire and forget execution to avoid blocking watchdog thread
         def run_executor():
@@ -60,7 +60,6 @@ class TaskEventHandler(FileSystemEventHandler):
                 logger.error(f"Executor failed for {file_path}: {e}")
 
         # In a real app we might use a task queue (e.g. Celery), but threading is okay for this demo
-        import threading
         threading.Thread(target=run_executor, daemon=True).start()
 
     def on_created(self, event):
@@ -72,7 +71,8 @@ class TaskEventHandler(FileSystemEventHandler):
 class TaskManager:
     def __init__(self):
         self.observer = Observer()
-        self.active_watches = {} # task_id -> Watch
+        self.active_watches = {} # folder_id -> Watch
+        self.active_scans = {} # folder_id -> threading.Event (to stop)
         self._is_running = False
 
     def start(self):
@@ -82,7 +82,7 @@ class TaskManager:
         logger.info("Starting TaskManager...")
         self.observer.start()
         self._is_running = True
-        self._sync_tasks()
+        self._sync_folders()
 
     def stop(self):
         if not self._is_running:
@@ -91,56 +91,89 @@ class TaskManager:
         logger.info("Stopping TaskManager...")
         self.observer.stop()
         self.observer.join()
+
+        for stop_event in self.active_scans.values():
+            stop_event.set()
+
         self._is_running = False
 
-    def _sync_tasks(self):
-        """Loads active tasks from DB and sets up watches."""
+    def _sync_folders(self):
+        """Loads active folders from DB and sets up watches."""
         with Session(engine) as session:
-            tasks = session.exec(select(Task)).all()
-            for task in tasks:
-                if task.status == "active":
-                    self.add_task(task)
+            folders = session.exec(select(Folder)).all()
+            for folder in folders:
+                if folder.status == "active":
+                    self.add_folder(folder)
 
-    def add_task(self, task: Task):
-        if not self._is_running or task.status != "active":
+    def add_folder(self, folder: Folder):
+        if not self._is_running or folder.status != "active":
             return
 
-        if task.id in self.active_watches:
-            self.remove_task(task)
+        if folder.id in self.active_watches:
+            self.remove_folder(folder)
 
-        if not task.watch_folder or not os.path.exists(task.watch_folder):
-            logger.warning(f"Task {task.id}: Watch folder '{task.watch_folder}' does not exist.")
+        if not folder.watch_folder or not os.path.exists(folder.watch_folder):
+            logger.warning(f"Folder {folder.id}: Watch folder '{folder.watch_folder}' does not exist.")
             return
 
-        logger.info(f"Setting up watch for Task {task.id} on folder: {task.watch_folder}")
-        handler = TaskEventHandler(task.id)
-        watch = self.observer.schedule(handler, task.watch_folder, recursive=False)
-        self.active_watches[task.id] = watch
+        handler = FolderEventHandler(folder.id)
+
+        if folder.real_time_watch:
+            logger.info(f"Setting up real-time watch for Folder {folder.id} on path: {folder.watch_folder}")
+            watch = self.observer.schedule(handler, folder.watch_folder, recursive=False)
+            self.active_watches[folder.id] = watch
+
+        # Set up periodic scan
+        if folder.scan_interval > 0:
+            stop_event = threading.Event()
+            self.active_scans[folder.id] = stop_event
+            threading.Thread(target=self._periodic_scan_loop, args=(folder.id, folder.scan_interval, stop_event), daemon=True).start()
 
         # Scan folder for existing files on startup/addition
-        self._scan_folder(task, handler)
+        self._scan_folder(folder, handler)
 
-    def update_task(self, task: Task, old_folder: str):
-        if task.id in self.active_watches:
-             self.remove_task(task)
-        if task.status == "active":
-             self.add_task(task)
+    def update_folder(self, folder: Folder, old_folder_path: str):
+        if folder.id in self.active_watches or folder.id in self.active_scans:
+             self.remove_folder(folder)
+        if folder.status == "active":
+             self.add_folder(folder)
 
-    def remove_task(self, task: Task):
-        if task.id in self.active_watches:
-            logger.info(f"Removing watch for Task {task.id}")
-            watch = self.active_watches.pop(task.id)
+    def remove_folder(self, folder: Folder):
+        if folder.id in self.active_watches:
+            logger.info(f"Removing real-time watch for Folder {folder.id}")
+            watch = self.active_watches.pop(folder.id)
             self.observer.unschedule(watch)
 
-    def _scan_folder(self, task: Task, handler: TaskEventHandler):
+        if folder.id in self.active_scans:
+            logger.info(f"Stopping periodic scan for Folder {folder.id}")
+            self.active_scans[folder.id].set()
+            self.active_scans.pop(folder.id)
+
+    def _periodic_scan_loop(self, folder_id: int, interval: int, stop_event: threading.Event):
+        logger.info(f"Starting periodic scan for Folder {folder_id} every {interval}s")
+        while not stop_event.is_set():
+            time.sleep(interval)
+            if stop_event.is_set():
+                break
+
+            with Session(engine) as session:
+                folder = session.get(Folder, folder_id)
+                if folder and folder.status == "active":
+                    handler = FolderEventHandler(folder.id)
+                    self._scan_folder(folder, handler)
+
+    def _scan_folder(self, folder: Folder, handler: FolderEventHandler):
         """Scans the watch folder for existing files and queues them for processing."""
-        if not os.path.exists(task.watch_folder):
+        if not os.path.exists(folder.watch_folder):
             return
 
-        logger.info(f"Scanning existing files for Task {task.id} in {task.watch_folder}")
-        for filename in os.listdir(task.watch_folder):
-            filepath = os.path.join(task.watch_folder, filename)
+        logger.info(f"Scanning files for Folder {folder.id} in {folder.watch_folder}")
+        for filename in os.listdir(folder.watch_folder):
+            filepath = os.path.join(folder.watch_folder, filename)
             if os.path.isfile(filepath) and not filename.startswith('.'):
+                if folder.filename_regex:
+                    if not re.search(folder.filename_regex, filename):
+                        continue
                 handler._handle_event(filepath)
 
 # Global singleton

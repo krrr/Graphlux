@@ -2,60 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from typing import List, Any
 from .db import get_session
-from .models import DAGDefinition, Task, SystemSettings
+from .models import Task, Folder, SystemSettings
 
 router = APIRouter()
-
-# --- DAGDefinition ---
-
-@router.get("/dags", response_model=List[DAGDefinition])
-def get_dags(session: Session = Depends(get_session)):
-    return session.exec(select(DAGDefinition)).all()
-
-@router.get("/dags/{dag_id}", response_model=DAGDefinition)
-def get_dag(dag_id: int, session: Session = Depends(get_session)):
-    dag = session.get(DAGDefinition, dag_id)
-    if not dag:
-        raise HTTPException(status_code=404, detail="DAG not found")
-    return dag
-
-@router.post("/dags", response_model=DAGDefinition)
-def create_dag(dag: DAGDefinition, session: Session = Depends(get_session)):
-    session.add(dag)
-    session.commit()
-    session.refresh(dag)
-    return dag
-
-@router.put("/dags/{dag_id}", response_model=DAGDefinition)
-def update_dag(dag_id: int, dag_update: DAGDefinition, session: Session = Depends(get_session)):
-    dag = session.get(DAGDefinition, dag_id)
-    if not dag:
-        raise HTTPException(status_code=404, detail="DAG not found")
-
-    update_data = dag_update.model_dump(exclude_unset=True)
-    for key, value in update_data.items():
-        if key != "id": # Don't update ID
-            setattr(dag, key, value)
-
-    session.add(dag)
-    session.commit()
-    session.refresh(dag)
-    return dag
-
-@router.delete("/dags/{dag_id}")
-def delete_dag(dag_id: int, session: Session = Depends(get_session)):
-    dag = session.get(DAGDefinition, dag_id)
-    if not dag:
-        raise HTTPException(status_code=404, detail="DAG not found")
-
-    # Check if there are tasks using this DAG
-    tasks = session.exec(select(Task).where(Task.dag_id == dag_id)).all()
-    if tasks:
-        raise HTTPException(status_code=400, detail="Cannot delete DAG. It is used by existing tasks.")
-
-    session.delete(dag)
-    session.commit()
-    return {"message": "DAG deleted successfully"}
 
 # --- Task ---
 
@@ -63,21 +12,18 @@ def delete_dag(dag_id: int, session: Session = Depends(get_session)):
 def get_tasks(session: Session = Depends(get_session)):
     return session.exec(select(Task)).all()
 
+@router.get("/tasks/{task_id}", response_model=Task)
+def get_task(task_id: int, session: Session = Depends(get_session)):
+    task = session.get(Task, task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return task
+
 @router.post("/tasks", response_model=Task)
 def create_task(task: Task, session: Session = Depends(get_session)):
-    # Verify DAG exists
-    dag = session.get(DAGDefinition, task.dag_id)
-    if not dag:
-        raise HTTPException(status_code=400, detail="Invalid DAG ID")
-
     session.add(task)
     session.commit()
     session.refresh(task)
-
-    # Notify task manager
-    from .task_manager import task_manager
-    task_manager.add_task(task)
-
     return task
 
 @router.put("/tasks/{task_id}", response_model=Task)
@@ -87,31 +33,13 @@ def update_task(task_id: int, task_update: Task, session: Session = Depends(get_
         raise HTTPException(status_code=404, detail="Task not found")
 
     update_data = task_update.model_dump(exclude_unset=True)
-
-    # Check if DAG exists if updating DAG ID
-    if "dag_id" in update_data and update_data["dag_id"] != task.dag_id:
-        dag = session.get(DAGDefinition, update_data["dag_id"])
-        if not dag:
-            raise HTTPException(status_code=400, detail="Invalid DAG ID")
-
-    # If watch_folder changed or status changed, we need to update the task manager
-    needs_manager_update = False
-    old_folder = task.watch_folder
-
     for key, value in update_data.items():
-        if key != "id":
-            if key in ("watch_folder", "status", "dag_id") and getattr(task, key) != value:
-                needs_manager_update = True
+        if key != "id": # Don't update ID
             setattr(task, key, value)
 
     session.add(task)
     session.commit()
     session.refresh(task)
-
-    if needs_manager_update:
-        from .task_manager import task_manager
-        task_manager.update_task(task, old_folder)
-
     return task
 
 @router.delete("/tasks/{task_id}")
@@ -120,13 +48,85 @@ def delete_task(task_id: int, session: Session = Depends(get_session)):
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
 
+    # Check if there are folders using this Task
+    folders = session.exec(select(Folder).where(Folder.task_id == task_id)).all()
+    if folders:
+        raise HTTPException(status_code=400, detail="Cannot delete Task. It is used by existing folders.")
+
     session.delete(task)
+    session.commit()
+    return {"message": "Task deleted successfully"}
+
+# --- Folder ---
+
+@router.get("/folders", response_model=List[Folder])
+def get_folders(session: Session = Depends(get_session)):
+    return session.exec(select(Folder)).all()
+
+@router.post("/folders", response_model=Folder)
+def create_folder(folder: Folder, session: Session = Depends(get_session)):
+    # Verify Task exists
+    task = session.get(Task, folder.task_id)
+    if not task:
+        raise HTTPException(status_code=400, detail="Invalid Task ID")
+
+    session.add(folder)
+    session.commit()
+    session.refresh(folder)
+
+    # Notify task manager
+    from .task_manager import task_manager
+    task_manager.add_folder(folder)
+
+    return folder
+
+@router.put("/folders/{folder_id}", response_model=Folder)
+def update_folder(folder_id: int, folder_update: Folder, session: Session = Depends(get_session)):
+    folder = session.get(Folder, folder_id)
+    if not folder:
+        raise HTTPException(status_code=404, detail="Folder not found")
+
+    update_data = folder_update.model_dump(exclude_unset=True)
+
+    # Check if Task exists if updating Task ID
+    if "task_id" in update_data and update_data["task_id"] != folder.task_id:
+        task = session.get(Task, update_data["task_id"])
+        if not task:
+            raise HTTPException(status_code=400, detail="Invalid Task ID")
+
+    # If watch_folder changed or status changed, we need to update the task manager
+    needs_manager_update = False
+    old_folder = folder.watch_folder
+
+    for key, value in update_data.items():
+        if key != "id":
+            if key in ("watch_folder", "status", "task_id", "real_time_watch", "scan_interval", "filename_regex") and getattr(folder, key) != value:
+                needs_manager_update = True
+            setattr(folder, key, value)
+
+    session.add(folder)
+    session.commit()
+    session.refresh(folder)
+
+    if needs_manager_update:
+        from .task_manager import task_manager
+        task_manager.update_folder(folder, old_folder)
+
+    return folder
+
+@router.delete("/folders/{folder_id}")
+def delete_folder(folder_id: int, session: Session = Depends(get_session)):
+    folder = session.get(Folder, folder_id)
+    if not folder:
+        raise HTTPException(status_code=404, detail="Folder not found")
+
+    session.delete(folder)
     session.commit()
 
     from .task_manager import task_manager
-    task_manager.remove_task(task)
+    task_manager.remove_folder(folder)
 
-    return {"message": "Task deleted successfully"}
+    return {"message": "Folder deleted successfully"}
 
 # --- SystemSettings ---
 

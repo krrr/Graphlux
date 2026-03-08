@@ -54,7 +54,6 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
   nodeConfigs = signal<{ [id: string]: any }>({});
 
   taskId = signal<number | null>(null);
-  selectedDagId = signal<number | null>(null);
 
   isExecuteModalVisible = signal(false);
   isLogsModalVisible = signal(false);
@@ -87,20 +86,18 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
       const idStr = params.get('taskId');
       if (idStr) {
         this.taskId.set(+idStr);
-        this.loadTaskAndDag();
+        this.loadTask();
       }
     });
   }
 
-  loadTaskAndDag() {
+  loadTask() {
     const tid = this.taskId();
     if (!tid) return;
-    this.apiService.getTasks().subscribe(tasks => {
-      const task = tasks.find(t => t.id === tid);
-      if (task && task.dag_id) {
-        this.selectedDagId.set(task.dag_id);
-        this.loadDag();
-      }
+    this.apiService.getTask(tid).subscribe(task => {
+        if (task) {
+            this.loadDag(task);
+        }
     });
   }
 
@@ -234,7 +231,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     this.logs.set([]);
     this.isLogsModalVisible.set(true);
 
-    this.apiService.executeDag(dag, this.executeFilePath(), this.selectedDagId() || undefined).subscribe({
+    this.apiService.executeTask(dag, this.executeFilePath(), this.taskId() || undefined).subscribe({
       next: (res) => console.log('Execution response:', res),
       error: (err) => {
         console.error('Execution error:', err);
@@ -282,82 +279,77 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   saveDag() {
-    const dagId = this.selectedDagId();
-    if (!dagId) {
-      this.message.error('No DAG ID associated with this task');
+    const taskId = this.taskId();
+    if (!taskId) {
+      this.message.error('No Task ID associated with this editor');
       return;
     }
 
     const dagJson = this.serializeDag();
 
-    this.apiService.getDag(dagId).subscribe(currentDag => {
+    this.apiService.getTask(taskId).subscribe(currentTask => {
       const payload = {
-        name: currentDag.name,
-        description: currentDag.description,
+        name: currentTask.name,
+        description: currentTask.description,
         json_data: dagJson
       };
 
-      this.apiService.updateDag(dagId, payload).subscribe(() => {
-        this.message.success('DAG Saved successfully');
+      this.apiService.updateTask(taskId, payload).subscribe(() => {
+        this.message.success('Task Saved successfully');
       });
     });
   }
 
-  async loadDag() {
-    const dagId = this.selectedDagId();
-    if (!dagId) return;
+  async loadDag(taskDef: any) {
+    await this.editor.clear();
+    this.nodeConfigs.set({});
+    this.selectedNode.set(null);
 
-    this.apiService.getDag(dagId).subscribe(async dagDef => {
-      await this.editor.clear();
-      this.nodeConfigs.set({});
-      this.selectedNode.set(null);
+    const dagJson = taskDef.json_data;
+    if (!dagJson || !dagJson.nodes) return;
 
-      const dagJson = dagDef.json_data;
-      if (!dagJson || !dagJson.nodes) return;
+    const nodeMap = new Map<string, any>();
+    const newConfigs: { [id: string]: any } = {};
 
-      const nodeMap = new Map<string, any>();
-      const newConfigs: { [id: string]: any } = {};
+    for (const [id, nodeData] of Object.entries<any>(dagJson.nodes)) {
+      const node = new ClassicPreset.Node(nodeData.type);
+      node.id = id;
 
-      for (const [id, nodeData] of Object.entries<any>(dagJson.nodes)) {
-        const node = new ClassicPreset.Node(nodeData.type);
-        node.id = id;
-
-        if (nodeData.type !== 'ReadInputNode') {
-          node.addInput('input', new ClassicPreset.Input(new ClassicPreset.Socket('Data')));
-        }
-
-        if (nodeData.type === 'ConditionNode') {
-          node.addOutput('true_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-          node.addOutput('false_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-        } else {
-          node.addOutput('default', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-        }
-
-        newConfigs[node.id] = { name: nodeData.name, config: nodeData.config || {} };
-        nodeMap.set(id, node);
-        await this.editor.addNode(node);
+      if (nodeData.type !== 'ReadInputNode') {
+        node.addInput('input', new ClassicPreset.Input(new ClassicPreset.Socket('Data')));
       }
 
-      this.nodeConfigs.set(newConfigs);
-
-      for (const edge of dagJson.edges) {
-        const sourceNode = nodeMap.get(edge.source);
-        const targetNode = nodeMap.get(edge.target);
-        if (sourceNode && targetNode) {
-          const conn = new ClassicPreset.Connection(sourceNode, edge.branch, targetNode, 'input');
-          await this.editor.addConnection(conn);
-        }
+      if (nodeData.type === 'ConditionNode') {
+        node.addOutput('true_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
+        node.addOutput('false_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
+      } else {
+        node.addOutput('default', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
       }
 
-      let x = 0;
-      for (const node of Array.from(nodeMap.values())) {
-        await this.area.translate(node.id, { x: x, y: 0 });
-        x += 250;
-      }
+      newConfigs[node.id] = { name: nodeData.name, config: nodeData.config || {} };
+      nodeMap.set(id, node);
+      await this.editor.addNode(node);
+    }
 
-      setTimeout(() => {
-        AreaExtensions.zoomAt(this.area, this.editor.getNodes());
-      }, 100);
-    });
+    this.nodeConfigs.set(newConfigs);
+
+    for (const edge of dagJson.edges) {
+      const sourceNode = nodeMap.get(edge.source);
+      const targetNode = nodeMap.get(edge.target);
+      if (sourceNode && targetNode) {
+        const conn = new ClassicPreset.Connection(sourceNode, edge.branch, targetNode, 'input');
+        await this.editor.addConnection(conn);
+      }
+    }
+
+    let x = 0;
+    for (const node of Array.from(nodeMap.values())) {
+      await this.area.translate(node.id, { x: x, y: 0 });
+      x += 250;
+    }
+
+    setTimeout(() => {
+      AreaExtensions.zoomAt(this.area, this.editor.getNodes());
+    }, 100);
   }
 }

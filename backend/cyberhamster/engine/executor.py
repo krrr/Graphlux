@@ -3,7 +3,7 @@ from .context import FileContext
 from .nodes import NODE_TYPES
 from ..logger import logger
 
-class DAGExecutor:
+class TaskExecutor:
     def __init__(self, dag_json: Dict[str, Any]):
         """
         Initialize the executor with a JSON representation of the DAG.

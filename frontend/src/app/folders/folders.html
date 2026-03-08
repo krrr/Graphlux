@@ -1,0 +1,146 @@
+<div class="folders-container">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2>Folders Manager</h2>
+    <button nz-button nzType="primary" (click)="showModal()">Create New Folder</button>
+  </div>
+
+  <nz-table #basicTable [nzData]="folders()">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Watch Folder</th>
+        <th>Task</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let folder of basicTable.data">
+        <td>{{ folder.id }}</td>
+        <td>{{ folder.name }}</td>
+        <td>{{ folder.watch_folder }}</td>
+        <td>{{ getTaskName(folder.task_id) }}</td>
+        <td>
+          <nz-tag [nzColor]="folder.status === 'active' ? 'green' : 'red'">
+            {{ folder.status | uppercase }}
+          </nz-tag>
+        </td>
+        <td>
+          <button nz-button nzType="link" (click)="showModal(folder)">Edit Folder</button>
+          <nz-divider nzType="vertical"></nz-divider>
+          <button nz-button nzType="link" (click)="toggleFolderStatus(folder)">
+            {{ folder.status === 'active' ? 'Pause' : 'Resume' }}
+          </button>
+          <nz-divider nzType="vertical"></nz-divider>
+          <button
+            nz-button
+            nzType="link"
+            nzDanger
+            nz-popconfirm
+            nzPopconfirmTitle="Are you sure delete this folder?"
+            (nzOnConfirm)="deleteFolder(folder.id)"
+          >
+            Delete
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+
+  <nz-modal
+    [nzVisible]="isModalVisible()"
+    (nzVisibleChange)="isModalVisible.set($event)"
+    [nzTitle]="isEditing() ? 'Edit Folder' : 'Create New Folder'"
+    (nzOnCancel)="handleCancel()"
+    (nzOnOk)="handleOk()"
+    nzWidth="600px"
+  >
+    <ng-container *nzModalContent>
+      <form nz-form nzLayout="vertical">
+        <nz-tabs>
+          <nz-tab nzTitle="General">
+            <nz-form-item>
+              <nz-form-label nzRequired>Name</nz-form-label>
+              <nz-form-control nzErrorTip="Please input the folder name!">
+                <input
+                  nz-input
+                  [ngModel]="folderForm().name"
+                  (ngModelChange)="updateForm('name', $event)"
+                  name="name"
+                  placeholder="Folder Name"
+                />
+              </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item>
+              <nz-form-label nzRequired>Watch Folder (Absolute path)</nz-form-label>
+              <nz-form-control nzErrorTip="Please input the watch folder path!">
+                <input
+                  nz-input
+                  [ngModel]="folderForm().watch_folder"
+                  (ngModelChange)="updateForm('watch_folder', $event)"
+                  name="watch_folder"
+                  placeholder="/path/to/folder"
+                />
+              </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item>
+              <nz-form-label nzRequired>Task</nz-form-label>
+              <nz-form-control nzErrorTip="Please select a task!">
+                <nz-select
+                  [ngModel]="folderForm().task_id"
+                  (ngModelChange)="updateForm('task_id', $event)"
+                  name="task_id"
+                  nzPlaceHolder="Select a task"
+                >
+                  <nz-option *ngFor="let t of tasks()" [nzValue]="t.id" [nzLabel]="t.name"></nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </nz-tab>
+          <nz-tab nzTitle="Scan">
+            <nz-form-item>
+              <nz-form-control>
+                <label nz-checkbox
+                  [ngModel]="folderForm().real_time_watch"
+                  (ngModelChange)="updateForm('real_time_watch', $event)"
+                  name="real_time_watch"
+                >
+                  Real-time watch (Watchdog)
+                </label>
+              </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item>
+              <nz-form-label>Scan Interval (seconds, 0 to disable)</nz-form-label>
+              <nz-form-control>
+                <input
+                  nz-input
+                  type="number"
+                  [ngModel]="folderForm().scan_interval"
+                  (ngModelChange)="updateForm('scan_interval', $event)"
+                  name="scan_interval"
+                />
+              </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item>
+              <nz-form-label>Filename Regex (optional)</nz-form-label>
+              <nz-form-control>
+                <input
+                  nz-input
+                  [ngModel]="folderForm().filename_regex"
+                  (ngModelChange)="updateForm('filename_regex', $event)"
+                  name="filename_regex"
+                  placeholder="e.g. \.(jpg|png)$"
+                />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-tab>
+        </nz-tabs>
+      </form>
+    </ng-container>
+  </nz-modal>
+</div>

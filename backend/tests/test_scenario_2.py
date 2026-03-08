@@ -2,7 +2,7 @@ import pytest
 import os
 import tempfile
 from unittest.mock import patch
-from cyberhamster.engine.executor import DAGExecutor
+from cyberhamster.engine.executor import TaskExecutor
 
 @pytest.fixture
 def dummy_mp4():
@@ -49,7 +49,7 @@ def test_scenario_2_success(mock_write_meta, mock_ffmpeg_run, mock_read_meta, du
         return True
     mock_ffmpeg_run.side_effect = side_effect_ffmpeg
     
-    executor = DAGExecutor(SCENARIO_2_DAG)
+    executor = TaskExecutor(SCENARIO_2_DAG)
     success = executor.execute(dummy_mp4)
     
     assert success is True

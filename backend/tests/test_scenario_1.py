@@ -3,7 +3,7 @@ import os
 import shutil
 import tempfile
 from unittest.mock import patch, MagicMock
-from cyberhamster.engine.executor import DAGExecutor
+from cyberhamster.engine.executor import TaskExecutor
 
 # Create a dummy image for testing
 @pytest.fixture
@@ -51,7 +51,7 @@ def test_scenario_1_success_branch(mock_write_meta, mock_imagemagick_run, mock_r
         return True
     mock_imagemagick_run.side_effect = side_effect_magick
     
-    executor = DAGExecutor(SCENARIO_1_DAG)
+    executor = TaskExecutor(SCENARIO_1_DAG)
     success = executor.execute(dummy_image)
     
     assert success is True
@@ -78,7 +78,7 @@ def test_scenario_1_fail_branch(mock_write_meta, mock_imagemagick_run, mock_read
         return True
     mock_imagemagick_run.side_effect = side_effect_magick
     
-    executor = DAGExecutor(SCENARIO_1_DAG)
+    executor = TaskExecutor(SCENARIO_1_DAG)
     success = executor.execute(dummy_image)
     
     assert success is True

@@ -2,19 +2,19 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 
-import { TasksComponent } from './tasks';
+import { FoldersComponent } from './folders';
 
-describe('Tasks', () => {
-  let component: TasksComponent;
-  let fixture: ComponentFixture<TasksComponent>;
+describe('Folders', () => {
+  let component: FoldersComponent;
+  let fixture: ComponentFixture<FoldersComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TasksComponent],
+      imports: [FoldersComponent],
       providers: [provideHttpClient(), provideHttpClientTesting()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(TasksComponent);
+    fixture = TestBed.createComponent(FoldersComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

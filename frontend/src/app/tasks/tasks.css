@@ -1,3 +1,13 @@
 .tasks-container {
   padding: 20px;
 }
+
+nz-card {
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+nz-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}

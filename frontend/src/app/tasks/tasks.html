@@ -1,52 +1,49 @@
 <div class="tasks-container">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-    <h2>Tasks Manager</h2>
+    <h2>DAG Tasks Manager</h2>
     <button nz-button nzType="primary" (click)="showModal()">Create New Task</button>
   </div>
 
-  <nz-table #basicTable [nzData]="tasks()">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Watch Folder</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let task of basicTable.data">
-        <td>{{ task.id }}</td>
-        <td>{{ task.name }}</td>
-        <td>{{ task.watch_folder }}</td>
-        <td>
-          <nz-tag [nzColor]="task.status === 'active' ? 'green' : 'red'">
-            {{ task.status | uppercase }}
-          </nz-tag>
-        </td>
-        <td>
-          <button nz-button nzType="link" (click)="openEditor(task.id)">Edit DAG</button>
-          <nz-divider nzType="vertical"></nz-divider>
-          <button nz-button nzType="link" (click)="showModal(task)">Edit Task</button>
-          <nz-divider nzType="vertical"></nz-divider>
-          <button nz-button nzType="link" (click)="toggleTaskStatus(task)">
-            {{ task.status === 'active' ? 'Pause' : 'Resume' }}
+  <div nz-row [nzGutter]="[16, 16]">
+    <div nz-col [nzSpan]="8" *ngFor="let task of tasks()">
+      <nz-card style="width: 100%; border-radius: 8px;" nzHoverable>
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+          <div style="display: flex; align-items: center; gap: 12px;" (click)="openEditor(task.id)">
+            <span nz-icon nzType="deployment-unit" nzTheme="outline" style="font-size: 32px; color: #1890ff;"></span>
+            <div>
+              <h3 style="margin: 0;">{{ task.name }}</h3>
+              <span style="color: #8c8c8c; font-size: 12px;">ID: {{ task.id }}</span>
+            </div>
+          </div>
+          <button nz-button nzType="text" nz-dropdown [nzDropdownMenu]="menu">
+            <span nz-icon nzType="more"></span>
           </button>
-          <nz-divider nzType="vertical"></nz-divider>
-          <button
-            nz-button
-            nzType="link"
-            nzDanger
-            nz-popconfirm
-            nzPopconfirmTitle="Are you sure delete this task?"
-            (nzOnConfirm)="deleteTask(task.id)"
-          >
-            Delete
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </nz-table>
+          <nz-dropdown-menu #menu="nzDropdownMenu">
+            <ul nz-menu>
+              <li nz-menu-item (click)="showModal(task)">Edit Properties</li>
+              <li nz-menu-item nzDanger (click)="deleteTask(task.id)">Delete</li>
+            </ul>
+          </nz-dropdown-menu>
+        </div>
+
+        <p style="color: #595959; margin-bottom: 16px; min-height: 40px;" (click)="openEditor(task.id)">
+          {{ task.description || 'No description provided.' }}
+        </p>
+
+        <div style="background-color: #fafafa; padding: 8px; border-radius: 4px;" (click)="openEditor(task.id)">
+          <strong>Associated Folders:</strong>
+          <ul style="margin: 4px 0 0 0; padding-left: 20px; color: #595959;">
+            <li *ngFor="let folder of getAssociatedFolders(task.id)">
+              {{ folder.name }} ({{ folder.watch_folder }})
+            </li>
+            <li *ngIf="getAssociatedFolders(task.id).length === 0" style="list-style-type: none; margin-left: -20px;">
+              <i>None</i>
+            </li>
+          </ul>
+        </div>
+      </nz-card>
+    </div>
+  </div>
 
   <nz-modal
     [nzVisible]="isModalVisible()"
@@ -71,15 +68,16 @@
         </nz-form-item>
 
         <nz-form-item>
-          <nz-form-label nzRequired>Watch Folder (Absolute path)</nz-form-label>
-          <nz-form-control nzErrorTip="Please input the watch folder path!">
-            <input
+          <nz-form-label>Description</nz-form-label>
+          <nz-form-control>
+            <textarea
               nz-input
-              [ngModel]="taskForm().watch_folder"
-              (ngModelChange)="updateForm('watch_folder', $event)"
-              name="watch_folder"
-              placeholder="/path/to/folder"
-            />
+              [ngModel]="taskForm().description"
+              (ngModelChange)="updateForm('description', $event)"
+              name="description"
+              placeholder="Description"
+              rows="3"
+            ></textarea>
           </nz-form-control>
         </nz-form-item>
       </form>

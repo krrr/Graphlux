@@ -11,32 +11,16 @@ export class ApiService {
 
   constructor(private http: HttpClient) {}
 
-  executeDag(dag: any, filePath: string, dagId?: number): Observable<any> {
-    return this.http.post('/api/execute', { dag, dag_id: dagId, file_path: filePath });
-  }
-
-  getDags(): Observable<any[]> {
-    return this.http.get<any[]>('/api/dags');
-  }
-
-  getDag(id: number): Observable<any> {
-    return this.http.get<any>(`/api/dags/${id}`);
-  }
-
-  createDag(dag: any): Observable<any> {
-    return this.http.post('/api/dags', dag);
-  }
-
-  updateDag(id: number, dag: any): Observable<any> {
-    return this.http.put(`/api/dags/${id}`, dag);
-  }
-
-  deleteDag(id: number): Observable<any> {
-    return this.http.delete(`/api/dags/${id}`);
+  executeTask(task: any, filePath: string, taskId?: number): Observable<any> {
+    return this.http.post('/api/execute', { task, task_id: taskId, file_path: filePath });
   }
 
   getTasks(): Observable<any[]> {
     return this.http.get<any[]>('/api/tasks');
+  }
+
+  getTask(id: number): Observable<any> {
+    return this.http.get<any>(`/api/tasks/${id}`);
   }
 
   createTask(task: any): Observable<any> {
@@ -49,6 +33,22 @@ export class ApiService {
 
   deleteTask(id: number): Observable<any> {
     return this.http.delete(`/api/tasks/${id}`);
+  }
+
+  getFolders(): Observable<any[]> {
+    return this.http.get<any[]>('/api/folders');
+  }
+
+  createFolder(folder: any): Observable<any> {
+    return this.http.post('/api/folders', folder);
+  }
+
+  updateFolder(id: number, folder: any): Observable<any> {
+    return this.http.put(`/api/folders/${id}`, folder);
+  }
+
+  deleteFolder(id: number): Observable<any> {
+    return this.http.delete(`/api/folders/${id}`);
   }
 
   getSettings(): Observable<any> {

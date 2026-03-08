@@ -18,6 +18,9 @@ import { COMMON_IMPORTS } from './shared-imports';
             <a routerLink="/tasks">Tasks</a>
           </li>
           <li nz-menu-item nzMatchRouter>
+            <a routerLink="/folders">Folders</a>
+          </li>
+          <li nz-menu-item nzMatchRouter>
             <a routerLink="/settings">Settings</a>
           </li>
         </ul>

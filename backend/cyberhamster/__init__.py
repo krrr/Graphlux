@@ -6,7 +6,7 @@ from typing import Dict, Any, List
 import asyncio
 import os
 
-from cyberhamster.engine.executor import DAGExecutor
+from cyberhamster.engine.executor import TaskExecutor
 from cyberhamster.db import init_db, get_session
 from cyberhamster.api import router as api_router
 from sqlmodel import Session
@@ -44,35 +44,35 @@ manager = ConnectionManager()
 app.include_router(api_router, prefix="/api")
 
 class ExecutionRequest(BaseModel):
-    dag: Dict[str, Any] = None
-    dag_id: int = None
+    task: Dict[str, Any] = None
+    task_id: int = None
     file_path: str
 
 @app.post("/api/execute")
-async def execute_dag_endpoint(request: ExecutionRequest):
+async def execute_task_endpoint(request: ExecutionRequest):
     """
-    Endpoint to trigger DAG execution.
+    Endpoint to trigger Task execution.
     """
     if not os.path.exists(request.file_path):
         return JSONResponse(status_code=400, content={"error": "File not found"})
 
-    dag_json = request.dag
-    if request.dag_id is not None:
+    task_json = request.task
+    if request.task_id is not None:
         from cyberhamster.db import engine
-        from cyberhamster.models import DAGDefinition
+        from cyberhamster.models import Task
         with Session(engine) as session:
-            dag_obj = session.get(DAGDefinition, request.dag_id)
-            if not dag_obj:
-                return JSONResponse(status_code=404, content={"error": "DAG not found"})
-            dag_json = dag_obj.json_data
+            task_obj = session.get(Task, request.task_id)
+            if not task_obj:
+                return JSONResponse(status_code=404, content={"error": "Task not found"})
+            task_json = task_obj.json_data
 
-    if not dag_json:
-        return JSONResponse(status_code=400, content={"error": "No DAG provided"})
+    if not task_json:
+        return JSONResponse(status_code=400, content={"error": "No Task provided"})
 
     # Send a log message via websocket
     await manager.broadcast(f"Starting execution for: {request.file_path}")
     
-    executor = DAGExecutor(dag_json)
+    executor = TaskExecutor(task_json)
     
     # Run in threadpool to not block the asyncio loop
     loop = asyncio.get_event_loop()
@@ -80,10 +80,10 @@ async def execute_dag_endpoint(request: ExecutionRequest):
     
     if success:
         await manager.broadcast(f"Successfully finished execution for: {request.file_path}")
-        return {"status": "success", "message": "DAG execution completed"}
+        return {"status": "success", "message": "Task execution completed"}
     else:
         await manager.broadcast(f"Failed execution for: {request.file_path}")
-        return JSONResponse(status_code=500, content={"status": "error", "message": "DAG execution failed"})
+        return JSONResponse(status_code=500, content={"status": "error", "message": "Task execution failed"})
 
 @app.websocket("/api/logs")
 async def websocket_endpoint(websocket: WebSocket):
