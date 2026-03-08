@@ -13,10 +13,5 @@
     <small>Absolute path to magick executable or 'magick' if in PATH</small>
   </div>
 
-  <div class="form-group">
-    <label>ExifTool Path (Currently PyExiv2 used internally)</label>
-    <input type="text" [(ngModel)]="settings.exiftool_path" disabled>
-  </div>
-
   <button (click)="saveSettings()">Save Settings</button>
 </div>
