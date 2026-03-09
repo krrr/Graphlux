@@ -9,11 +9,39 @@ import en from '@angular/common/locales/en';
 import { FormsModule } from '@angular/forms';
 import { IconDefinition } from '@ant-design/icons-angular';
 import { provideNzIcons } from 'ng-zorro-antd/icon';
-import { SaveOutline, AlertFill, AlertOutline } from '@ant-design/icons-angular/icons';
+import { 
+  SaveOutline, 
+  AlertFill, 
+  AlertOutline, 
+  MoreOutline, 
+  DeploymentUnitOutline, 
+  FileTextOutline, 
+  FolderOpenOutline,
+  SyncOutline,
+  PercentageOutline,
+  BranchesOutline,
+  EditOutline,
+  VideoCameraOutline,
+  SettingOutline
+} from '@ant-design/icons-angular/icons';
 
 registerLocaleData(en);
 
-const icons: IconDefinition[] = [SaveOutline, AlertOutline, AlertFill];
+const icons: IconDefinition[] = [
+  SaveOutline, 
+  AlertOutline, 
+  AlertFill, 
+  MoreOutline, 
+  DeploymentUnitOutline, 
+  FileTextOutline,
+  FolderOpenOutline,
+  SyncOutline,
+  PercentageOutline,
+  BranchesOutline,
+  EditOutline,
+  VideoCameraOutline,
+  SettingOutline
+];
 
 
 export const appConfig: ApplicationConfig = {
