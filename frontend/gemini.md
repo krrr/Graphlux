@@ -1,1 +1,2 @@
-前端使用最新版本angular，已经默认开启zoneless写法，需要双向绑定的变量请用signal。
+- 前端使用最新版本angular，已经默认开启zoneless写法，需要双向绑定的变量请用`signal`。
+- nz-icon新增的图标需要在`app.config.ts`内导入

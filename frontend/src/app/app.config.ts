@@ -22,7 +22,10 @@ import {
   BranchesOutline,
   EditOutline,
   VideoCameraOutline,
-  SettingOutline
+  SettingOutline,
+  CopyOutline,
+  DeleteOutline,
+  LayoutOutline
 } from '@ant-design/icons-angular/icons';
 
 registerLocaleData(en);
@@ -40,7 +43,10 @@ const icons: IconDefinition[] = [
   BranchesOutline,
   EditOutline,
   VideoCameraOutline,
-  SettingOutline
+  SettingOutline,
+  CopyOutline,
+  DeleteOutline,
+  LayoutOutline,
 ];
 
 

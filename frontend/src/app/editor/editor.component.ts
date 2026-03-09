@@ -5,14 +5,13 @@ import { ActivatedRoute } from '@angular/router';
 import { NodeEditor, GetSchemes, ClassicPreset } from 'rete';
 import { AreaPlugin, AreaExtensions } from 'rete-area-plugin';
 import { ConnectionPlugin, Presets as ConnectionPresets } from 'rete-connection-plugin';
-import { ContextMenuPlugin, Presets as ContextMenuPresets } from 'rete-context-menu-plugin';
 import { AutoArrangePlugin, Presets as ArrangePresets } from 'rete-auto-arrange-plugin';
 import { AngularPlugin, Presets, AngularArea2D } from 'rete-angular-plugin/18';
 import { CustomNodeComponent } from './custom-node/custom-node';
 import { ApiService } from '../api.service';
 import { Subscription } from 'rxjs';
 import { NzButtonModule } from 'ng-zorro-antd/button';
-import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzContextMenuService, NzDropdownMenuComponent, NzDropdownModule } from 'ng-zorro-antd/dropdown';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -20,6 +19,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
+import { COMMON_IMPORTS } from '../shared-imports';
 
 type Schemes = GetSchemes<
   ClassicPreset.Node,
@@ -34,19 +34,22 @@ type AreaExtra = AngularArea2D<Schemes>;
     CommonModule,
     FormsModule,
     NzButtonModule,
-    NzDropDownModule,
+    NzDropdownModule,
     NzMenuModule,
     NzModalModule,
     NzFormModule,
     NzInputModule,
     NzSelectModule,
-    NzCheckboxModule
+    NzCheckboxModule,
+    ...COMMON_IMPORTS
   ],
   templateUrl: './editor.component.html',
   styleUrls: ['./editor.component.css']
 })
 export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild('rete') container!: ElementRef<HTMLElement>;
+  @ViewChild('contextMenu') contextMenu!: NzDropdownMenuComponent;
+
   logs = signal<string[]>([]);
   private logSubscription: Subscription | undefined;
   private routeSub: Subscription | undefined;
@@ -78,7 +81,8 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     private apiService: ApiService,
     private injector: Injector,
     private route: ActivatedRoute,
-    private message: NzMessageService
+    private message: NzMessageService,
+    private nzContextMenuService: NzContextMenuService
   ) {}
 
   ngOnInit() {
@@ -140,16 +144,21 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
           }
         }
       }
-      return context;
-    });
 
-    const contextMenu = new ContextMenuPlugin<Schemes>({
-      items: ContextMenuPresets.classic.setup([
-        ['Clone', () => this.cloneSelectedNode()],
-        ['Delete', () => this.deleteSelectedNode()],
-        ['Change Type', this.availableNodes.map(n => [n.label, () => this.changeSelectedNodeType(n.type)] as [string, () => void])],
-        ...this.availableNodes.map(n => ['Add ' + n.label, () => this.addNode(n.type)] as [string, () => void]),
-      ] as any)
+      if (context.type === 'contextmenu') {
+        const { event, context: target } = context.data;
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (target !== 'root' && 'id' in target && this.editor.getNode(target.id)) {
+          this.selectedNode.set(target);
+        } else {
+          this.selectedNode.set(null);
+        }
+        this.nzContextMenuService.create(event, this.contextMenu);
+      }
+      
+      return context;
     });
 
     render.addPreset(Presets.classic.setup({
@@ -159,7 +168,6 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         }
       }
     }));
-    render.addPreset(Presets.contextMenu.setup() as any);
 
     connection.addPreset(ConnectionPresets.classic.setup());
 
@@ -169,7 +177,6 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     this.editor.use(this.area);
     this.area.use(connection);
     this.area.use(render);
-    this.area.use(contextMenu as any);
     this.area.use(this.arrange as any);
 
     this.area.addPipe(context => {
