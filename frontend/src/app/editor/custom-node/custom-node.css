@@ -1,0 +1,123 @@
+:host {
+  display: block;
+}
+
+.node-wrapper {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  min-width: 220px;
+  border: 2px solid transparent;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  position: relative;
+  overflow: visible;
+}
+
+.node-wrapper.selected {
+  border-color: #1890ff;
+  box-shadow: 0 4px 16px rgba(24, 144, 255, 0.2);
+}
+
+.node-header {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.icon-container {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+}
+
+.title {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.node-content {
+  padding: 12px 0;
+  display: flex;
+  justify-content: space-between;
+  min-height: 40px;
+}
+
+.sockets {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input-sockets {
+  align-items: flex-start;
+}
+
+.output-sockets {
+  align-items: flex-end;
+}
+
+.socket-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.socket-point {
+  width: 12px;
+  height: 12px;
+  background: #1890ff;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 0 0 1px #1890ff;
+}
+
+.input-sockets .socket-point {
+  margin-left: -6px;
+}
+
+.output-sockets .socket-point {
+  margin-right: -6px;
+}
+
+.socket-label {
+  font-size: 12px;
+  color: #666;
+  padding: 0 8px;
+}
+
+.node-footer {
+  padding: 8px 16px;
+  background: #fafafa;
+  border-top: 1px solid #f0f0f0;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  font-size: 11px;
+}
+
+.config-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.config-key {
+  color: #888;
+  margin-right: 8px;
+}
+
+.config-value {
+  color: #333;
+  font-weight: 500;
+}

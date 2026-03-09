@@ -1,0 +1,31 @@
+<div class="node-wrapper" [class.selected]="data.selected" data-testid="node">
+  <div class="node-header">
+    <div class="icon-container" [style.background-color]="iconColor">
+      <span nz-icon [nzType]="iconType" nzTheme="outline"></span>
+    </div>
+    <div class="title">{{ customName || data.label }}</div>
+  </div>
+
+  <div class="node-content">
+    <div class="sockets input-sockets">
+      <div class="socket-wrapper" *ngFor="let item of inputs">
+        <div class="socket-point" [attr.data-testid]="'input-' + item.key"></div>
+        <div class="socket-label" *ngIf="item.key !== 'input'">{{ item.key }}</div>
+      </div>
+    </div>
+
+    <div class="sockets output-sockets">
+      <div class="socket-wrapper" *ngFor="let item of outputs">
+        <div class="socket-label" *ngIf="item.key !== 'default'">{{ item.key }}</div>
+        <div class="socket-point" [attr.data-testid]="'output-' + item.key"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="node-footer" *ngIf="configDisplayKeys.length > 0">
+    <div class="config-row" *ngFor="let key of configDisplayKeys">
+      <span class="config-key">{{ key }}:</span>
+      <span class="config-value" [title]="getConfigValue(key)">{{ getConfigValue(key) }}</span>
+    </div>
+  </div>
+</div>
