@@ -1,0 +1,25 @@
+❯ Building...
+✔ Building...
+Initial chunk files | Names         |  Raw size
+styles.css          | styles        | 762.34 kB |
+main.js             | main          | 163.15 kB |
+
+                    | Initial total | 925.49 kB
+
+Application bundle generation complete. [4.772 seconds] - 2026-03-10T03:37:57.485Z
+
+Watch mode enabled. Watching for file changes...
+NOTE: Raw file sizes do not reflect development server per-request transformations.
+  ➜  Local:   http://localhost:4200/
+3:38:32 AM [vite] http proxy error: /api/tasks
+AggregateError [ECONNREFUSED]:
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+3:38:32 AM [vite] http proxy error: /api/folders
+AggregateError [ECONNREFUSED]:
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+3:38:33 AM [vite] http proxy error: /api/tasks
+AggregateError [ECONNREFUSED]:
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)

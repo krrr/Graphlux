@@ -1,0 +1,57 @@
+INFO:     Will watch for changes in these directories: ['/app/backend']
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [6924] using WatchFiles
+INFO:     Started server process [7068]
+INFO:     Waiting for application startup.
+2026-03-10 03:40:19,558 - cyberhamster - INFO - Starting TaskManager...
+INFO:     Application startup complete.
+INFO:     127.0.0.1:40200 - "GET /api/tasks HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40202 - "GET /api/folders HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40204 - "POST /api/tasks HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40212 - "GET /api/tasks HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40224 - "WebSocket /api/logs" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:40234 - "GET /api/tasks/1 HTTP/1.1" 200 OK
+INFO:     connection closed
+INFO:     127.0.0.1:45704 - "GET /api/folders HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45700 - "GET /api/tasks HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45720 - "POST /api/tasks HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45726 - "GET /api/tasks HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45108 - "GET /api/tasks HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45120 - "GET /api/folders HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45128 - "POST /api/tasks HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45134 - "GET /api/tasks HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45138 - "WebSocket /api/logs" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:45148 - "GET /api/tasks/3 HTTP/1.1" 200 OK
+INFO:     connection closed
+WARNING:  WatchFiles detected changes in 'cyberhamster/engine/nodes.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2026-03-10 03:43:05,957 - cyberhamster - INFO - Stopping TaskManager...
+INFO:     Application shutdown complete.
+INFO:     Finished server process [7068]
+INFO:     Started server process [10079]
+INFO:     Waiting for application startup.
+2026-03-10 03:43:07,085 - cyberhamster - INFO - Starting TaskManager...
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'cyberhamster/engine/executor.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2026-03-10 03:43:16,631 - cyberhamster - INFO - Stopping TaskManager...
+INFO:     Application shutdown complete.
+INFO:     Finished server process [10079]
+INFO:     Started server process [10095]
+INFO:     Waiting for application startup.
+2026-03-10 03:43:17,749 - cyberhamster - INFO - Starting TaskManager...
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'cyberhamster/engine/executor.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2026-03-10 03:43:21,071 - cyberhamster - INFO - Stopping TaskManager...
+INFO:     Application shutdown complete.
+INFO:     Finished server process [10095]
+INFO:     Started server process [10109]
+INFO:     Waiting for application startup.
+2026-03-10 03:43:22,278 - cyberhamster - INFO - Starting TaskManager...
+INFO:     Application startup complete.

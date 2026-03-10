@@ -68,6 +68,8 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
   executeFilePath = signal('');
 
   availableNodes = [
+    { type: 'StartNode', label: 'Start (Input File)' },
+    { type: 'FinishNode', label: 'Finish / Output' },
     { type: 'ReadInputNode', label: 'Read Input Metadata' },
     { type: 'ConvertNode', label: 'Convert Format' },
     { type: 'CalculateCompressionNode', label: 'Calculate Compression' },
@@ -229,19 +231,23 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     const node = this.selectedNode();
     if (!node) return;
 
+    if (node.label === 'StartNode') {
+        this.message.warning('Cannot clone Start node (only one allowed)');
+        return;
+    }
+
     const newNodeType = node.label;
     const newNode = new ClassicPreset.Node(newNodeType);
-    newNode.addInput('input', new ClassicPreset.Input(new ClassicPreset.Socket('Data')));
+
+    if (newNodeType !== 'StartNode') {
+      newNode.addInput('input', new ClassicPreset.Input(new ClassicPreset.Socket('Data')));
+    }
 
     if (newNodeType === 'ConditionNode') {
       newNode.addOutput('true_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
       newNode.addOutput('false_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-    } else {
+    } else if (newNodeType !== 'FinishNode') {
       newNode.addOutput('default', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-    }
-
-    if (newNodeType === 'ReadInputNode') {
-      newNode.removeInput('input');
     }
 
     await this.editor.addNode(newNode);
@@ -262,6 +268,11 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     const node = this.selectedNode();
     if (!node) return;
 
+    if (node.label === 'StartNode') {
+        this.message.warning('Cannot delete Start node. It is required.');
+        return;
+    }
+
     const conns = this.editor.getConnections().filter(c => c.source === node.id || c.target === node.id);
     for (const c of conns) {
       await this.editor.removeConnection(c.id);
@@ -275,22 +286,26 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     const node = this.selectedNode();
     if (!node) return;
 
+    if (node.label === 'StartNode' || newType === 'StartNode') {
+        this.message.warning('Cannot change to or from Start node');
+        return;
+    }
+
     const oldId = node.id;
     const view = this.area.nodeViews.get(oldId);
     const pos = view ? { x: view.position.x, y: view.position.y } : { x: 0, y: 0 };
 
     const newNode = new ClassicPreset.Node(newType);
-    newNode.addInput('input', new ClassicPreset.Input(new ClassicPreset.Socket('Data')));
+
+    if (newType !== 'StartNode') {
+        newNode.addInput('input', new ClassicPreset.Input(new ClassicPreset.Socket('Data')));
+    }
 
     if (newType === 'ConditionNode') {
       newNode.addOutput('true_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
       newNode.addOutput('false_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-    } else {
+    } else if (newType !== 'FinishNode') {
       newNode.addOutput('default', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-    }
-
-    if (newType === 'ReadInputNode') {
-      newNode.removeInput('input');
     }
 
     await this.editor.addNode(newNode);
@@ -329,19 +344,22 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   async addNode(nodeType: string) {
+    if (nodeType === 'StartNode' && this.editor.getNodes().some(n => n.label === 'StartNode')) {
+        this.message.warning('Only one Start node is allowed');
+        return;
+    }
+
     const node = new ClassicPreset.Node(nodeType);
-    
-    node.addInput('input', new ClassicPreset.Input(new ClassicPreset.Socket('Data')));
+
+    if (nodeType !== 'StartNode') {
+        node.addInput('input', new ClassicPreset.Input(new ClassicPreset.Socket('Data')));
+    }
 
     if (nodeType === 'ConditionNode') {
       node.addOutput('true_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
       node.addOutput('false_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-    } else {
+    } else if (nodeType !== 'FinishNode') {
       node.addOutput('default', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-    }
-
-    if (nodeType === 'ReadInputNode') {
-      node.removeInput('input');
     }
 
     await this.editor.addNode(node);
@@ -445,11 +463,9 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
 
     const dagJson: any = { nodes: {}, edges: [], start_node: null };
 
-    const readNodes = nodes.filter(n => n.label === 'ReadInputNode');
-    if (readNodes.length > 0) {
-      dagJson.start_node = readNodes[0].id;
-    } else if (nodes.length > 0) {
-      dagJson.start_node = nodes[0].id;
+    const startNodes = nodes.filter(n => n.label === 'StartNode');
+    if (startNodes.length > 0) {
+      dagJson.start_node = startNodes[0].id;
     }
 
     nodes.forEach(node => {
@@ -502,6 +518,12 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     const dagJson = taskDef.json_data;
     if (!dagJson || !dagJson.nodes) return;
 
+    if (Object.keys(dagJson.nodes).length === 0) {
+      // Empty DAG, create default Start node
+      await this.addNode('StartNode');
+      return;
+    }
+
     const nodeMap = new Map<string, any>();
     const newConfigs: { [id: string]: any } = {};
 
@@ -509,14 +531,14 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
       const node = new ClassicPreset.Node(nodeData.type);
       node.id = id;
 
-      if (nodeData.type !== 'ReadInputNode') {
+      if (nodeData.type !== 'StartNode') {
         node.addInput('input', new ClassicPreset.Input(new ClassicPreset.Socket('Data')));
       }
 
       if (nodeData.type === 'ConditionNode') {
         node.addOutput('true_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
         node.addOutput('false_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-      } else {
+      } else if (nodeData.type !== 'FinishNode') {
         node.addOutput('default', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
       }
 
