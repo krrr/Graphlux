@@ -1,3 +1,4 @@
+import os
 from typing import Dict, Any, List
 from .context import FileContext
 from .nodes import NODE_TYPES
@@ -42,6 +43,7 @@ class TaskExecutor:
                 logger.error(f"Unknown node type: {node_type} for node {node_id}")
 
         # Build edges dictionary
+        self.reverse_edges = {} # target_id -> list of (source_id, branch_name)
         for edge in self.dag_json.get("edges", []):
             source = edge.get("source")
             target = edge.get("target")
@@ -50,6 +52,20 @@ class TaskExecutor:
             if source not in self.edges:
                 self.edges[source] = {}
             self.edges[source][branch] = target
+
+            if target not in self.reverse_edges:
+                self.reverse_edges[target] = []
+            self.reverse_edges[target].append((source, branch))
+
+    def _build_inputs_for_node(self, node_id: str, context: FileContext) -> Dict[str, Any]:
+        """Collect and merge outputs from all upstream nodes."""
+        inputs = {}
+        if node_id in self.reverse_edges:
+            for source_id, branch in self.reverse_edges[node_id]:
+                source_output = context.get_node_output(source_id)
+                # Merge outputs, later edges might overwrite earlier ones if keys clash
+                inputs.update(source_output)
+        return inputs
 
     def execute(self, file_path: str) -> bool:
         """
@@ -66,6 +82,17 @@ class TaskExecutor:
             logger.error("No start node defined in DAG.")
             return False
         
+        # Prepare the initial file object for the start node
+        try:
+            initial_file_obj = {
+                "path": file_path,
+                "size": os.path.getsize(file_path) if os.path.exists(file_path) else 0,
+                "metadata": {}
+            }
+        except Exception as e:
+            logger.error(f"Failed to get info for {file_path}: {e}")
+            return False
+
         try:
             while current_node_id:
                 if current_node_id not in self.nodes:
@@ -75,8 +102,17 @@ class TaskExecutor:
                 current_node = self.nodes[current_node_id]
                 logger.info(f"--- Executing node: {current_node.name} (ID: {current_node_id}) ---")
                 
-                success, next_branch = current_node.execute(context)
+                # Build inputs
+                if current_node_id == self.start_node_id:
+                    node_inputs = {"file": initial_file_obj}
+                else:
+                    node_inputs = self._build_inputs_for_node(current_node_id, context)
+
+                success, next_branch, output_data = current_node.execute(node_inputs, context)
                 
+                # Save output to context
+                context.set_node_output(current_node_id, output_data)
+
                 if not success:
                     logger.warning(f"DAG execution halted at node: {current_node.name} (ID: {current_node_id})")
                     # Could handle specific failure logic or fallback branches here

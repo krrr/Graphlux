@@ -19,6 +19,8 @@ export class CustomNodeComponent implements OnChanges, OnInit {
 
   get iconType(): string {
     switch (this.data.label) {
+      case 'StartNode': return 'play-circle';
+      case 'FinishNode': return 'check-circle';
       case 'ReadInputNode': return 'folder-open';
       case 'ConvertNode': return 'sync';
       case 'CalculateCompressionNode': return 'percentage';
@@ -32,6 +34,8 @@ export class CustomNodeComponent implements OnChanges, OnInit {
 
   get iconColor(): string {
     switch (this.data.label) {
+      case 'StartNode': return '#52c41a';
+      case 'FinishNode': return '#1890ff';
       case 'ReadInputNode': return '#1890ff';
       case 'ConvertNode': return '#52c41a';
       case 'CalculateCompressionNode': return '#722ed1';

@@ -10,35 +10,21 @@ class FileContext:
         :param original_file_path: The absolute or relative path to the original file.
         """
         self.original_file_path: str = original_file_path
-        self.current_file_path: str = original_file_path
-        self.metadata: Dict[str, Any] = {}
-        self.shared_data: Dict[str, Any] = {}
         self.temp_files: List[str] = []
-
-    def update_current_path(self, new_path: str):
-        """Update the current path of the file being processed."""
-        self.current_file_path = new_path
+        self.outputs: Dict[str, Dict[str, Any]] = {}
 
     def add_temp_file(self, temp_path: str):
         """Register a temporary file so it can be cleaned up later."""
         if temp_path not in self.temp_files:
             self.temp_files.append(temp_path)
 
-    def set_metadata(self, key: str, value: Any):
-        """Set a metadata value."""
-        self.metadata[key] = value
+    def set_node_output(self, node_id: str, output: Dict[str, Any]):
+        """Record the output data from a node's execution."""
+        self.outputs[node_id] = output
 
-    def get_metadata(self, key: str, default: Any = None) -> Any:
-        """Get a metadata value."""
-        return self.metadata.get(key, default)
-
-    def set_shared_data(self, key: str, value: Any):
-        """Set shared data for nodes to communicate."""
-        self.shared_data[key] = value
-
-    def get_shared_data(self, key: str, default: Any = None) -> Any:
-        """Get shared data."""
-        return self.shared_data.get(key, default)
+    def get_node_output(self, node_id: str) -> Dict[str, Any]:
+        """Retrieve the output data of a previously executed node."""
+        return self.outputs.get(node_id, {})
 
     def cleanup(self):
         """Clean up all registered temporary files."""
