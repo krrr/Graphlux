@@ -9,19 +9,19 @@ import { COMMON_IMPORTS } from './shared-imports';
   imports: [RouterModule, NzLayoutModule, ...COMMON_IMPORTS],
   template: `
     <nz-layout class="app-layout">
-      <nz-sider nzWidth="200px">
+      <nz-sider nzWidth="200px" nzTheme="light">
         <div class="logo">
           <h2>CyberHamster</h2>
         </div>
-        <ul nz-menu nzTheme="dark" nzMode="inline">
+        <ul nz-menu nzMode="inline">
           <li nz-menu-item nzMatchRouter>
-            <a routerLink="/tasks">Tasks</a>
+            <a routerLink="/tasks"><nz-icon nzType="apartment"/> Tasks</a>
           </li>
           <li nz-menu-item nzMatchRouter>
-            <a routerLink="/folders">Folders</a>
+            <a routerLink="/folders"><nz-icon nzType="folder-open" /> Folders</a>
           </li>
           <li nz-menu-item nzMatchRouter>
-            <a routerLink="/settings">Settings</a>
+            <a routerLink="/settings"><nz-icon nzType="setting"/> Settings</a>
           </li>
         </ul>
       </nz-sider>
@@ -47,14 +47,12 @@ import { COMMON_IMPORTS } from './shared-imports';
     }
     .logo h2 {
       margin: 0;
-      color: white;
       font-size: 18px;
     }
     .inner-content {
-      padding: 24px;
       background: #fff;
       height: 100%;
-      overflow-y: auto;
+      overflow: hidden;
     }
     nz-content {
       background: #f0f2f5;
@@ -62,5 +60,4 @@ import { COMMON_IMPORTS } from './shared-imports';
   `]
 })
 export class AppComponent {
-  title = 'frontend';
 }

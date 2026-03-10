@@ -3,6 +3,18 @@ import { ClassicPreset } from 'rete';
 import { CommonModule } from '@angular/common';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 
+export const NODE_INFO: Record<string, { icon: string, color: string }> = {
+  'StartNode': { icon: 'home', color: '#52c41a' },
+  'FinishNode': { icon: 'check-circle', color: '#1890ff' },
+  'ReadInputNode': { icon: 'folder-open', color: '#1890ff' },
+  'ConvertNode': { icon: 'sync', color: '#52c41a' },
+  'CalculateCompressionNode': { icon: 'percentage', color: '#722ed1' },
+  'ConditionNode': { icon: 'branches', color: '#faad14' },
+  'FileOperationNode': { icon: 'file-text', color: '#eb2f96' },
+  'MetadataWriteNode': { icon: 'edit', color: '#13c2c2' },
+  'FFmpegActionNode': { icon: 'video-camera', color: '#f5222d' },
+};
+
 @Component({
   selector: 'app-custom-node',
   standalone: true,
@@ -18,33 +30,11 @@ export class CustomNodeComponent implements OnChanges, OnInit {
   seed = 0;
 
   get iconType(): string {
-    switch (this.data.label) {
-      case 'StartNode': return 'home';
-      case 'FinishNode': return 'check-circle';
-      case 'ReadInputNode': return 'folder-open';
-      case 'ConvertNode': return 'sync';
-      case 'CalculateCompressionNode': return 'percentage';
-      case 'ConditionNode': return 'branches';
-      case 'FileOperationNode': return 'file-text';
-      case 'MetadataWriteNode': return 'edit';
-      case 'FFmpegActionNode': return 'video-camera';
-      default: return 'setting';
-    }
+    return NODE_INFO[this.data.label]?.icon || 'setting';
   }
 
   get iconColor(): string {
-    switch (this.data.label) {
-      case 'StartNode': return '#52c41a';
-      case 'FinishNode': return '#1890ff';
-      case 'ReadInputNode': return '#1890ff';
-      case 'ConvertNode': return '#52c41a';
-      case 'CalculateCompressionNode': return '#722ed1';
-      case 'ConditionNode': return '#faad14';
-      case 'FileOperationNode': return '#eb2f96';
-      case 'MetadataWriteNode': return '#13c2c2';
-      case 'FFmpegActionNode': return '#f5222d';
-      default: return '#666';
-    }
+    return NODE_INFO[this.data.label]?.color || '#666';
   }
 
   get inputs() {

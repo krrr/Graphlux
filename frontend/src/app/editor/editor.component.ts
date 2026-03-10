@@ -7,7 +7,7 @@ import { AreaPlugin, AreaExtensions } from 'rete-area-plugin';
 import { ConnectionPlugin, Presets as ConnectionPresets } from 'rete-connection-plugin';
 import { AutoArrangePlugin, Presets as ArrangePresets } from 'rete-auto-arrange-plugin';
 import { AngularPlugin, Presets, AngularArea2D } from 'rete-angular-plugin/18';
-import { CustomNodeComponent } from './custom-node/custom-node';
+import { CustomNodeComponent, NODE_INFO } from './custom-node/custom-node';
 import { ApiService } from '../api.service';
 import { Subscription } from 'rxjs';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -57,6 +57,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
   editor = new NodeEditor<Schemes>();
   area!: AreaPlugin<Schemes, AreaExtra>;
   selectedNode = signal<any>(null);
+  isPropertyPanelVisible = signal(true);
   nodeConfigs = signal<{ [id: string]: any }>({});
 
   taskId = signal<number | null>(null);
@@ -78,6 +79,11 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     { type: 'MetadataWriteNode', label: 'Write Metadata' },
     { type: 'FFmpegActionNode', label: 'FFmpeg Action' }
   ];
+
+  getNodeIcon(type: string | undefined): string {
+    if (!type) return 'question-circle';
+    return NODE_INFO[type]?.icon || 'setting';
+  }
 
   constructor(
     private apiService: ApiService,
@@ -138,6 +144,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         const node = this.editor.getNode(nodeId);
         if (node) {
           this.selectedNode.set(node);
+          this.isPropertyPanelVisible.set(true);
           if (!this.nodeConfigs()[node.id]) {
             this.nodeConfigs.update(configs => ({
               ...configs,
@@ -145,6 +152,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
             }));
           }
         }
+        this.nzContextMenuService.close();  // necessary, don't know why
       } else if (context.type === 'contextmenu') {
         const { event, context: target } = context.data;
         event.preventDefault();
@@ -154,6 +162,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
           const node = this.editor.getNode(target.id);
           if (node) {
             this.selectedNode.set(node);
+            this.isPropertyPanelVisible.set(true);
             selectableNodes.select(node.id, false);  // rete.js will cancel selected state, handle it
           }
         } else if (target === 'root') {
@@ -201,14 +210,14 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
   zoomIn() {
     const currentZoom = this.area.area.transform.k;
     if (currentZoom < 2) {
-      this.area.area.zoom(currentZoom * 1.2, this.area.area.pointer.x, this.area.area.pointer.y);
+      this.area.area.zoom(currentZoom * 1.2, );
     }
   }
 
   zoomOut() {
     const currentZoom = this.area.area.transform.k;
     if (currentZoom > 0.2) {
-      this.area.area.zoom(currentZoom / 1.2, this.area.area.pointer.x, this.area.area.pointer.y);
+      this.area.area.zoom(currentZoom / 1.2, );
     }
   }
 
@@ -340,6 +349,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
 
     await this.deleteSelectedNode();
     this.selectedNode.set(newNode);
+    this.isPropertyPanelVisible.set(true);
   }
 
   patchNodeData(node: any, name: string, config: any) {

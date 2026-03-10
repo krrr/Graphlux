@@ -1,6 +1,6 @@
 <div class="editor-container">
   <div class="toolbar">
-    <button nz-button nzType="primary" (click)="saveDag()"><span nz-icon nzType="save"></span>Save DAG</button>
+    <button nz-button nzType="primary" (click)="saveDag()"><span nz-icon nzType="save"></span>Save</button>
     <button nz-button nzType="default" (click)="showExecuteModal()">Execute DAG</button>
     <button nz-button nz-dropdown [nzDropdownMenu]="menu">
       Add Node
@@ -13,22 +13,29 @@
     <button nz-button nzType="default" (click)="autoArrange()">Auto Arrange</button>
     <div style="flex-grow: 1;"></div>
     <div class="zoom-controls">
-      <button nz-button nzType="text" (click)="zoomOut()"><span nz-icon nzType="minus"></span></button>
+      <button nz-button nzType="text" (click)="zoomOut()" nzSize="small"><span nz-icon nzType="minus"></span></button>
       <span class="zoom-indicator">{{ zoomLevel() }}</span>
-      <button nz-button nzType="text" (click)="zoomIn()"><span nz-icon nzType="plus"></span></button>
-      <button nz-button nzType="text" (click)="zoomFit()">Fit</button>
+      <button nz-button nzType="text" (click)="zoomIn()" nzSize="small"><span nz-icon nzType="plus"></span></button>
+      <button nz-button nzType="text" (click)="zoomFit()" nzSize="small">Fit</button>
     </div>
     <span style="color: #888; font-size: 14px; margin-left: 20px;" *ngIf="taskId()">Task ID: {{ taskId() }}</span>
   </div>
   <div class="main-content">
     <div class="rete-area" #rete></div>
 
-    <div class="property-editor" *ngIf="selectedNode()">
-      <h3>Node Properties</h3>
-      <p><strong>ID:</strong> {{ selectedNode().id }}</p>
-      <p><strong>Type:</strong> {{ selectedNode().label }}</p>
+    <div class="property-editor" *ngIf="selectedNode() && isPropertyPanelVisible()">
+      <div class="title-area">
+        <button nz-button nzType="text" (click)="isPropertyPanelVisible.set(false)" class="close-btn">
+          <span nz-icon nzType="close"></span>
+        </button>
+        <div class="title">Node Properties</div>
+      </div>
 
-      <form nz-form nzLayout="vertical">
+      <form nz-form >
+        <nz-form-item>
+          <nz-form-label>Type</nz-form-label>
+          <nz-form-control><span nz-icon [nzType]="getNodeIcon(selectedNode().label)"></span> {{ selectedNode().label }}</nz-form-control>
+        </nz-form-item>
         <nz-form-item>
           <nz-form-label>Name</nz-form-label>
           <nz-form-control>
@@ -293,10 +300,10 @@
   <nz-dropdown-menu #contextMenu="nzDropdownMenu">
     <ul nz-menu *ngIf="!!selectedNode()">
       <li nz-menu-item (click)="cloneSelectedNode()">
-        <span nz-icon nzType="copy" nzTheme="outline"></span> Clone
+        <span nz-icon nzType="copy" nzTheme="outline"></span>Clone
       </li>
       <li nz-menu-item (click)="deleteSelectedNode()">
-        <span nz-icon nzType="delete" nzTheme="outline"></span> Delete
+        <span nz-icon nzType="delete" nzTheme="outline"></span>Delete
       </li>
       <li nz-menu-divider></li>
       <li nz-submenu nzTitle="Change Type" nzIcon="swap">
@@ -309,7 +316,7 @@
     </ul>
 
     <ul nz-menu *ngIf="!selectedNode()">
-      <li nz-submenu nzTitle="Add Node">
+      <li nz-submenu nzTitle="Add Node" nzIcon="plus">
         <ul>
           <li nz-menu-item *ngFor="let t of availableNodes" (click)="addNode(t.type)">
             {{ t.label }}

@@ -6,7 +6,7 @@
 
   <div nz-row [nzGutter]="[16, 16]">
     <div nz-col [nzSpan]="8" *ngFor="let task of tasks()">
-      <nz-card style="width: 100%; border-radius: 8px;" nzHoverable (click)="openEditor(task.id)">
+      <nz-card style="width: 100%; " nzHoverable (click)="openEditor(task.id)" class="task-card">
         <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
           <div style="display: flex; align-items: center; gap: 12px;" >
             <span nz-icon nzType="deployment-unit" nzTheme="outline" style="font-size: 32px; color: #1890ff;"></span>
@@ -27,19 +27,17 @@
         </div>
 
         <p style="color: #595959; margin-bottom: 16px; min-height: 40px;" (click)="openEditor(task.id)">
-          {{ task.description || 'No description provided.' }}
+          {{ task.description || 'No description.' }}
         </p>
 
-        <div style="background-color: #fafafa; padding: 8px; border-radius: 4px;" (click)="openEditor(task.id)">
-          <strong>Associated Folders:</strong>
-          <ul style="margin: 4px 0 0 0; padding-left: 20px; color: #595959;">
-            <li *ngFor="let folder of getAssociatedFolders(task.id)">
-              {{ folder.name }} ({{ folder.watch_folder }})
-            </li>
-            <li *ngIf="getAssociatedFolders(task.id).length === 0" style="list-style-type: none; margin-left: -20px;">
+        <div class="folder-list" (click)="openEditor(task.id)">
+          <span nz-icon nzType="folder"></span>
+          <div style="margin-left: 10px; color: #595959;">
+            <nz-tag *ngFor="let folder of getAssociatedFolders(task.id)" [title]="folder.watch_folder">{{ folder.name }}</nz-tag>
+            <div *ngIf="getAssociatedFolders(task.id).length === 0">
               <i>None</i>
-            </li>
-          </ul>
+            </div>
+          </div>
         </div>
       </nz-card>
     </div>

@@ -11,6 +11,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { COMMON_IMPORTS } from '../shared-imports';
+import { NzTagComponent } from "ng-zorro-antd/tag";
 
 @Component({
   selector: 'app-tasks',
@@ -24,10 +25,11 @@ import { COMMON_IMPORTS } from '../shared-imports';
     NzIconModule,
     NzGridModule,
     NzDropDownModule,
-    ...COMMON_IMPORTS
-  ],
+    ...COMMON_IMPORTS,
+    NzTagComponent
+],
   templateUrl: './tasks.html',
-  styleUrls: ['./tasks.css']
+  styleUrls: ['./tasks.scss']
 })
 export class TasksComponent implements OnInit {
   tasks = signal<any[]>([]);
