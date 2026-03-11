@@ -1,18 +1,18 @@
 <div class="tasks-container">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px">
     <h2>DAG Tasks Manager</h2>
     <button nz-button nzType="primary" (click)="showModal()">Create New Task</button>
   </div>
 
   <div nz-row [nzGutter]="[16, 16]">
     <div nz-col [nzSpan]="8" *ngFor="let task of tasks()">
-      <nz-card style="width: 100%; " nzHoverable (click)="openEditor(task.id)" class="task-card">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-          <div style="display: flex; align-items: center; gap: 12px;" >
-            <span nz-icon nzType="deployment-unit" nzTheme="outline" style="font-size: 32px; color: #1890ff;"></span>
+      <nz-card style="width: 100%" nzHoverable (click)="openEditor(task.id)" class="task-card">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px">
+          <div style="display: flex; align-items: center; gap: 12px">
+            <span nz-icon nzType="deployment-unit" nzTheme="outline" style="font-size: 32px; color: #1890ff"></span>
             <div>
-              <h3 style="margin: 0;">{{ task.name }}</h3>
-              <span style="color: #8c8c8c; font-size: 12px;">ID: {{ task.id }}</span>
+              <h3 style="margin: 0">{{ task.name }}</h3>
+              <span style="color: #8c8c8c; font-size: 12px">ID: {{ task.id }}</span>
             </div>
           </div>
           <button nz-button nzType="text" nz-dropdown [nzDropdownMenu]="menu" (click)="$event.stopPropagation()">
@@ -26,13 +26,13 @@
           </nz-dropdown-menu>
         </div>
 
-        <p style="color: #595959; margin-bottom: 16px; min-height: 40px;" (click)="openEditor(task.id)">
+        <p style="color: #595959; margin-bottom: 16px; min-height: 40px" (click)="openEditor(task.id)">
           {{ task.description || 'No description.' }}
         </p>
 
         <div class="folder-list" (click)="openEditor(task.id)">
           <span nz-icon nzType="folder"></span>
-          <div style="margin-left: 10px; color: #595959;">
+          <div style="margin-left: 10px; color: #595959">
             <nz-tag *ngFor="let folder of getAssociatedFolders(task.id)" [title]="folder.watch_folder">{{ folder.name }}</nz-tag>
             <div *ngIf="getAssociatedFolders(task.id).length === 0">
               <i>None</i>
@@ -55,13 +55,7 @@
         <nz-form-item>
           <nz-form-label nzRequired>Name</nz-form-label>
           <nz-form-control nzErrorTip="Please input the task name!">
-            <input
-              nz-input
-              [ngModel]="taskForm().name"
-              (ngModelChange)="updateForm('name', $event)"
-              name="name"
-              placeholder="Task Name"
-            />
+            <input nz-input [ngModel]="taskForm().name" (ngModelChange)="updateForm('name', $event)" name="name" placeholder="Task Name" />
           </nz-form-control>
         </nz-form-item>
 

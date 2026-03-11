@@ -1,24 +1,24 @@
 .tasks-container {
-  padding: 20px;
+    padding: 20px;
 }
 
 nz-card {
-  transition: all 0.3s;
-  cursor: pointer;
+    transition: all 0.3s;
+    cursor: pointer;
 }
 
 .task-card {
-  border-radius: 2px;
+    border-radius: 2px;
 }
 
 nz-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .folder-list {
-  background-color: #fafafa;
-  padding: 4px 8px;
-  border-radius: 2px;
-  display: flex;
+    background-color: #fafafa;
+    padding: 4px 8px;
+    border-radius: 2px;
+    display: flex;
 }

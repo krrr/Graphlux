@@ -5,21 +5,21 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { FoldersComponent } from './folders';
 
 describe('Folders', () => {
-  let component: FoldersComponent;
-  let fixture: ComponentFixture<FoldersComponent>;
+    let component: FoldersComponent;
+    let fixture: ComponentFixture<FoldersComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [FoldersComponent],
-      providers: [provideHttpClient(), provideHttpClientTesting()]
-    }).compileComponents();
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            imports: [FoldersComponent],
+            providers: [provideHttpClient(), provideHttpClientTesting()],
+        }).compileComponents();
 
-    fixture = TestBed.createComponent(FoldersComponent);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
-  });
+        fixture = TestBed.createComponent(FoldersComponent);
+        component = fixture.componentInstance;
+        await fixture.whenStable();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });

@@ -1,5 +1,5 @@
 <div class="folders-container">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px">
     <h2>Folders Manager</h2>
     <button nz-button nzType="primary" (click)="showModal()">Create New Folder</button>
   </div>
@@ -63,20 +63,14 @@
             <nz-form-item>
               <nz-form-label nzRequired>Name</nz-form-label>
               <nz-form-control nzErrorTip="Please input the folder name!">
-                <input
-                  nz-input
-                  [ngModel]="folderForm().name"
-                  (ngModelChange)="updateForm('name', $event)"
-                  name="name"
-                  placeholder="Folder Name"
-                />
+                <input nz-input [ngModel]="folderForm().name" (ngModelChange)="updateForm('name', $event)" name="name" placeholder="Folder Name" />
               </nz-form-control>
             </nz-form-item>
 
             <nz-form-item>
               <nz-form-label nzRequired>Watch Folder (Absolute path)</nz-form-label>
               <nz-form-control nzErrorTip="Please input the watch folder path!">
-                <div style="display: flex; gap: 8px;">
+                <div style="display: flex; gap: 8px">
                   <input
                     nz-input
                     [ngModel]="folderForm().watch_folder"
@@ -106,7 +100,8 @@
           <nz-tab nzTitle="Scan">
             <nz-form-item>
               <nz-form-control>
-                <label nz-checkbox
+                <label
+                  nz-checkbox
                   [ngModel]="folderForm().real_time_watch"
                   (ngModelChange)="updateForm('real_time_watch', $event)"
                   name="real_time_watch"

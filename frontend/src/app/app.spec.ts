@@ -4,28 +4,28 @@ import { AppComponent } from './app';
 import { ActivatedRoute } from '@angular/router';
 
 describe('App', () => {
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [AppComponent],
-      providers: [
-        {
-          provide: ActivatedRoute,
-          useValue: {}
-        }
-      ]
-    }).compileComponents();
-  });
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            imports: [AppComponent],
+            providers: [
+                {
+                    provide: ActivatedRoute,
+                    useValue: {},
+                },
+            ],
+        }).compileComponents();
+    });
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
-  });
+    it('should create the app', () => {
+        const fixture = TestBed.createComponent(AppComponent);
+        const app = fixture.componentInstance;
+        expect(app).toBeTruthy();
+    });
 
-  it('should render title', async () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h2')?.textContent).toContain('CyberHamster');
-  });
+    it('should render title', async () => {
+        const fixture = TestBed.createComponent(AppComponent);
+        await fixture.whenStable();
+        const compiled = fixture.nativeElement as HTMLElement;
+        expect(compiled.querySelector('h2')?.textContent).toContain('CyberHamster');
+    });
 });

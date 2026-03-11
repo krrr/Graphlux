@@ -2,21 +2,21 @@
   <div class="toolbar">
     <button nz-button nzType="primary" (click)="saveDag()"><span nz-icon nzType="save"></span>Save</button>
     <button nz-button nzType="default" (click)="showExecuteModal()">Execute DAG</button>
-    <button nz-button nz-dropdown [nzDropdownMenu]="menu" nzTrigger="click"> Add Node </button>
+    <button nz-button nz-dropdown [nzDropdownMenu]="menu" nzTrigger="click">Add Node</button>
     <nz-dropdown-menu #menu="nzDropdownMenu">
       <ul nz-menu>
-        <li nz-menu-item *ngFor="let i of availableNodes" (click)="addNode(i.type)"> {{ i.label }} </li>
+        <li nz-menu-item *ngFor="let i of availableNodes" (click)="addNode(i.type)">{{ i.label }}</li>
       </ul>
     </nz-dropdown-menu>
     <button nz-button nzType="default" (click)="autoArrange()">Auto Arrange</button>
-    <div style="flex-grow: 1;"></div>
+    <div style="flex-grow: 1"></div>
     <div class="zoom-controls">
       <button nz-button nzType="text" (click)="zoomOut()" nzSize="small"><span nz-icon nzType="minus"></span></button>
       <span class="zoom-indicator">{{ zoomLevel() }}</span>
       <button nz-button nzType="text" (click)="zoomIn()" nzSize="small"><span nz-icon nzType="plus"></span></button>
       <button nz-button nzType="text" (click)="zoomFit()" nzSize="small">Fit</button>
     </div>
-    <span style="color: #888; font-size: 14px; margin-left: 20px;" *ngIf="taskId()">Task ID: {{ taskId() }}</span>
+    <span style="color: #888; font-size: 14px; margin-left: 20px" *ngIf="taskId()">Task ID: {{ taskId() }}</span>
   </div>
   <div class="main-content">
     <div class="rete-area" #rete></div>
@@ -29,7 +29,7 @@
         <div class="title">Node Properties</div>
       </div>
 
-      <form nz-form >
+      <form nz-form>
         <nz-form-item>
           <nz-form-label>Type</nz-form-label>
           <nz-form-control><span nz-icon [nzType]="getNodeIcon(selectedNode().label)"></span> {{ selectedNode().label }}</nz-form-control>
@@ -201,7 +201,8 @@
                 [ngModel]="nodeConfigs()[selectedNode().id].config.write_to_original"
                 (ngModelChange)="updateNodeConfig(selectedNode().id, 'write_to_original', $event)"
                 name="write_to_original"
-              >Enable</label>
+                >Enable</label
+              >
             </nz-form-control>
           </nz-form-item>
           <nz-form-item>
@@ -248,7 +249,6 @@
         </ng-container>
       </form>
     </div>
-
   </div>
 
   <nz-modal
@@ -288,7 +288,7 @@
       <div class="console">
         <div class="logs-container">
           <div *ngFor="let log of logs()">{{ log }}</div>
-          <div *ngIf="logs().length === 0" style="color: #666;">Waiting for logs...</div>
+          <div *ngIf="logs().length === 0" style="color: #666">Waiting for logs...</div>
         </div>
       </div>
     </ng-container>
@@ -297,12 +297,8 @@
   <!-- Context Menus -->
   <nz-dropdown-menu #contextMenu="nzDropdownMenu">
     <ul nz-menu *ngIf="!!selectedNode()">
-      <li nz-menu-item (click)="cloneSelectedNode()">
-        <span nz-icon nzType="copy" nzTheme="outline"></span>Clone
-      </li>
-      <li nz-menu-item (click)="deleteSelectedNode()">
-        <span nz-icon nzType="delete" nzTheme="outline"></span>Delete
-      </li>
+      <li nz-menu-item (click)="cloneSelectedNode()"><span nz-icon nzType="copy" nzTheme="outline"></span>Clone</li>
+      <li nz-menu-item (click)="deleteSelectedNode()"><span nz-icon nzType="delete" nzTheme="outline"></span>Delete</li>
       <li nz-menu-divider></li>
       <li nz-submenu nzTitle="Change Type" nzIcon="swap">
         <ul>

@@ -5,11 +5,4 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 
-export const COMMON_IMPORTS = [
-    CommonModule,
-
-    NzMenuModule,
-    NzIconModule,
-    NzButtonModule,
-    NzTabsModule
-] as const;
+export const COMMON_IMPORTS = [CommonModule, NzMenuModule, NzIconModule, NzButtonModule, NzTabsModule] as const;

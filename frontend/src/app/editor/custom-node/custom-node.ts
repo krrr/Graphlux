@@ -4,16 +4,16 @@ import { CommonModule } from '@angular/common';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { ReteModule } from 'rete-angular-plugin/18';
 
-export const NODE_INFO: Record<string, { icon: string, color: string }> = {
-    'StartNode': { icon: 'home', color: '#52c41a' },
-    'FinishNode': { icon: 'check-circle', color: '#1890ff' },
-    'ReadInputNode': { icon: 'folder-open', color: '#1890ff' },
-    'ConvertNode': { icon: 'sync', color: '#52c41a' },
-    'CalculateCompressionNode': { icon: 'percentage', color: '#722ed1' },
-    'ConditionNode': { icon: 'branches', color: '#faad14' },
-    'FileOperationNode': { icon: 'file-text', color: '#eb2f96' },
-    'MetadataWriteNode': { icon: 'edit', color: '#13c2c2' },
-    'FFmpegActionNode': { icon: 'video-camera', color: '#f5222d' },
+export const NODE_INFO: Record<string, { icon: string; color: string }> = {
+    StartNode: { icon: 'home', color: '#52c41a' },
+    FinishNode: { icon: 'check-circle', color: '#1890ff' },
+    ReadInputNode: { icon: 'folder-open', color: '#1890ff' },
+    ConvertNode: { icon: 'sync', color: '#52c41a' },
+    CalculateCompressionNode: { icon: 'percentage', color: '#722ed1' },
+    ConditionNode: { icon: 'branches', color: '#faad14' },
+    FileOperationNode: { icon: 'file-text', color: '#eb2f96' },
+    MetadataWriteNode: { icon: 'edit', color: '#13c2c2' },
+    FFmpegActionNode: { icon: 'video-camera', color: '#f5222d' },
 };
 
 @Component({
@@ -21,14 +21,14 @@ export const NODE_INFO: Record<string, { icon: string, color: string }> = {
     standalone: true,
     imports: [CommonModule, NzIconModule, ReteModule],
     templateUrl: './custom-node.html',
-    styleUrls: ['./custom-node.scss']
+    styleUrls: ['./custom-node.scss'],
 })
 export class CustomNodeComponent implements OnChanges {
     @Input() data!: ClassicPreset.Node & { selected?: boolean };
     @Input() emit!: (data: any) => void;
     @Input() rendered!: () => void;
 
-    seed = 0;  // from official demo
+    seed = 0; // from official demo
 
     get iconType(): string {
         return NODE_INFO[this.data.label]?.icon || 'setting';
@@ -39,9 +39,9 @@ export class CustomNodeComponent implements OnChanges {
     }
 
     get inputs() {
-        return Object.keys(this.data.inputs).map(key => ({
+        return Object.keys(this.data.inputs).map((key) => ({
             key,
-            input: this.data.inputs[key]!
+            input: this.data.inputs[key]!,
         }));
     }
 
@@ -50,16 +50,16 @@ export class CustomNodeComponent implements OnChanges {
     }
 
     get outputs() {
-        return Object.keys(this.data.outputs).map(key => ({
+        return Object.keys(this.data.outputs).map((key) => ({
             key,
-            output: this.data.outputs[key]!
+            output: this.data.outputs[key]!,
         }));
     }
 
     get configDisplayKeys() {
         const config = (this.data as any).customConfig || {};
         return Object.keys(config)
-            .filter(key => config[key] !== undefined && config[key] !== null && config[key] !== '')
+            .filter((key) => config[key] !== undefined && config[key] !== null && config[key] !== '')
             .slice(0, 3); // show up to 3 properties
     }
 
@@ -83,7 +83,7 @@ export class CustomNodeComponent implements OnChanges {
     ngOnChanges() {
         // from official demo
         this.cdr.detectChanges();
-        this.seed++;  // force render sockets
+        this.seed++; // force render sockets
         requestAnimationFrame(() => this.rendered());
     }
 }
