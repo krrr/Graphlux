@@ -9,7 +9,11 @@
   <div class="node-content">
     <div class="sockets input-sockets">
       <div class="socket-wrapper" *ngFor="let item of inputs">
-        <div class="socket-point" [attr.data-testid]="'input-' + item.key"></div>
+        <div class="socket-point"
+             refComponent
+             [data]="{type: 'socket', side: 'input', key: item.key, nodeId: data.id, payload: item.input.socket, seed: seed }"
+             [emit]="emit"
+             [attr.data-testid]="'input-' + item.key"></div>
         <div class="socket-label" *ngIf="item.key !== 'input'">{{ item.key }}</div>
       </div>
     </div>
@@ -17,7 +21,11 @@
     <div class="sockets output-sockets">
       <div class="socket-wrapper" *ngFor="let item of outputs">
         <div class="socket-label" *ngIf="item.key !== 'default'">{{ item.key }}</div>
-        <div class="socket-point" [attr.data-testid]="'output-' + item.key"></div>
+        <div class="socket-point"
+             refComponent
+             [data]="{type: 'socket', side: 'output', key: item.key, nodeId: data.id, payload: item.output.socket, seed: seed }"
+             [emit]="emit"
+             [attr.data-testid]="'output-' + item.key"></div>
       </div>
     </div>
   </div>

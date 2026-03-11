@@ -20,6 +20,8 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { COMMON_IMPORTS } from '../shared-imports';
+import { CustomSocketComponent } from './custom-node/custom-socket.component';
+import { CustomConnComponent } from './custom-node/custom-conn.component';
 
 type Schemes = GetSchemes<
   ClassicPreset.Node,
@@ -180,7 +182,13 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
       customize: {
         node(context) {
           return CustomNodeComponent;
-        }
+        },
+        socket(context) {
+          return CustomSocketComponent;
+        },
+        connection(context) {
+          return CustomConnComponent;
+        },
       }
     }));
 

@@ -2,9 +2,7 @@
   <div class="toolbar">
     <button nz-button nzType="primary" (click)="saveDag()"><span nz-icon nzType="save"></span>Save</button>
     <button nz-button nzType="default" (click)="showExecuteModal()">Execute DAG</button>
-    <button nz-button nz-dropdown [nzDropdownMenu]="menu">
-      Add Node
-    </button>
+    <button nz-button nz-dropdown [nzDropdownMenu]="menu" nzTrigger="click"> Add Node </button>
     <nz-dropdown-menu #menu="nzDropdownMenu">
       <ul nz-menu>
         <li nz-menu-item *ngFor="let i of availableNodes" (click)="addNode(i.type)"> {{ i.label }} </li>

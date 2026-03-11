@@ -72,20 +72,10 @@
 }
 
 .socket-point {
-  width: 12px;
-  height: 12px;
-  background: var(--primary-color);
-  border-radius: 50%;
-  border: 2px solid white;
-  box-shadow: 0 0 0 1px var(--primary-color);
-}
-
-.input-sockets .socket-point {
-  margin-left: -6px;
-}
-
-.output-sockets .socket-point {
-  margin-right: -6px;
+    margin-right: -8px;
+    width: 16px;
+    height: 16px;
+    padding: 2px;
 }
 
 .socket-label {

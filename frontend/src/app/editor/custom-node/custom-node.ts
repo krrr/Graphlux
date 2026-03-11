@@ -2,6 +2,7 @@ import { Component, Input, ChangeDetectorRef, OnInit, OnChanges } from '@angular
 import { ClassicPreset } from 'rete';
 import { CommonModule } from '@angular/common';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { ReteModule } from 'rete-angular-plugin/18';
 
 export const NODE_INFO: Record<string, { icon: string, color: string }> = {
   'StartNode': { icon: 'home', color: '#52c41a' },
@@ -18,7 +19,7 @@ export const NODE_INFO: Record<string, { icon: string, color: string }> = {
 @Component({
   selector: 'app-custom-node',
   standalone: true,
-  imports: [CommonModule, NzIconModule],
+  imports: [CommonModule, NzIconModule, ReteModule],
   templateUrl: './custom-node.html',
   styleUrls: ['./custom-node.scss']
 })
