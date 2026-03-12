@@ -1,3 +1,2 @@
 # CyberHamster
-本项目是一个用于批量压缩/精简图片和视频文件的自动化桌面/本地网络服务工具。
-软件采用 **有向无环图 (DAG) 的节点式管道架构**，允许用户通过前端可视化连线配置处理逻辑。本项目特色功能是支持利用文件元数据进行状态追踪和防重复执行，而不只是完全依赖管理数据库。
+An automated batch processing and compressing of images and videos, utilizing a Directed Acyclic Graph (DAG) node pipeline architecture. It provides a web interface, allowing local or remote access. Feature highlight: Supports using file metadata to track state and prevent redundant execution, rather than depending solely on a database.
