@@ -7,9 +7,8 @@
   <nz-table #basicTable [nzData]="folders()">
     <thead>
       <tr>
-        <th>ID</th>
         <th>Name</th>
-        <th>Watch Folder</th>
+        <th>Watch Path</th>
         <th>Task</th>
         <th>Status</th>
         <th>Actions</th>
@@ -17,7 +16,6 @@
     </thead>
     <tbody>
       <tr *ngFor="let folder of basicTable.data">
-        <td>{{ folder.id }}</td>
         <td>{{ folder.name }}</td>
         <td>{{ folder.watch_folder }}</td>
         <td>{{ getTaskName(folder.task_id) }}</td>

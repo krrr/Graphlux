@@ -17,8 +17,8 @@ interface FileItem {
     selector: 'app-file-dialog',
     standalone: true,
     imports: [CommonModule, NzModalModule, NzListModule, NzButtonModule, NzIconModule, NzInputModule],
-    templateUrl: './file-dialog.html',
-    styleUrls: ['./file-dialog.css'],
+    templateUrl: './file-dialog.component.html',
+    styleUrls: ['./file-dialog.component.scss'],
 })
 export class FileDialogComponent implements OnInit {
     @Input() mode: 'file' | 'folder' = 'folder';

@@ -29,291 +29,292 @@
         <div class="title">Node Properties</div>
       </div>
 
-      <form nz-form>
-        <nz-form-item>
-          <nz-form-label>Type</nz-form-label>
-          <nz-form-control><span nz-icon [nzType]="getNodeIcon(selectedNode().label)"></span> {{ selectedNode().label }}</nz-form-control>
-        </nz-form-item>
-        <nz-form-item>
-          <nz-form-label>Name</nz-form-label>
-          <nz-form-control>
-            <input
-              nz-input
-              [ngModel]="nodeConfigs()[selectedNode().id].name"
-              (ngModelChange)="updateNodeName(selectedNode().id, $event)"
-              name="nodeName"
-              placeholder="Node Name"
-            />
-          </nz-form-control>
-        </nz-form-item>
-      </form>
-
-      <h4>Configuration</h4>
-
-      <form nz-form nzLayout="vertical">
-        <!-- ReadInputNode Config -->
-        <ng-container *ngIf="selectedNode().label === 'ReadInputNode'">
+      <div class="props-area">
+        <div class="ant-form">
           <nz-form-item>
-            <nz-form-label>Check Tag</nz-form-label>
+            <nz-form-label>Type</nz-form-label>
+            <nz-form-control><span nz-icon [nzType]="getNodeIcon(selectedNode().label)"></span> {{ selectedNode().label }}</nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label>Name</nz-form-label>
             <nz-form-control>
               <input
                 nz-input
-                [ngModel]="nodeConfigs()[selectedNode().id].config.check_tag"
-                (ngModelChange)="updateNodeConfig(selectedNode().id, 'check_tag', $event)"
-                name="check_tag"
-                placeholder="e.g. XMP:ProcessingStatus"
+                [ngModel]="nodeConfigs()[selectedNode().id].name"
+                (ngModelChange)="updateNodeName(selectedNode().id, $event)"
+                name="nodeName"
+                placeholder="Node Name"
               />
             </nz-form-control>
           </nz-form-item>
-          <nz-form-item>
-            <nz-form-label>Skip Value</nz-form-label>
-            <nz-form-control>
-              <input
-                nz-input
-                [ngModel]="nodeConfigs()[selectedNode().id].config.skip_value"
-                (ngModelChange)="updateNodeConfig(selectedNode().id, 'skip_value', $event)"
-                name="skip_value"
-                placeholder="e.g. Processed=True"
-              />
-            </nz-form-control>
-          </nz-form-item>
-        </ng-container>
+        </div>
 
-        <!-- ConvertNode Config -->
-        <ng-container *ngIf="selectedNode().label === 'ConvertNode'">
-          <nz-form-item>
-            <nz-form-label>Tool</nz-form-label>
-            <nz-form-control>
-              <nz-select
-                [ngModel]="nodeConfigs()[selectedNode().id].config.tool"
-                (ngModelChange)="updateNodeConfig(selectedNode().id, 'tool', $event)"
-                name="tool"
-              >
-                <nz-option nzValue="imagemagick" nzLabel="ImageMagick"></nz-option>
-                <nz-option nzValue="ffmpeg" nzLabel="FFmpeg"></nz-option>
-              </nz-select>
-            </nz-form-control>
-          </nz-form-item>
-          <nz-form-item>
-            <nz-form-label>Target Extension</nz-form-label>
-            <nz-form-control>
-              <input
-                nz-input
-                [ngModel]="nodeConfigs()[selectedNode().id].config.target_extension"
-                (ngModelChange)="updateNodeConfig(selectedNode().id, 'target_extension', $event)"
-                name="target_extension"
-                placeholder=".avif"
-              />
-            </nz-form-control>
-          </nz-form-item>
-          <nz-form-item>
-            <nz-form-label>Arguments (JSON Array string)</nz-form-label>
-            <nz-form-control>
-              <input
-                nz-input
-                [ngModel]="nodeConfigs()[selectedNode().id].config.args | json"
-                (ngModelChange)="updateArgs($event, selectedNode().id)"
-                name="args"
-                placeholder='["-quality", "85"]'
-              />
-            </nz-form-control>
-          </nz-form-item>
-        </ng-container>
-
-        <!-- CodeEvalNode Config -->
-        <ng-container *ngIf="selectedNode().label === 'CodeEvalNode'">
-          <nz-form-item>
-            <nz-form-label>Python Code</nz-form-label>
-            <nz-form-control>
-              <textarea
-                nz-input
-                [ngModel]="nodeConfigs()[selectedNode().id].config.code"
-                (ngModelChange)="updateNodeConfig(selectedNode().id, 'code', $event)"
-                name="code"
-                rows="6"
-                placeholder="import os&#10;args['file']['size'] / os.path.getsize(args['original_file_path'])"
-              ></textarea>
-            </nz-form-control>
-          </nz-form-item>
-          <nz-form-item>
-            <nz-form-label>Quick Insert Variable</nz-form-label>
-            <nz-form-control>
-              <nz-input-group nzSearch [nzAddOnAfter]="suffixButton">
-                <nz-select [ngModel]="selectedVarForInsert()" (ngModelChange)="selectedVarForInsert.set($event)" name="quick_var">
-                  <nz-option *ngFor="let varName of getAvailableVariables(selectedNode().id)" [nzValue]="formatVarForCode(varName)" [nzLabel]="varName"></nz-option>
-                </nz-select>
-              </nz-input-group>
-              <ng-template #suffixButton>
-                <button nz-button nzType="primary" nzSearch (click)="insertVariableToCode()">Insert</button>
-              </ng-template>
-            </nz-form-control>
-          </nz-form-item>
-          <nz-form-item>
-            <nz-form-label>Output Variable Name</nz-form-label>
-            <nz-form-control>
-              <input
-                nz-input
-                [ngModel]="nodeConfigs()[selectedNode().id].config.output_var || 'eval_result'"
-                (ngModelChange)="updateNodeConfig(selectedNode().id, 'output_var', $event)"
-                name="output_var"
-                placeholder="eval_result"
-              />
-            </nz-form-control>
-          </nz-form-item>
-        </ng-container>
-
-        <!-- ConditionNode Config -->
-        <ng-container *ngIf="selectedNode().label === 'ConditionNode'">
-          <nz-form-item>
-            <nz-form-label>Relation</nz-form-label>
-            <nz-form-control>
-              <nz-select
-                [ngModel]="nodeConfigs()[selectedNode().id].config.relation || 'and'"
-                (ngModelChange)="updateNodeConfig(selectedNode().id, 'relation', $event)"
-                name="relation"
-              >
-                <nz-option nzValue="and" nzLabel="AND"/>
-                <nz-option nzValue="or" nzLabel="OR"/>
-              </nz-select>
-            </nz-form-control>
-          </nz-form-item>
-
-          <div *ngFor="let cond of nodeConfigs()[selectedNode().id].config.conditions; let i = index" style="border: 1px solid #d9d9d9; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <strong>Condition {{ i + 1 }}</strong>
-              <button nz-button nzType="text" nzDanger nzSize="small" (click)="removeCondition(selectedNode().id, i)"><span nz-icon nzType="delete"></span></button>
-            </div>
-            <nz-form-item style="margin-bottom: 8px;">
-              <nz-form-label>Variable</nz-form-label>
-              <nz-form-control>
-                <nz-select [ngModel]="cond.variable"
-                  (ngModelChange)="updateCondition(selectedNode().id, i, 'variable', $event)"
-                  name="cond_var_{{i}}"
-                >
-                  <nz-option *ngFor="let varName of getAvailableVariables(selectedNode().id)" [nzValue]="varName" [nzLabel]="varName"></nz-option>
-                </nz-select>
-              </nz-form-control>
-            </nz-form-item>
-            <nz-form-item style="margin-bottom: 8px;">
-              <nz-form-label>Operator</nz-form-label>
-              <nz-form-control>
-                <nz-select
-                  [ngModel]="cond.operator"
-                  (ngModelChange)="updateCondition(selectedNode().id, i, 'operator', $event)"
-                  name="cond_op_{{i}}"
-                >
-                  <nz-option nzValue="<" nzLabel="<"></nz-option>
-                  <nz-option nzValue=">" nzLabel=">"></nz-option>
-                  <nz-option nzValue="==" nzLabel="=="></nz-option>
-                </nz-select>
-              </nz-form-control>
-            </nz-form-item>
-            <nz-form-item style="margin-bottom: 0;">
-              <nz-form-label>Threshold (Number)</nz-form-label>
+        <h4>Configuration</h4>
+        <form nz-form nzLayout="vertical">
+          <!-- ReadInputNode Config -->
+          <ng-container *ngIf="selectedNode().label === 'ReadInputNode'">
+            <nz-form-item>
+              <nz-form-label>Check Tag</nz-form-label>
               <nz-form-control>
                 <input
                   nz-input
-                  type="number"
-                  [ngModel]="cond.threshold"
-                  (ngModelChange)="updateCondition(selectedNode().id, i, 'threshold', $event)"
-                  name="cond_thresh_{{i}}"
+                  [ngModel]="nodeConfigs()[selectedNode().id].config.check_tag"
+                  (ngModelChange)="updateNodeConfig(selectedNode().id, 'check_tag', $event)"
+                  name="check_tag"
+                  placeholder="e.g. XMP:ProcessingStatus"
                 />
               </nz-form-control>
             </nz-form-item>
-          </div>
+            <nz-form-item>
+              <nz-form-label>Skip Value</nz-form-label>
+              <nz-form-control>
+                <input
+                  nz-input
+                  [ngModel]="nodeConfigs()[selectedNode().id].config.skip_value"
+                  (ngModelChange)="updateNodeConfig(selectedNode().id, 'skip_value', $event)"
+                  name="skip_value"
+                  placeholder="e.g. Processed=True"
+                />
+              </nz-form-control>
+            </nz-form-item>
+          </ng-container>
 
-          <button nz-button nzType="dashed" nzBlock (click)="addCondition(selectedNode().id)">
-            <span nz-icon nzType="plus"></span>
-            Add Condition
-          </button>
-        </ng-container>
+          <!-- ConvertNode Config -->
+          <ng-container *ngIf="selectedNode().label === 'ConvertNode'">
+            <nz-form-item>
+              <nz-form-label>Tool</nz-form-label>
+              <nz-form-control>
+                <nz-select
+                  [ngModel]="nodeConfigs()[selectedNode().id].config.tool"
+                  (ngModelChange)="updateNodeConfig(selectedNode().id, 'tool', $event)"
+                  name="tool"
+                >
+                  <nz-option nzValue="imagemagick" nzLabel="ImageMagick"></nz-option>
+                  <nz-option nzValue="ffmpeg" nzLabel="FFmpeg"></nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label>Target Extension</nz-form-label>
+              <nz-form-control>
+                <input
+                  nz-input
+                  [ngModel]="nodeConfigs()[selectedNode().id].config.target_extension"
+                  (ngModelChange)="updateNodeConfig(selectedNode().id, 'target_extension', $event)"
+                  name="target_extension"
+                  placeholder=".avif"
+                />
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label>Arguments (JSON Array string)</nz-form-label>
+              <nz-form-control>
+                <input
+                  nz-input
+                  [ngModel]="nodeConfigs()[selectedNode().id].config.args | json"
+                  (ngModelChange)="updateArgs($event, selectedNode().id)"
+                  name="args"
+                  placeholder='["-quality", "85"]'
+                />
+              </nz-form-control>
+            </nz-form-item>
+          </ng-container>
 
-        <!-- FileOperationNode Config -->
-        <ng-container *ngIf="selectedNode().label === 'FileOperationNode'">
-          <nz-form-item>
-            <nz-form-label>Action</nz-form-label>
-            <nz-form-control>
-              <nz-select
-                [ngModel]="nodeConfigs()[selectedNode().id].config.action"
-                (ngModelChange)="updateNodeConfig(selectedNode().id, 'action', $event)"
-                name="action"
-              >
-                <nz-option nzValue="overwrite" nzLabel="Overwrite / Move"></nz-option>
-                <nz-option nzValue="cleanup" nzLabel="Cleanup"></nz-option>
-              </nz-select>
-            </nz-form-control>
-          </nz-form-item>
-          <nz-form-item *ngIf="nodeConfigs()[selectedNode().id].config.action === 'overwrite'">
-            <nz-form-label>Target Extension (Optional, for rename)</nz-form-label>
-            <nz-form-control>
-              <input
-                nz-input
-                [ngModel]="nodeConfigs()[selectedNode().id].config.target_extension"
-                (ngModelChange)="updateNodeConfig(selectedNode().id, 'target_extension', $event)"
-                name="target_extension_fo"
-                placeholder=".avif"
-              />
-            </nz-form-control>
-          </nz-form-item>
-        </ng-container>
+          <!-- CodeEvalNode Config -->
+          <ng-container *ngIf="selectedNode().label === 'CodeEvalNode'">
+            <nz-form-item>
+              <nz-form-label>Python Code</nz-form-label>
+              <nz-form-control>
+                <textarea
+                  nz-input
+                  [ngModel]="nodeConfigs()[selectedNode().id].config.code"
+                  (ngModelChange)="updateNodeConfig(selectedNode().id, 'code', $event)"
+                  name="code"
+                  rows="6"
+                  placeholder="import os&#10;args['file']['size'] / os.path.getsize(args['original_file_path'])"
+                ></textarea>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label>Quick Insert Variable</nz-form-label>
+              <nz-form-control>
+                <nz-input-group nzSearch [nzAddOnAfter]="suffixButton">
+                  <nz-select [ngModel]="selectedVarForInsert()" (ngModelChange)="selectedVarForInsert.set($event)" name="quick_var" nzSize="small">
+                    <nz-option *ngFor="let varName of getAvailableVariables(selectedNode().id)" [nzValue]="formatVarForCode(varName)" [nzLabel]="varName"/>
+                  </nz-select>
+                </nz-input-group>
+                <ng-template #suffixButton>
+                  <button nz-button (click)="insertVariableToCode()" nzSize="small">Insert</button>
+                </ng-template>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label>Output Variable Name</nz-form-label>
+              <nz-form-control>
+                <input
+                  nz-input
+                  [ngModel]="nodeConfigs()[selectedNode().id].config.output_var || 'eval_result'"
+                  (ngModelChange)="updateNodeConfig(selectedNode().id, 'output_var', $event)"
+                  name="output_var"
+                  placeholder="eval_result"
+                />
+              </nz-form-control>
+            </nz-form-item>
+          </ng-container>
 
-        <!-- MetadataWriteNode Config -->
-        <ng-container *ngIf="selectedNode().label === 'MetadataWriteNode'">
-          <nz-form-item>
-            <nz-form-label>Write To Original File</nz-form-label>
-            <nz-form-control>
-              <label
-                nz-checkbox
-                [ngModel]="nodeConfigs()[selectedNode().id].config.write_to_original"
-                (ngModelChange)="updateNodeConfig(selectedNode().id, 'write_to_original', $event)"
-                name="write_to_original"
-                >Enable</label
-              >
-            </nz-form-control>
-          </nz-form-item>
-          <nz-form-item>
-            <nz-form-label>Tags (JSON Key-Value string)</nz-form-label>
-            <nz-form-control>
-              <textarea
-                nz-input
-                [ngModel]="nodeConfigs()[selectedNode().id].config.tags | json"
-                (ngModelChange)="updateTags($event, selectedNode().id)"
-                name="tags"
-                rows="4"
-                placeholder='{"XMP:ProcessingStatus": "LowCompression_Skipped"}'
-              ></textarea>
-            </nz-form-control>
-          </nz-form-item>
-        </ng-container>
+          <!-- ConditionNode Config -->
+          <ng-container *ngIf="selectedNode().label === 'ConditionNode'">
+            <nz-form-item>
+              <nz-form-label>Relation</nz-form-label>
+              <nz-form-control>
+                <nz-select
+                  [ngModel]="nodeConfigs()[selectedNode().id].config.relation || 'and'"
+                  (ngModelChange)="updateNodeConfig(selectedNode().id, 'relation', $event)"
+                  name="relation"
+                >
+                  <nz-option nzValue="and" nzLabel="AND"/>
+                  <nz-option nzValue="or" nzLabel="OR"/>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
 
-        <!-- FFmpegActionNode Config -->
-        <ng-container *ngIf="selectedNode().label === 'FFmpegActionNode'">
-          <nz-form-item>
-            <nz-form-label>Arguments (String format)</nz-form-label>
-            <nz-form-control>
-              <input
-                nz-input
-                [ngModel]="nodeConfigs()[selectedNode().id].config.args"
-                (ngModelChange)="updateNodeConfig(selectedNode().id, 'args', $event)"
-                name="args_ff"
-                placeholder="-map 0:v -c:v copy"
-              />
-            </nz-form-control>
-          </nz-form-item>
-          <nz-form-item>
-            <nz-form-label>Target Extension</nz-form-label>
-            <nz-form-control>
-              <input
-                nz-input
-                [ngModel]="nodeConfigs()[selectedNode().id].config.extension"
-                (ngModelChange)="updateNodeConfig(selectedNode().id, 'extension', $event)"
-                name="extension_ff"
-                placeholder=".mp4"
-              />
-            </nz-form-control>
-          </nz-form-item>
-        </ng-container>
-      </form>
+            <div *ngFor="let cond of nodeConfigs()[selectedNode().id].config.conditions; let i = index" style="border: 1px solid #d9d9d9; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <strong>Condition {{ i + 1 }}</strong>
+                <button nz-button nzType="text" nzDanger nzSize="small" (click)="removeCondition(selectedNode().id, i)"><span nz-icon nzType="delete"></span></button>
+              </div>
+              <nz-form-item style="margin-bottom: 8px;">
+                <nz-form-label>Variable</nz-form-label>
+                <nz-form-control>
+                  <nz-select [ngModel]="cond.variable"
+                    (ngModelChange)="updateCondition(selectedNode().id, i, 'variable', $event)"
+                    name="cond_var_{{i}}"
+                  >
+                    <nz-option *ngFor="let varName of getAvailableVariables(selectedNode().id)" [nzValue]="varName" [nzLabel]="varName"></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+              <nz-form-item style="margin-bottom: 8px;">
+                <nz-form-label>Operator</nz-form-label>
+                <nz-form-control>
+                  <nz-select
+                    [ngModel]="cond.operator"
+                    (ngModelChange)="updateCondition(selectedNode().id, i, 'operator', $event)"
+                    name="cond_op_{{i}}"
+                  >
+                    <nz-option nzValue="<" nzLabel="<"></nz-option>
+                    <nz-option nzValue=">" nzLabel=">"></nz-option>
+                    <nz-option nzValue="==" nzLabel="=="></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+              <nz-form-item style="margin-bottom: 0;">
+                <nz-form-label>Threshold (Number)</nz-form-label>
+                <nz-form-control>
+                  <input
+                    nz-input
+                    type="number"
+                    [ngModel]="cond.threshold"
+                    (ngModelChange)="updateCondition(selectedNode().id, i, 'threshold', $event)"
+                    name="cond_thresh_{{i}}"
+                  />
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+
+            <button nz-button nzType="dashed" nzBlock (click)="addCondition(selectedNode().id)">
+              <span nz-icon nzType="plus"></span>
+              Add Condition
+            </button>
+          </ng-container>
+
+          <!-- FileOperationNode Config -->
+          <ng-container *ngIf="selectedNode().label === 'FileOperationNode'">
+            <nz-form-item>
+              <nz-form-label>Action</nz-form-label>
+              <nz-form-control>
+                <nz-select
+                  [ngModel]="nodeConfigs()[selectedNode().id].config.action"
+                  (ngModelChange)="updateNodeConfig(selectedNode().id, 'action', $event)"
+                  name="action"
+                >
+                  <nz-option nzValue="overwrite" nzLabel="Overwrite / Move"></nz-option>
+                  <nz-option nzValue="cleanup" nzLabel="Cleanup"></nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item *ngIf="nodeConfigs()[selectedNode().id].config.action === 'overwrite'">
+              <nz-form-label>Target Extension (Optional, for rename)</nz-form-label>
+              <nz-form-control>
+                <input
+                  nz-input
+                  [ngModel]="nodeConfigs()[selectedNode().id].config.target_extension"
+                  (ngModelChange)="updateNodeConfig(selectedNode().id, 'target_extension', $event)"
+                  name="target_extension_fo"
+                  placeholder=".avif"
+                />
+              </nz-form-control>
+            </nz-form-item>
+          </ng-container>
+
+          <!-- MetadataWriteNode Config -->
+          <ng-container *ngIf="selectedNode().label === 'MetadataWriteNode'">
+            <nz-form-item>
+              <nz-form-label>Write To Original File</nz-form-label>
+              <nz-form-control>
+                <label
+                  nz-checkbox
+                  [ngModel]="nodeConfigs()[selectedNode().id].config.write_to_original"
+                  (ngModelChange)="updateNodeConfig(selectedNode().id, 'write_to_original', $event)"
+                  name="write_to_original"
+                  >Enable</label
+                >
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label>Tags (JSON Key-Value string)</nz-form-label>
+              <nz-form-control>
+                <textarea
+                  nz-input
+                  [ngModel]="nodeConfigs()[selectedNode().id].config.tags | json"
+                  (ngModelChange)="updateTags($event, selectedNode().id)"
+                  name="tags"
+                  rows="4"
+                  placeholder='{"XMP:ProcessingStatus": "LowCompression_Skipped"}'
+                ></textarea>
+              </nz-form-control>
+            </nz-form-item>
+          </ng-container>
+
+          <!-- FFmpegActionNode Config -->
+          <ng-container *ngIf="selectedNode().label === 'FFmpegActionNode'">
+            <nz-form-item>
+              <nz-form-label>Arguments (String format)</nz-form-label>
+              <nz-form-control>
+                <input
+                  nz-input
+                  [ngModel]="nodeConfigs()[selectedNode().id].config.args"
+                  (ngModelChange)="updateNodeConfig(selectedNode().id, 'args', $event)"
+                  name="args_ff"
+                  placeholder="-map 0:v -c:v copy"
+                />
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label>Target Extension</nz-form-label>
+              <nz-form-control>
+                <input
+                  nz-input
+                  [ngModel]="nodeConfigs()[selectedNode().id].config.extension"
+                  (ngModelChange)="updateNodeConfig(selectedNode().id, 'extension', $event)"
+                  name="extension_ff"
+                  placeholder=".mp4"
+                />
+              </nz-form-control>
+            </nz-form-item>
+          </ng-container>
+        </form>
+      </div>
     </div>
   </div>
 

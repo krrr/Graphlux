@@ -14,7 +14,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { COMMON_IMPORTS } from '../shared-imports';
-import { FileDialogComponent } from '../components/file-dialog/file-dialog';
+import { FileDialogComponent } from '../components/file-dialog/file-dialog.component';
 
 @Component({
     selector: 'app-folders',
@@ -34,8 +34,8 @@ import { FileDialogComponent } from '../components/file-dialog/file-dialog';
         FileDialogComponent,
         ...COMMON_IMPORTS,
     ],
-    templateUrl: './folders.html',
-    styleUrls: ['./folders.css'],
+    templateUrl: './folders.component.html',
+    styleUrls: ['./folders.component.scss'],
 })
 export class FoldersComponent implements OnInit {
     folders = signal<any[]>([]);

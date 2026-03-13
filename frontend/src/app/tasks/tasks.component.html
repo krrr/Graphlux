@@ -1,0 +1,76 @@
+<div class="tasks-container">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px">
+    <h2>DAG Tasks Manager</h2>
+    <button nz-button nzType="primary" (click)="showModal()">Create New Task</button>
+  </div>
+
+  <div class="task-list">
+    <nz-card *ngFor="let task of tasks()" nzHoverable (click)="openEditor(task.id)" class="task-card">
+      <div class="card-header" >
+        <div style="display: flex; align-items: center; gap: 12px">
+          <span nz-icon nzType="deployment-unit" nzTheme="outline" style="font-size: 32px; color: #1890ff"></span>
+          <div>
+            <h3 style="margin: 0">{{ task.name }}</h3>
+          </div>
+        </div>
+        <button nz-button nzType="text" nz-dropdown [nzDropdownMenu]="menu" (click)="$event.stopPropagation()">
+          <span nz-icon nzType="more"></span>
+        </button>
+        <nz-dropdown-menu #menu="nzDropdownMenu">
+          <ul nz-menu>
+            <li nz-menu-item (click)="showModal(task)"><nz-icon nzType="edit" />Edit Properties</li>
+            <li nz-menu-item (click)="deleteTask(task.id)"><nz-icon nzType="delete" />Delete</li>
+          </ul>
+        </nz-dropdown-menu>
+      </div>
+  
+      <p style="color: #595959; margin-bottom: 16px; min-height: 40px" (click)="openEditor(task.id)">
+        {{ task.description || 'No description.' }}
+      </p>
+  
+      <div class="folder-list" (click)="openEditor(task.id)">
+        <span nz-icon nzType="folder"></span>
+        <div style="margin-left: 10px; color: #595959">
+          <nz-tag *ngFor="let folder of getAssociatedFolders(task.id)" [title]="folder.watch_folder">{{ folder.name
+            }}</nz-tag>
+          <div *ngIf="getAssociatedFolders(task.id).length === 0">
+            <i>None</i>
+          </div>
+        </div>
+      </div>
+    </nz-card>
+  </div>
+
+  <nz-modal
+    [nzVisible]="isModalVisible()"
+    (nzVisibleChange)="isModalVisible.set($event)"
+    [nzTitle]="isEditing() ? 'Edit Task' : 'Create New Task'"
+    (nzOnCancel)="handleCancel()"
+    (nzOnOk)="handleOk()"
+  >
+    <ng-container *nzModalContent>
+      <form nz-form nzLayout="vertical">
+        <nz-form-item>
+          <nz-form-label nzRequired>Name</nz-form-label>
+          <nz-form-control nzErrorTip="Please input the task name!">
+            <input nz-input [ngModel]="taskForm().name" (ngModelChange)="updateForm('name', $event)" name="name" placeholder="Task Name" />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>Description</nz-form-label>
+          <nz-form-control>
+            <textarea
+              nz-input
+              [ngModel]="taskForm().description"
+              (ngModelChange)="updateForm('description', $event)"
+              name="description"
+              placeholder="Description"
+              rows="3"
+            ></textarea>
+          </nz-form-control>
+        </nz-form-item>
+      </form>
+    </ng-container>
+  </nz-modal>
+</div>

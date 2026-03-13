@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 
-import { FoldersComponent } from './folders';
+import { FoldersComponent } from './folders.component';
 
 describe('Folders', () => {
     let component: FoldersComponent;

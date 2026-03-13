@@ -7,7 +7,7 @@ import { AreaPlugin, AreaExtensions } from 'rete-area-plugin';
 import { ConnectionPlugin, Presets as ConnectionPresets } from 'rete-connection-plugin';
 import { AutoArrangePlugin, Presets as ArrangePresets } from 'rete-auto-arrange-plugin';
 import { AngularPlugin, Presets, AngularArea2D } from 'rete-angular-plugin/18';
-import { CustomNodeComponent, NODE_INFO } from './custom-node/custom-node';
+import { CustomNodeComponent, NODE_INFO } from './custom-node/custom-node.component';
 import { ApiService } from '../api.service';
 import { Subscription } from 'rxjs';
 import { NzButtonModule } from 'ng-zorro-antd/button';

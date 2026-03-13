@@ -1,0 +1,36 @@
+.tasks-container {
+    padding: 20px;
+}
+
+.task-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(330px,1fr));
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.task-card {
+    transition: all 0.3s;
+    cursor: pointer;
+    ::ng-deep .ant-card-body {
+        padding: 16px;
+    }
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px
+    }
+}
+
+nz-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.folder-list {
+    background-color: #fafafa;
+    padding: 4px 8px;
+    border-radius: 2px;
+    display: flex;
+}

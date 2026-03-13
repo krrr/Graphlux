@@ -20,8 +20,8 @@ export const NODE_INFO: Record<string, { icon: string; color: string }> = {
     selector: 'app-custom-node',
     standalone: true,
     imports: [CommonModule, NzIconModule, ReteModule],
-    templateUrl: './custom-node.html',
-    styleUrls: ['./custom-node.scss'],
+    templateUrl: './custom-node.component.html',
+    styleUrls: ['./custom-node.component.scss'],
 })
 export class CustomNodeComponent implements OnChanges {
     @Input() data!: ClassicPreset.Node & { selected?: boolean };

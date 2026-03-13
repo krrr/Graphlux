@@ -34,31 +34,28 @@ import { COMMON_IMPORTS } from './shared-imports';
             </nz-layout>
         </nz-layout>
     `,
-    styles: [
-        `
-            .app-layout {
-                height: 100vh;
-            }
-            .logo {
-                height: 64px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-            }
-            .logo h2 {
-                margin: 0;
-                font-size: 18px;
-            }
-            .inner-content {
-                background: #fff;
-                height: 100%;
-                overflow: hidden;
-            }
-            nz-content {
-                background: #f0f2f5;
-            }
-        `,
-    ],
+    styles: [`
+        .app-layout {
+            height: 100vh;
+        }
+        .logo {
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .logo h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .inner-content {
+            height: 100%;
+            overflow: hidden;
+        }
+        nz-content {
+            background: #fff;
+        }
+    `],
 })
 export class AppComponent {}

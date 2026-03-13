@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FileDialogComponent } from './file-dialog';
+import { FileDialogComponent } from './file-dialog.component';
 
 describe('FileDialogComponent', () => {
     let component: FileDialogComponent;

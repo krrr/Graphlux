@@ -3,7 +3,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
-import { SettingsComponent } from './settings';
+import { SettingsComponent } from './settings.component';
 
 describe('Settings', () => {
     let component: SettingsComponent;

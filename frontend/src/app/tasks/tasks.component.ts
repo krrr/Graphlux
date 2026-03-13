@@ -9,7 +9,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzGridModule } from 'ng-zorro-antd/grid';
-import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzDropdownModule } from 'ng-zorro-antd/dropdown';
 import { COMMON_IMPORTS } from '../shared-imports';
 import { NzTagComponent } from 'ng-zorro-antd/tag';
 
@@ -24,12 +24,12 @@ import { NzTagComponent } from 'ng-zorro-antd/tag';
         NzInputModule,
         NzIconModule,
         NzGridModule,
-        NzDropDownModule,
+        NzDropdownModule,
         ...COMMON_IMPORTS,
         NzTagComponent,
     ],
-    templateUrl: './tasks.html',
-    styleUrls: ['./tasks.scss'],
+    templateUrl: './tasks.component.html',
+    styleUrls: ['./tasks.component.scss'],
 })
 export class TasksComponent implements OnInit {
     tasks = signal<any[]>([]);

@@ -15,7 +15,7 @@ import {
     SettingOutline,
 } from '@ant-design/icons-angular/icons';
 
-import { CustomNodeComponent } from './custom-node';
+import { CustomNodeComponent } from './custom-node.component';
 
 const icons: IconDefinition[] = [
     FolderOpenOutline,

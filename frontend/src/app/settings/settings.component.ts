@@ -10,8 +10,8 @@ import { COMMON_IMPORTS } from '../shared-imports';
     selector: 'app-settings',
     standalone: true,
     imports: [FormsModule, NzFormModule, NzInputModule, ...COMMON_IMPORTS],
-    templateUrl: './settings.html',
-    styleUrls: ['./settings.css'],
+    templateUrl: './settings.component.html',
+    styleUrls: ['./settings.component.scss'],
 })
 export class SettingsComponent implements OnInit {
     settings = signal({
