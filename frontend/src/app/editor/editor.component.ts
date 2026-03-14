@@ -375,36 +375,6 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         this.isPropertyPanelVisible.set(true);
     }
 
-    async addNode(nodeType: string) {
-        if (nodeType === 'StartNode' && this.editor.getNodes().some((n) => n.label === 'StartNode')) {
-            this.message.warning('Only one Start node is allowed');
-            return;
-        }
-
-        const node = new ClassicPreset.Node(nodeType);
-
-        if (nodeType !== 'StartNode') {
-            node.addInput('input', new ClassicPreset.Input(new ClassicPreset.Socket('Data')));
-        }
-
-        if (nodeType === 'ConditionNode') {
-            node.addOutput('true_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-            node.addOutput('false_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-        } else if (nodeType !== 'FinishNode') {
-            node.addOutput('default', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-        }
-
-        await this.editor.addNode(node);
-
-        this.editorService.nodeConfigs.update((configs) => ({
-            ...configs,
-            [node.id]: { name: node.label, config: {} },
-        }));
-        this.editorService.patchNodeData(node, node.label, {});
-
-        const center = this.area.area.pointer;
-        await this.area.translate(node.id, { x: center.x, y: center.y });
-    }
 
     updateNodeName(nodeId: string, name: string) {
         this.editorService.nodeConfigs.update((configs) => ({
@@ -520,7 +490,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
 
         if (Object.keys(dagJson.nodes).length === 0) {
             // Empty DAG, create default Start node
-            await this.addNode('StartNode');
+            await this.editorService.addNode('StartNode');
             return;
         }
 
@@ -562,7 +532,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         let x = 0;
         for (const node of Array.from(nodeMap.values())) {
             const nodeData = dagJson.nodes[node.id];
-            if (nodeData && nodeData.position) {
+            if (nodeData?.position) {
                 await this.area.translate(node.id, nodeData.position);
             } else {
                 await this.area.translate(node.id, { x: x, y: 0 });
@@ -570,8 +540,6 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
             }
         }
 
-        setTimeout(() => {
-            AreaExtensions.zoomAt(this.area, this.editor.getNodes());
-        }, 100);
+        AreaExtensions.zoomAt(this.area, this.editor.getNodes());
     }
 }

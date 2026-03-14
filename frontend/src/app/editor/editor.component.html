@@ -5,7 +5,7 @@
     <button nz-button nz-dropdown [nzDropdownMenu]="menu" nzTrigger="click">Add Node</button>
     <nz-dropdown-menu #menu="nzDropdownMenu">
       <ul nz-menu>
-        <li nz-menu-item *ngFor="let t of availableNodes" (click)="addNode(t)">{{ NODE_INFO[t].label }}</li>
+        <li nz-menu-item *ngFor="let t of availableNodes" (click)="editorService.addNode(t)">{{ NODE_INFO[t].label }}</li>
       </ul>
     </nz-dropdown-menu>
     <button nz-button nzType="default" (click)="autoArrange()">Auto Arrange</button>
@@ -125,7 +125,7 @@
     <ul nz-menu *ngIf="!selectedNode()">
       <li nz-submenu nzTitle="Add Node" nzIcon="plus">
         <ul>
-          <li nz-menu-item *ngFor="let t of availableNodes" (click)="addNode(t)">{{ NODE_INFO[t].label }}</li>
+          <li nz-menu-item *ngFor="let t of availableNodes" (click)="editorService.addNode(t)">{{ NODE_INFO[t].label }}</li>
         </ul>
       </li>
       <li nz-menu-divider></li>

@@ -1,5 +1,6 @@
-import { Injectable, signal } from '@angular/core';
-import { NodeEditor } from 'rete';
+import { inject, Injectable, signal } from '@angular/core';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { ClassicPreset, NodeEditor } from 'rete';
 import { AreaPlugin } from 'rete-area-plugin';
 
 
@@ -10,6 +11,7 @@ export class EditorService {
     editor!: NodeEditor<any>;
     area!: AreaPlugin<any, any>;
     nodeConfigs = signal<{ [id: string]: any }>({});
+    message = inject(NzMessageService);
 
     patchNodeData(node: any, name: string, config: any) {
         (node as any).customName = name;
@@ -68,6 +70,37 @@ export class EditorService {
             }
         }
         return Array.from(variables);
+    }
+
+    async addNode(nodeType: string) {
+        if (nodeType === 'StartNode' && this.editor.getNodes().some((n) => n.label === 'StartNode')) {
+            console.error('Only one Start node is allowed');
+            return;
+        }
+
+        const node = new ClassicPreset.Node(nodeType);
+
+        if (nodeType !== 'StartNode') {
+            node.addInput('input', new ClassicPreset.Input(new ClassicPreset.Socket('Data')));
+        }
+
+        if (nodeType === 'ConditionNode') {
+            node.addOutput('true_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
+            node.addOutput('false_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
+        } else if (nodeType !== 'FinishNode') {
+            node.addOutput('default', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
+        }
+
+        await this.editor.addNode(node);
+
+        this.nodeConfigs.update((configs) => ({
+            ...configs,
+            [node.id]: { name: NODE_INFO[nodeType].label, config: {} },
+        }));
+        this.patchNodeData(node, node.label, {});
+
+        const center = this.area.area.pointer;
+        await this.area.translate(node.id, { x: center.x, y: center.y });
     }
 }
 
