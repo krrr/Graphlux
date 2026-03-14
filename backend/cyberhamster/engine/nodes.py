@@ -2,7 +2,8 @@ import os
 import shutil
 import tempfile
 import shlex
-from typing import Any, Dict, Optional, Tuple, List, TypedDict
+import ast
+from typing import Any, Dict, Optional, Tuple, TypedDict
 from .context import FileContext
 from ..tools.ffmpeg_wrapper import FFmpegWrapper
 from ..tools.exiftool_wrapper import ExifToolWrapper
@@ -14,6 +15,7 @@ class FileObject(TypedDict, total=False):
     path: str
     size: int
     metadata: Dict[str, Any]
+
 
 class DAGNode:
     """Base class for a node in the execution DAG."""
@@ -54,7 +56,7 @@ class FinishNode(DAGNode):
             logger.info(f"[{self.name}] Successfully completed pipeline for file: {file_obj.get('path')}")
         return True, None, {"status": "success", "file": file_obj}
 
-class ReadInputNode(DAGNode):
+class MetadataReadNode(DAGNode):
     """Reads metadata, stops if already processed."""
     def execute(self, inputs: Dict[str, Any], context: FileContext) -> Tuple[bool, Optional[str], Dict[str, Any]]:
         file_obj = inputs.get("file")
@@ -270,7 +272,6 @@ class MetadataWriteNode(DAGNode):
             logger.error(f"[{self.name}] Failed to write metadata to {target_file}")
             return False, None, {}
 
-import ast
 
 class CodeEvalNode(DAGNode):
     """Evaluates Python code. Similar to a multi-line lambda, returning the last expression's result. Reads variables via args."""
@@ -350,15 +351,9 @@ class FFmpegActionNode(DAGNode):
         logger.error(f"[{self.name}] FFmpeg execution failed for {input_file}")
         return False, None, {}
 
+
 # A registry to instantiate nodes by type
-NODE_TYPES = {
-    "StartNode": StartNode,
-    "FinishNode": FinishNode,
-    "ReadInputNode": ReadInputNode,
-    "ConvertNode": ConvertNode,
-    "CodeEvalNode": CodeEvalNode,
-    "ConditionNode": ConditionNode,
-    "FileOperationNode": FileOperationNode,
-    "MetadataWriteNode": MetadataWriteNode,
-    "FFmpegActionNode": FFmpegActionNode
+NODE_TYPES = { i.__name__: i for i in (
+    StartNode, FinishNode, MetadataReadNode, ConvertNode, CodeEvalNode, ConditionNode, FileOperationNode,
+    MetadataWriteNode, FFmpegActionNode)
 }

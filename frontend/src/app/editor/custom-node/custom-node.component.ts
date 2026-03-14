@@ -7,7 +7,7 @@ import { ReteModule } from 'rete-angular-plugin/18';
 export const NODE_INFO: Record<string, { icon: string; color: string }> = {
     StartNode: { icon: 'home', color: '#52c41a' },
     FinishNode: { icon: 'check-circle', color: '#1890ff' },
-    ReadInputNode: { icon: 'folder-open', color: '#1890ff' },
+    MetadataReadNode: { icon: 'folder-open', color: '#1890ff' },
     ConvertNode: { icon: 'sync', color: '#52c41a' },
     CodeEvalNode: { icon: 'code', color: '#722ed1' },
     ConditionNode: { icon: 'branches', color: '#faad14' },

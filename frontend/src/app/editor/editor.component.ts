@@ -22,6 +22,14 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { COMMON_IMPORTS } from '../shared-imports';
 import { CustomSocketComponent } from './custom-node/custom-socket.component';
 import { CustomConnComponent } from './custom-node/custom-conn.component';
+import { PropsMetadataReadComponent } from './properties/props-metadata-read.component';
+import { PropsConvertComponent } from './properties/props-convert.component';
+import { PropsCodeEvalComponent } from './properties/props-code-eval.component';
+import { PropsConditionComponent } from './properties/props-condition.component';
+import { PropsFileOperationComponent } from './properties/props-file-operation.component';
+import { PropsMetadataWriteComponent } from './properties/props-metadata-write.component';
+import { PropsFFmpegActionComponent } from './properties/props-ffmpeg-action.component';
+import { EditorService } from './editor.service';
 
 type Schemes = GetSchemes<ClassicPreset.Node, ClassicPreset.Connection<ClassicPreset.Node, ClassicPreset.Node>>;
 type AreaExtra = AngularArea2D<Schemes>;
@@ -41,7 +49,15 @@ type AreaExtra = AngularArea2D<Schemes>;
         NzSelectModule,
         NzCheckboxModule,
         ...COMMON_IMPORTS,
+        PropsMetadataReadComponent,
+        PropsConvertComponent,
+        PropsCodeEvalComponent,
+        PropsConditionComponent,
+        PropsFileOperationComponent,
+        PropsMetadataWriteComponent,
+        PropsFFmpegActionComponent,
     ],
+    providers: [EditorService],
     templateUrl: './editor.component.html',
     styleUrls: ['./editor.component.scss'],
 })
@@ -57,7 +73,6 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     area!: AreaPlugin<Schemes, AreaExtra>;
     selectedNode = signal<any>(null);
     isPropertyPanelVisible = signal(true);
-    nodeConfigs = signal<{ [id: string]: any }>({});
 
     taskId = signal<number | null>(null);
     arrange!: AutoArrangePlugin<any>;
@@ -70,12 +85,12 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     availableNodes = [
         // { type: 'StartNode', label: 'Start (Input File)' },
         { type: 'FinishNode', label: 'Finish / Output' },
-        { type: 'ReadInputNode', label: 'Read Input Metadata' },
+        { type: 'MetadataReadNode', label: 'Read Media Metadata' },
         { type: 'ConvertNode', label: 'Convert Format' },
         { type: 'CodeEvalNode', label: 'Code Eval (Python)' },
         { type: 'ConditionNode', label: 'Condition Branch' },
         { type: 'FileOperationNode', label: 'File Operation (Move/Clean)' },
-        { type: 'MetadataWriteNode', label: 'Write Metadata' },
+        { type: 'MetadataWriteNode', label: 'Write Media Metadata' },
         { type: 'FFmpegActionNode', label: 'FFmpeg Action' },
     ];
 
@@ -90,6 +105,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         private route: ActivatedRoute,
         private message: NzMessageService,
         private nzContextMenuService: NzContextMenuService,
+        public editorService: EditorService,
     ) {}
 
     ngOnInit() {
@@ -128,7 +144,9 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     async ngAfterViewInit() {
+        this.editorService.editor = this.editor;
         this.area = new AreaPlugin<Schemes, AreaExtra>(this.container.nativeElement);
+        this.editorService.area = this.area;
         const connection = new ConnectionPlugin<Schemes, AreaExtra>();
         const render = new AngularPlugin<Schemes, AreaExtra>({ injector: this.injector });
 
@@ -144,8 +162,8 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
                 if (node) {
                     this.selectedNode.set(node);
                     this.isPropertyPanelVisible.set(true);
-                    if (!this.nodeConfigs()[node.id]) {
-                        this.nodeConfigs.update((configs) => ({
+                    if (!this.editorService.nodeConfigs()[node.id]) {
+                        this.editorService.nodeConfigs.update((configs) => ({
                             ...configs,
                             [node.id]: { name: node.label, config: {} },
                         }));
@@ -274,8 +292,8 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
 
         await this.editor.addNode(newNode);
 
-        const config = this.nodeConfigs()[node.id] || { config: {} };
-        this.nodeConfigs.update((configs) => ({
+        const config = this.editorService.nodeConfigs()[node.id] || { config: {} };
+        this.editorService.nodeConfigs.update((configs) => ({
             ...configs,
             [newNode.id]: { name: config.name + ' (Copy)', config: JSON.parse(JSON.stringify(config.config)) },
         }));
@@ -333,12 +351,12 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         await this.editor.addNode(newNode);
         await this.area.translate(newNode.id, pos);
 
-        const config = this.nodeConfigs()[oldId] || { config: {} };
-        this.nodeConfigs.update((configs) => ({
+        const config = this.editorService.nodeConfigs()[oldId] || { config: {} };
+        this.editorService.nodeConfigs.update((configs) => ({
             ...configs,
             [newNode.id]: { name: newNode.label, config: {} },
         }));
-        this.patchNodeData(newNode, newNode.label, {});
+        this.editorService.patchNodeData(newNode, newNode.label, {});
 
         // reconnect edges where possible
         const conns = this.editor.getConnections().filter((c) => c.source === oldId || c.target === oldId);
@@ -365,11 +383,6 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         this.isPropertyPanelVisible.set(true);
     }
 
-    patchNodeData(node: any, name: string, config: any) {
-        (node as any).customName = name;
-        (node as any).customConfig = config;
-    }
-
     async addNode(nodeType: string) {
         if (nodeType === 'StartNode' && this.editor.getNodes().some((n) => n.label === 'StartNode')) {
             this.message.warning('Only one Start node is allowed');
@@ -391,141 +404,26 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
 
         await this.editor.addNode(node);
 
-        this.nodeConfigs.update((configs) => ({
+        this.editorService.nodeConfigs.update((configs) => ({
             ...configs,
             [node.id]: { name: node.label, config: {} },
         }));
-        this.patchNodeData(node, node.label, {});
+        this.editorService.patchNodeData(node, node.label, {});
 
         const center = this.area.area.pointer;
         await this.area.translate(node.id, { x: center.x, y: center.y });
     }
 
     updateNodeName(nodeId: string, name: string) {
-        this.nodeConfigs.update((configs) => ({
+        this.editorService.nodeConfigs.update((configs) => ({
             ...configs,
             [nodeId]: { ...configs[nodeId], name },
         }));
 
         const node = this.editor.getNode(nodeId);
         if (node) {
-            this.patchNodeData(node, name, this.nodeConfigs()[nodeId].config);
+            this.editorService.patchNodeData(node, name, this.editorService.nodeConfigs()[nodeId].config);
             this.area.update('node', nodeId);
-        }
-    }
-
-    updateNodeConfig(nodeId: string, field: string, value: any) {
-        this.nodeConfigs.update((configs) => ({
-            ...configs,
-            [nodeId]: {
-                ...configs[nodeId],
-                config: { ...configs[nodeId].config, [field]: value },
-            },
-        }));
-
-        const node = this.editor.getNode(nodeId);
-        if (node) {
-            this.patchNodeData(node, this.nodeConfigs()[nodeId].name, this.nodeConfigs()[nodeId].config);
-            this.area.update('node', nodeId);
-        }
-    }
-
-    addCondition(nodeId: string) {
-        const config = this.nodeConfigs()[nodeId].config;
-        if (!config.conditions) {
-            config.conditions = [];
-        }
-        config.conditions.push({ variable: 'compression_ratio', operator: '<', threshold: 0.8 });
-        this.updateNodeConfig(nodeId, 'conditions', config.conditions);
-    }
-
-    removeCondition(nodeId: string, index: number) {
-        const config = this.nodeConfigs()[nodeId].config;
-        if (config.conditions) {
-            config.conditions.splice(index, 1);
-            this.updateNodeConfig(nodeId, 'conditions', config.conditions);
-        }
-    }
-
-    getAvailableVariables(nodeId: string): string[] {
-        const variables = new Set<string>();
-        const visited = new Set<string>();
-        const queue = [nodeId];
-
-        // Traverse backwards
-        while (queue.length > 0) {
-            const currentId = queue.shift()!;
-            if (visited.has(currentId)) continue;
-            visited.add(currentId);
-
-            const connections = this.editor.getConnections().filter(c => c.target === currentId);
-            for (const conn of connections) {
-                const sourceNodeId = conn.source;
-                queue.push(sourceNodeId);
-
-                const sourceNode = this.editor.getNode(sourceNodeId);
-                if (sourceNode?.label === 'StartNode') {
-                    // Only add default variables if connected to StartNode
-                    variables.add('file.size');
-                    variables.add('file.path');
-                    variables.add('original_file_path');
-                } else if (sourceNode?.label === 'CodeEvalNode') {
-                    const sourceConfig = this.nodeConfigs()[sourceNodeId];
-                    variables.add(sourceConfig?.config?.output_var || 'eval_result');
-                } else {
-                    // Check source node config for output_var
-                    const sourceConfig = this.nodeConfigs()[sourceNodeId];
-                    if (sourceConfig?.config?.output_var) {
-                        variables.add(sourceConfig.config.output_var);
-                    }
-                }
-            }
-        }
-        return Array.from(variables);
-    }
-
-    formatVarForCode(varName: string): string {
-        if (varName.startsWith('file.')) {
-            const parts = varName.split('.');
-            return `args["${parts[0]}"]["${parts[1]}"]`;
-        }
-        return `args["${varName}"]`;
-    }
-
-    updateCondition(nodeId: string, index: number, field: string, value: any) {
-        const config = this.nodeConfigs()[nodeId].config;
-        if (config.conditions && config.conditions[index]) {
-            config.conditions[index][field] = value;
-            this.updateNodeConfig(nodeId, 'conditions', config.conditions);
-        }
-    }
-
-    updateArgs(jsonString: string, nodeId: string) {
-        try {
-            const args = JSON.parse(jsonString);
-            this.updateNodeConfig(nodeId, 'args', args);
-        } catch (e) {
-            // Ignore invalid JSON during typing
-        }
-    }
-
-    selectedVarForInsert = signal<string>('args["file"]["size"]');
-
-    insertVariableToCode() {
-        const nodeId = this.selectedNode()?.id;
-        if (!nodeId) return;
-
-        const currentCode = this.nodeConfigs()[nodeId].config.code || '';
-        const newCode = currentCode + (currentCode.endsWith('\n') || currentCode === '' ? '' : ' ') + this.selectedVarForInsert();
-        this.updateNodeConfig(nodeId, 'code', newCode);
-    }
-
-    updateTags(jsonString: string, nodeId: string) {
-        try {
-            const tags = JSON.parse(jsonString);
-            this.updateNodeConfig(nodeId, 'tags', tags);
-        } catch (e) {
-            // Ignore
         }
     }
 
@@ -567,7 +465,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     serializeDag() {
         const nodes = this.editor.getNodes();
         const connections = this.editor.getConnections();
-        const currentConfigs = this.nodeConfigs();
+        const currentConfigs = this.editorService.nodeConfigs();
 
         const dagJson: any = { nodes: {}, edges: [], start_node: null };
 
@@ -622,7 +520,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
 
     async loadDag(taskDef: any) {
         await this.editor.clear();
-        this.nodeConfigs.set({});
+        this.editorService.nodeConfigs.set({});
         this.selectedNode.set(null);
 
         const dagJson = taskDef.json_data;
@@ -653,12 +551,12 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
             }
 
             newConfigs[node.id] = { name: nodeData.name, config: nodeData.config || {} };
-            this.patchNodeData(node, nodeData.name, nodeData.config || {});
+            this.editorService.patchNodeData(node, nodeData.name, nodeData.config || {});
             nodeMap.set(id, node);
             await this.editor.addNode(node);
         }
 
-        this.nodeConfigs.set(newConfigs);
+        this.editorService.nodeConfigs.set(newConfigs);
 
         for (const edge of dagJson.edges) {
             const sourceNode = nodeMap.get(edge.source);

@@ -12,7 +12,7 @@ class TaskExecutor:
         Example dag_json format:
         {
             "nodes": {
-                "node_1": {"type": "ReadInputNode", "name": "Start", "config": {...}},
+                "node_1": {"type": "MetadataReadNode", "name": "Start", "config": {...}},
                 "node_2": {"type": "ConvertNode", "name": "Convert to AVIF", "config": {...}}
             },
             "edges": [

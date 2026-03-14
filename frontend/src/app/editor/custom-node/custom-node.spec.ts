@@ -40,7 +40,7 @@ describe('CustomNodeComponent', () => {
 
         fixture = TestBed.createComponent(CustomNodeComponent);
         component = fixture.componentInstance;
-        component.data = new ClassicPreset.Node('ReadInputNode');
+        component.data = new ClassicPreset.Node('MetadataReadNode');
         component.emit = () => {};
         component.rendered = () => {};
         await fixture.whenStable();

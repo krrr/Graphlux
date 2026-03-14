@@ -19,7 +19,7 @@ def dummy_image():
 SCENARIO_1_DAG = {
     "start_node": "node_1",
     "nodes": {
-        "node_1": {"type": "ReadInputNode", "name": "Read JPG", "config": {}},
+        "node_1": {"type": "MetadataReadNode", "name": "Read JPG", "config": {}},
         "node_2": {"type": "ConvertNode", "name": "Convert AVIF", "config": {"tool": "imagemagick", "target_extension": ".avif"}},
         "node_3": {"type": "CodeEvalNode", "name": "Calc Comp", "config": {"code": "import os\nos.path.getsize(args['file']['path']) / os.path.getsize(args['original_file_path'])", "output_var": "compression_ratio"}},
         "node_4": {"type": "ConditionNode", "name": "Check Threshold", "config": {"relation": "and", "conditions": [{"variable": "compression_ratio", "operator": "<", "threshold": 0.8}]}},

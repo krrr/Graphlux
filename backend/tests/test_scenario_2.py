@@ -16,7 +16,7 @@ def dummy_mp4():
 SCENARIO_2_DAG = {
     "start_node": "node_1",
     "nodes": {
-        "node_1": {"type": "ReadInputNode", "name": "Read MP4", "config": {}},
+        "node_1": {"type": "MetadataReadNode", "name": "Read MP4", "config": {}},
         "node_2": {"type": "FFmpegActionNode", "name": "Streamline Audio", "config": {
             "args": "-map 0:v -map 0:a:0 -c:v copy -c:a aac -b:a 128k",
             "extension": ".mp4"
