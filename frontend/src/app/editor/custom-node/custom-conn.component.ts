@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { ClassicPreset } from 'rete';
+import { TaskConnection, TaskNode } from '../editor.service';
 
 @Component({
     selector: 'custom_conn',
@@ -25,7 +26,7 @@ import { ClassicPreset } from 'rete';
     ],
 })
 export class CustomConnComponent {
-    @Input() data!: ClassicPreset.Connection<ClassicPreset.Node, ClassicPreset.Node>;
+    @Input() data!: TaskConnection<TaskNode>;
     @Input() start: any;
     @Input() end: any;
     @Input() path!: string;

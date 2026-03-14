@@ -1,9 +1,8 @@
-import { Component, Input, ChangeDetectorRef, OnInit, OnChanges } from '@angular/core';
-import { ClassicPreset } from 'rete';
+import { Component, Input, ChangeDetectorRef, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { ReteModule } from 'rete-angular-plugin/18';
-import { NODE_INFO } from '../editor.service';
+import { NODE_INFO, TaskNode } from '../editor.service';
 
 
 @Component({
@@ -14,18 +13,18 @@ import { NODE_INFO } from '../editor.service';
     styleUrls: ['./custom-node.component.scss'],
 })
 export class CustomNodeComponent implements OnChanges {
-    @Input() data!: ClassicPreset.Node & { selected?: boolean };
+    @Input() data!: TaskNode;
     @Input() emit!: (data: any) => void;
     @Input() rendered!: () => void;
 
     seed = 0; // from official demo
 
     get iconType(): string {
-        return NODE_INFO[this.data.label]?.icon || 'setting';
+        return NODE_INFO[this.data.type]?.icon || 'setting';
     }
 
     get iconColor(): string {
-        return NODE_INFO[this.data.label]?.color || '#666';
+        return NODE_INFO[this.data.type]?.color || '#666';
     }
 
     get headerBgColor(): string {
@@ -42,10 +41,6 @@ export class CustomNodeComponent implements OnChanges {
             key,
             input: this.data.inputs[key]!,
         }));
-    }
-
-    get customName(): string | undefined {
-        return (this.data as any).customName;
     }
 
     get outputs() {

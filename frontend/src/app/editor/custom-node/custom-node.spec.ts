@@ -16,6 +16,7 @@ import {
 } from '@ant-design/icons-angular/icons';
 
 import { CustomNodeComponent } from './custom-node.component';
+import { TaskNode } from '../editor.service';
 
 const icons: IconDefinition[] = [
     FolderOpenOutline,
@@ -40,7 +41,7 @@ describe('CustomNodeComponent', () => {
 
         fixture = TestBed.createComponent(CustomNodeComponent);
         component = fixture.componentInstance;
-        component.data = new ClassicPreset.Node('MetadataReadNode');
+        component.data = new TaskNode('MetadataReadNode', 'test');
         component.emit = () => {};
         component.rendered = () => {};
         await fixture.whenStable();

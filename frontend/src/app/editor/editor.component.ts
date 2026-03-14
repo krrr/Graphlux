@@ -29,9 +29,9 @@ import { PropsConditionComponent } from './properties/props-condition.component'
 import { PropsFileOperationComponent } from './properties/props-file-operation.component';
 import { PropsMetadataWriteComponent } from './properties/props-metadata-write.component';
 import { PropsFFmpegActionComponent } from './properties/props-ffmpeg-action.component';
-import { EditorService, NODE_INFO } from './editor.service';
+import { EditorService, NODE_INFO, TaskConnection, TaskNode } from './editor.service';
 
-type Schemes = GetSchemes<ClassicPreset.Node, ClassicPreset.Connection<ClassicPreset.Node, ClassicPreset.Node>>;
+type Schemes = GetSchemes<TaskNode, TaskConnection<TaskNode>>;
 type AreaExtra = AngularArea2D<Schemes>;
 
 @Component({
@@ -153,6 +153,8 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
                 const node = this.editor.getNode(nodeId);
                 if (node) {
                     this.selectedNode.set(node);
+                    console.debug('selected node', node);
+                    
                     this.isPropertyPanelVisible.set(true);
                     if (!this.editorService.nodeConfigs()[node.id]) {
                         this.editorService.nodeConfigs.update((configs) => ({
@@ -263,13 +265,13 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         const node = this.selectedNode();
         if (!node) return;
 
-        if (node.label === 'StartNode') {
+        if (node.type === 'StartNode') {
             this.message.error('Cannot clone Start node (only one allowed)');
             return;
         }
 
-        const newNodeType = node.label;
-        const newNode = new ClassicPreset.Node(newNodeType);
+        const newNodeType = node.type;
+        const newNode = new TaskNode(newNodeType, node.label + ' (Copy)');
 
         if (newNodeType !== 'StartNode') {
             newNode.addInput('input', new ClassicPreset.Input(new ClassicPreset.Socket('Data')));
@@ -287,8 +289,9 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         const config = this.editorService.nodeConfigs()[node.id] || { config: {} };
         this.editorService.nodeConfigs.update((configs) => ({
             ...configs,
-            [newNode.id]: { name: config.name + ' (Copy)', config: JSON.parse(JSON.stringify(config.config)) },
+            [newNode.id]: { name: node.label + ' (Copy)', config: JSON.parse(JSON.stringify(config.config)) },
         }));
+        this.editorService.patchNodeData(newNode, node.label + ' (Copy)', config.config);
 
         const view = this.area.nodeViews.get(node.id);
         if (view) {
@@ -300,7 +303,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         const node = this.selectedNode();
         if (!node) return;
 
-        if (node.label === 'StartNode') {
+        if (node.type === 'StartNode') {
             this.message.error('Cannot delete Start node. It is required.');
             return;
         }
@@ -318,7 +321,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         const node = this.selectedNode();
         if (!node) return;
 
-        if (node.label === 'StartNode' || newType === 'StartNode') {
+        if (node.type === 'StartNode' || newType === 'StartNode') {
             this.message.error('Cannot change to or from Start node');
             return;
         }
@@ -327,7 +330,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         const view = this.area.nodeViews.get(oldId);
         const pos = view ? { x: view.position.x, y: view.position.y } : { x: 0, y: 0 };
 
-        const newNode = new ClassicPreset.Node(newType);
+        const newNode = new TaskNode(newType, NODE_INFO[newType].label);
 
         if (newType !== 'StartNode') {
             newNode.addInput('input', new ClassicPreset.Input(new ClassicPreset.Socket('Data')));
@@ -431,7 +434,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
 
         const dagJson: any = { nodes: {}, edges: [], start_node: null };
 
-        const startNodes = nodes.filter((n) => n.label === 'StartNode');
+        const startNodes = nodes.filter((n) => n.type === 'StartNode');
         if (startNodes.length > 0) {
             dagJson.start_node = startNodes[0].id;
         }
@@ -440,8 +443,8 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
             const config = currentConfigs[node.id];
             const position = this.area.nodeViews.get(node.id)?.position || { x: 0, y: 0 };
             dagJson.nodes[node.id] = {
-                type: node.label,
-                name: config?.name || node.label,
+                type: node.type,
+                name: node.label,
                 config: config?.config || {},
                 position: position,
             };
@@ -498,7 +501,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         const newConfigs: { [id: string]: any } = {};
 
         for (const [id, nodeData] of Object.entries<any>(dagJson.nodes)) {
-            const node = new ClassicPreset.Node(nodeData.type);
+            const node = new TaskNode(nodeData.type, nodeData.name);
             node.id = id;
 
             if (nodeData.type !== 'StartNode') {
@@ -524,7 +527,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
             const sourceNode = nodeMap.get(edge.source);
             const targetNode = nodeMap.get(edge.target);
             if (sourceNode && targetNode) {
-                const conn = new ClassicPreset.Connection(sourceNode, edge.branch, targetNode, 'input');
+                const conn = new TaskConnection(sourceNode, edge.branch, targetNode, 'input');
                 await this.editor.addConnection(conn);
             }
         }

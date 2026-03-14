@@ -14,7 +14,7 @@ export class EditorService {
     message = inject(NzMessageService);
 
     patchNodeData(node: any, name: string, config: any) {
-        (node as any).customName = name;
+        node.label = name;
         (node as any).customConfig = config;
     }
 
@@ -53,12 +53,12 @@ export class EditorService {
                 const sourceNodeId = conn.source;
                 queue.push(sourceNodeId);
 
-                const sourceNode = this.editor.getNode(sourceNodeId);
-                if (sourceNode?.label === 'StartNode') {
+                const sourceNode = this.editor.getNode(sourceNodeId) as any;
+                if (sourceNode?.type === 'StartNode') {
                     variables.add('file.size');
                     variables.add('file.path');
                     variables.add('original_file_path');
-                } else if (sourceNode?.label === 'CodeEvalNode') {
+                } else if (sourceNode?.type === 'CodeEvalNode') {
                     const sourceConfig = this.nodeConfigs()[sourceNodeId];
                     variables.add(sourceConfig?.config?.output_var || 'eval_result');
                 } else {
@@ -73,12 +73,12 @@ export class EditorService {
     }
 
     async addNode(nodeType: string) {
-        if (nodeType === 'StartNode' && this.editor.getNodes().some((n) => n.label === 'StartNode')) {
+        if (nodeType === 'StartNode' && this.editor.getNodes().some((n: any) => n.type === 'StartNode')) {
             console.error('Only one Start node is allowed');
             return;
         }
 
-        const node = new ClassicPreset.Node(nodeType);
+        const node = new TaskNode(nodeType, NODE_INFO[nodeType].label);
 
         if (nodeType !== 'StartNode') {
             node.addInput('input', new ClassicPreset.Input(new ClassicPreset.Socket('Data')));
@@ -97,7 +97,7 @@ export class EditorService {
             ...configs,
             [node.id]: { name: NODE_INFO[nodeType].label, config: {} },
         }));
-        this.patchNodeData(node, node.label, {});
+        this.patchNodeData(node, NODE_INFO[nodeType].label, {});
 
         const center = this.area.area.pointer;
         await this.area.translate(node.id, { x: center.x, y: center.y });
@@ -116,3 +116,14 @@ export const NODE_INFO: Record<string, { icon: string; color: string, label: str
     MetadataWriteNode: { icon: 'edit', color: '#13c2c2', label: 'Write Media Metadata' },
     FFmpegActionNode: { icon: 'video-camera', color: '#c2dd2f', label: 'FFmpeg Action' },
 };
+
+export class TaskNode extends ClassicPreset.Node {
+    type: string
+
+    constructor(type: string, label: string) {
+        super(label);
+        this.type = type;
+    }
+}
+
+export class TaskConnection<N extends TaskNode> extends ClassicPreset.Connection<N, N> {}

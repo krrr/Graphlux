@@ -33,14 +33,14 @@
         <div class="ant-form">
           <nz-form-item>
             <nz-form-label>Type</nz-form-label>
-            <nz-form-control><span nz-icon [nzType]="getNodeIcon(selectedNode().label)"></span> {{ selectedNode().label }}</nz-form-control>
+            <nz-form-control><span nz-icon [nzType]="getNodeIcon(selectedNode().type)"></span> {{ selectedNode().type }}</nz-form-control>
           </nz-form-item>
           <nz-form-item>
             <nz-form-label>Name</nz-form-label>
             <nz-form-control>
               <input
                 nz-input
-                [ngModel]="editorService.nodeConfigs()[selectedNode().id].name"
+                [ngModel]="selectedNode().label"
                 (ngModelChange)="updateNodeName(selectedNode().id, $event)"
                 name="nodeName"
                 placeholder="Node Name"
@@ -50,7 +50,7 @@
         </div>
 
         <h4>Configuration</h4>
-        <div [ngSwitch]="selectedNode().label" class="ant-form ant-form-vertical">
+        <div [ngSwitch]="selectedNode().type" class="ant-form ant-form-vertical">
           <app-read-input-props *ngSwitchCase="'MetadataReadNode'" [nodeId]="selectedNode().id"/>
           <app-convert-props *ngSwitchCase="'ConvertNode'" [nodeId]="selectedNode().id"/>
           <app-code-eval-props *ngSwitchCase="'CodeEvalNode'" [nodeId]="selectedNode().id"/>
