@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
+import { appConfig } from './app.config';
 
 import { ActivatedRoute } from '@angular/router';
 
@@ -8,6 +9,7 @@ describe('App', () => {
         await TestBed.configureTestingModule({
             imports: [AppComponent],
             providers: [
+                ...(appConfig.providers),
                 {
                     provide: ActivatedRoute,
                     useValue: {},

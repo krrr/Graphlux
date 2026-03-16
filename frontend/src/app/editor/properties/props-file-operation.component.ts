@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { PropsBase } from './props-base';
 
 @Component({
     selector: 'app-file-operation-props',
@@ -39,16 +40,5 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
         </nz-form-item>
     `
 })
-export class PropsFileOperationComponent implements OnChanges {
-    config = signal<any>({});
-    @Input() nodeId!: string;
-    editorService = inject(EditorService);
-
-    ngOnChanges(): void {
-        this.config.set(this.editorService.getNodeConfig(this.nodeId));
-    }
-
-    updateConfig(field: string, value: any) {
-        this.editorService.updateNodeConfig(this.nodeId, field, value);
-    }
+export class PropsFileOperationComponent extends PropsBase implements OnChanges {
 }

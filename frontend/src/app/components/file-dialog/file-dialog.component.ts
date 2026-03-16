@@ -1,11 +1,9 @@
 import { Component, Input, Output, EventEmitter, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzListModule } from 'ng-zorro-antd/list';
-import { NzButtonModule } from 'ng-zorro-antd/button';
-import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzInputModule } from 'ng-zorro-antd/input';
 import { ApiService } from '../../api.service';
+import { COMMON_IMPORTS } from '../../shared-imports';
+import { lastValueFrom } from 'rxjs';
 
 interface FileItem {
     name: string;
@@ -16,7 +14,7 @@ interface FileItem {
 @Component({
     selector: 'app-file-dialog',
     standalone: true,
-    imports: [CommonModule, NzModalModule, NzListModule, NzButtonModule, NzIconModule, NzInputModule],
+    imports: [NzModalModule, NzListModule, ...COMMON_IMPORTS ],
     templateUrl: './file-dialog.component.html',
     styleUrls: ['./file-dialog.component.scss'],
 })
@@ -47,31 +45,31 @@ export class FileDialogComponent implements OnInit {
         }
     }
 
-    loadDirectory(path?: string) {
+    async loadDirectory(path?: string) {
         this.loading.set(true);
-        this.apiService.listDirectory(path).subscribe({
-            next: (data) => {
-                if (this.mode === 'folder') {
-                    this.items.set(data.filter((item) => item.is_dir));
-                } else {
-                    this.items.set(data);
-                }
-                if (path) {
-                    this.currentPath = path;
-                } else {
-                    // For roots
-                    this.currentPath = null;
-                }
-                this.selectedPath.set(null);
-                this.loading.set(false);
-            },
-            error: (err) => {
-                console.error('Failed to load directory', err);
-                this.loading.set(false);
-                // Fallback to roots on error
-                this.loadDirectory(undefined);
-            },
-        });
+        try {
+            var data = await lastValueFrom(this.apiService.listDirectory(path));
+        } catch (err) {
+            console.error('Failed to load directory', err);
+            // Fallback to roots on error
+            this.loadDirectory(undefined);
+            return;
+        } finally {
+            this.loading.set(false);
+        }
+
+        if (this.mode === 'folder') {
+            this.items.set(data.filter((item) => item.is_dir));
+        } else {
+            this.items.set(data);
+        }
+        if (path) {
+            this.currentPath = path;
+        } else {
+            // For roots
+            this.currentPath = null;
+        }
+        this.selectedPath.set(null);
     }
 
     goUp() {
@@ -127,5 +125,18 @@ export class FileDialogComponent implements OnInit {
     handleCancel(): void {
         this.isVisible = false;
         this.isVisibleChange.emit(this.isVisible);
+    }
+
+    onPathInputChange(path: string) {
+        if (!path) {
+            this.currentPath = 'System Roots';
+        } else {
+            this.currentPath = path;
+        }
+        this.selectedPath.set(path);
+        this.loadDirectory(path).then(() => {
+            console.log(this.items());
+            
+        });
     }
 }

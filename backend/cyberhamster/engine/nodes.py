@@ -75,21 +75,13 @@ class MetadataReadNode(DAGNode):
             logger.error(f"[{self.name}] Failed to read metadata from {file_path}")
             return False, None, {}
 
-        # Merge metadata into file_obj
-        if "metadata" not in file_obj:
-            file_obj["metadata"] = {}
-        for k, v in metadata.items():
-            file_obj["metadata"][k] = v
+        enable_single_tag = self.config.get("enable_single_tag", False)
         
-        # Check if already processed (example logic from config)
-        check_tag = self.config.get("check_tag", "XMP:ProcessingStatus")
-        skip_value = self.config.get("skip_value", "Processed=True")
-        
-        if check_tag in metadata and str(metadata[check_tag]) == skip_value:
-            logger.info(f"[{self.name}] File {file_path} already processed (tag: {check_tag}={skip_value}). Skipping.")
-            return False, None, {}
-            
-        return True, "default", {"file": file_obj}
+        if enable_single_tag:
+            read_single_tag = self.config.get("read_single_tag")
+            return True, "default", {"metadata": metadata[read_single_tag]}
+        else:
+            return True, "default", {"metadata": metadata}
 
 class ConvertNode(DAGNode):
     """Converts image format."""
@@ -153,7 +145,7 @@ class ConditionNode(DAGNode):
         for cond in conditions:
             var_name = cond.get("variable")
             operator = cond.get("operator")
-            threshold = cond.get("threshold")
+            target = cond.get("target")
 
             val = inputs.get(var_name)
             if val is None:
@@ -164,18 +156,18 @@ class ConditionNode(DAGNode):
             res = False
             try:
                 if operator == "<":
-                    res = val < threshold
+                    res = val < target
                 elif operator == ">":
-                    res = val > threshold
+                    res = val > target
                 elif operator == "==":
-                    res = val == threshold
+                    res = val == target
                 else:
                     logger.error(f"[{self.name}] Unknown operator: {operator}")
             except Exception as e:
-                logger.error(f"[{self.name}] Error evaluating condition {var_name} {operator} {threshold} (value={val}): {e}")
+                logger.error(f"[{self.name}] Error evaluating condition {var_name} {operator} {target} (value={val}): {e}")
 
             results.append(res)
-            logger.info(f"[{self.name}] Evaluated {var_name} {operator} {threshold} (value={val}) -> {res}")
+            logger.info(f"[{self.name}] Evaluated {var_name} {operator} {target} (value={val}) -> {res}")
             
         final_result = all(results) if relation == "and" else any(results)
         logger.info(f"[{self.name}] Final relation '{relation}' of {results} -> {final_result}")

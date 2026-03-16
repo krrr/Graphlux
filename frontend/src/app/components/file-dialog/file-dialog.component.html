@@ -11,7 +11,7 @@
         <button nz-button nzType="default" (click)="goUp()" [disabled]="!currentPath">
           <i nz-icon nzType="arrow-up"></i>
         </button>
-        <input nz-input [value]="currentPath || 'System Roots'" disabled class="path-input" />
+        <input nz-input #pathInput [ngModel]="currentPath || 'System Roots'" (keydown.enter)="onPathInputChange(pathInput.value)" class="path-input" />
       </div>
 
       <div class="file-list" [class.loading]="loading()">

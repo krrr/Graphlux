@@ -151,8 +151,13 @@ def list_directory(path: str = None, showHidden: bool = False):
         else:
             return [{"name": "/", "path": "/", "is_dir": True}]
 
-    if not os.path.exists(path) or not os.path.isdir(path):
-        raise HTTPException(status_code=400, detail="Invalid directory path")
+    if not os.path.exists(path):
+        raise HTTPException(status_code=400, detail="Path does not exist")
+
+    if not os.path.isdir(path):
+        path = os.path.dirname(path)
+        if not path or not os.path.isdir(path):
+             raise HTTPException(status_code=400, detail="Invalid directory path")
 
     try:
         items = []

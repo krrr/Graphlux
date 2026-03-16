@@ -78,13 +78,10 @@
         <nz-form-item>
           <nz-form-label nzRequired>Input File Path (Absolute)</nz-form-label>
           <nz-form-control nzErrorTip="Please input the file path!">
-            <input
-              nz-input
-              [ngModel]="executeFilePath()"
-              (ngModelChange)="executeFilePath.set($event)"
-              name="executeFilePath"
-              placeholder="/path/to/test.jpg"
-            />
+            <div style="display: flex; gap: 8px">
+              <input nz-input [(ngModel)]="executeFilePath" name="executeFilePath" />
+              <button nz-button type="button" (click)="openFileDialog()">Browse...</button>
+            </div>
           </nz-form-control>
         </nz-form-item>
       </form>
@@ -136,3 +133,8 @@
     </ul>
   </nz-dropdown-menu>
 </div>
+
+
+<app-file-dialog [(isVisible)]="isFileDialogVisible" mode="file"
+  [currentPath]="executeFilePath()" (fileSelected)="executeFilePath.set($event)"
+/>

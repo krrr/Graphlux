@@ -8,6 +8,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { PropsBase } from './props-base';
 
 @Component({
     selector: 'app-condition-props',
@@ -59,13 +60,12 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
             </nz-form-control>
           </nz-form-item>
           <nz-form-item style="margin-bottom: 0;">
-            <nz-form-label>Threshold (Number)</nz-form-label>
+            <nz-form-label>Target</nz-form-label>
             <nz-form-control>
               <input
                 nz-input
-                type="number"
-                [ngModel]="cond.threshold"
-                (ngModelChange)="updateCondition(i, 'threshold', $event)"
+                [ngModel]="cond.target"
+                (ngModelChange)="updateCondition(i, 'target', $event)"
                 name="cond_thresh_{{i}}"
               />
             </nz-form-control>
@@ -78,26 +78,14 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
         </button>
     `
 })
-export class PropsConditionComponent implements OnChanges {
-    config = signal<any>({});
-    @Input() nodeId!: string;
-    editorService = inject(EditorService);
-
-    ngOnChanges(): void {
-        this.config.set(this.editorService.getNodeConfig(this.nodeId));
-    }
-
+export class PropsConditionComponent extends PropsBase implements OnChanges {
     get availableVariables(): string[] {
         return this.editorService.getAvailableVariables(this.nodeId);
     }
     
-    updateConfig(field: string, value: any) {
-        this.editorService.updateNodeConfig(this.nodeId, field, value);
-    }
-
     addCondition() {
         const conditions = this.config().conditions ? [...this.config().conditions] : [];
-        conditions.push({ variable: 'compression_ratio', operator: '<', threshold: 0.8 });
+        conditions.push({});
         this.updateConfig('conditions', conditions);
     }
 

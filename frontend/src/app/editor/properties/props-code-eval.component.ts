@@ -7,6 +7,7 @@ import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { PropsBase } from './props-base';
 
 @Component({
     selector: 'app-code-eval-props',
@@ -53,24 +54,12 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
         </nz-form-item>
     `
 })
-export class PropsCodeEvalComponent implements OnChanges {
-    config = signal<any>({});
-    @Input() nodeId!: string;
-    editorService = inject(EditorService);
-
-    ngOnChanges(): void {
-        this.config.set(this.editorService.getNodeConfig(this.nodeId));
-    }
-
+export class PropsCodeEvalComponent extends PropsBase implements OnChanges {
     get availableVariables(): string[] {
         return this.editorService.getAvailableVariables(this.nodeId);
     }
     
     selectedVarForInsert: string = 'args["file"]["size"]';
-
-    updateConfig(field: string, value: any) {
-        this.editorService.updateNodeConfig(this.nodeId, field, value);
-    }
 
     formatVarForCode(varName: string): string {
         if (varName.startsWith('file.')) {

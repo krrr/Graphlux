@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, signal } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { inject } from '@angular/core';
 import { EditorService } from '../editor.service';
 import { CommonModule } from '@angular/common';
@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
+import { PropsBase } from './props-base';
 
 @Component({
     selector: 'app-metadata-write-props',
@@ -39,19 +40,7 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
         </nz-form-item>
     `
 })
-export class PropsMetadataWriteComponent implements OnChanges {
-    config = signal<any>({});
-    @Input() nodeId!: string;
-    editorService = inject(EditorService);
-
-    ngOnChanges(): void {
-        this.config.set(this.editorService.getNodeConfig(this.nodeId));
-    }
-
-    updateConfig(field: string, value: any) {
-        this.editorService.updateNodeConfig(this.nodeId, field, value);
-    }
-
+export class PropsMetadataWriteComponent extends PropsBase implements OnChanges {
     updateTags(jsonString: string) {
         try {
             const tags = JSON.parse(jsonString);

@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { PropsBase } from './props-base';
 
 @Component({
     selector: 'app-ffmpeg-action-props',
@@ -37,16 +38,5 @@ import { NzInputModule } from 'ng-zorro-antd/input';
         </nz-form-item>
     `
 })
-export class PropsFFmpegActionComponent implements OnChanges {
-    config = signal<any>({});
-    @Input() nodeId!: string;
-    editorService = inject(EditorService);
-
-    ngOnChanges(): void {
-        this.config.set(this.editorService.getNodeConfig(this.nodeId));
-    }
-
-    updateConfig(field: string, value: any) {
-        this.editorService.updateNodeConfig(this.nodeId, field, value);
-    }
+export class PropsFFmpegActionComponent extends PropsBase implements OnChanges {
 }

@@ -13,7 +13,7 @@ import { Subscription } from 'rxjs';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzContextMenuService, NzDropdownMenuComponent, NzDropdownModule } from 'ng-zorro-antd/dropdown';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
-import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
@@ -30,6 +30,7 @@ import { PropsFileOperationComponent } from './properties/props-file-operation.c
 import { PropsMetadataWriteComponent } from './properties/props-metadata-write.component';
 import { PropsFFmpegActionComponent } from './properties/props-ffmpeg-action.component';
 import { EditorService, NODE_INFO, TaskConnection, TaskNode } from './editor.service';
+import { FileDialogComponent } from '../components/file-dialog/file-dialog.component';
 
 type Schemes = GetSchemes<TaskNode, TaskConnection<TaskNode>>;
 type AreaExtra = AngularArea2D<Schemes>;
@@ -56,6 +57,7 @@ type AreaExtra = AngularArea2D<Schemes>;
         PropsFileOperationComponent,
         PropsMetadataWriteComponent,
         PropsFFmpegActionComponent,
+        FileDialogComponent,
     ],
     providers: [EditorService],
     templateUrl: './editor.component.html',
@@ -80,6 +82,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
 
     isExecuteModalVisible = signal(false);
     isLogsModalVisible = signal(false);
+    isFileDialogVisible = false;
     executeFilePath = signal('');
 
     availableNodes = ['FinishNode', 'MetadataReadNode', 'ConvertNode', 'CodeEvalNode', 'ConditionNode', 'FileOperationNode',
@@ -96,6 +99,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         private injector: Injector,
         private route: ActivatedRoute,
         private message: NzMessageService,
+        private modal: NzModalService,
         private nzContextMenuService: NzContextMenuService,
         public editorService: EditorService,
     ) {}
@@ -544,5 +548,9 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         }
 
         AreaExtensions.zoomAt(this.area, this.editor.getNodes());
+    }
+
+    openFileDialog() {
+        this.isFileDialogVisible = true;
     }
 }

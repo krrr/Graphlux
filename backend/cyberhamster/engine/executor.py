@@ -103,7 +103,7 @@ class TaskExecutor:
             initial_file_obj = {
                 "path": file_path,
                 "size": os.path.getsize(file_path) if os.path.exists(file_path) else 0,
-                "metadata": None
+                "ctime": os.path.getctime(file_path),
             }
         except Exception as e:
             logger.error(f"Failed to get info for {file_path}: {e}")

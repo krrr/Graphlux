@@ -61,6 +61,8 @@ export class EditorService {
                 } else if (sourceNode?.type === 'CodeEvalNode') {
                     const sourceConfig = this.nodeConfigs()[sourceNodeId];
                     variables.add(sourceConfig?.config?.output_var || 'eval_result');
+                } else if (sourceNode?.type === 'MetadataReadNode') {
+                    variables.add('metadata');
                 } else {
                     const sourceConfig = this.nodeConfigs()[sourceNodeId];
                     if (sourceConfig?.config?.output_var) {
