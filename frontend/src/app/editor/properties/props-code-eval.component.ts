@@ -1,30 +1,28 @@
 import { Component, Input, OnChanges, signal } from '@angular/core';
-import { inject } from '@angular/core';
-import { EditorService } from '../editor.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzCodeEditorModule } from 'ng-zorro-antd/code-editor';
 import { PropsBase } from './props-base';
 
 @Component({
     selector: 'app-code-eval-props',
     standalone: true,
-    imports: [CommonModule, FormsModule, NzFormModule, NzInputModule, NzSelectModule, NzButtonModule],
+    imports: [CommonModule, FormsModule, NzFormModule, NzInputModule, NzSelectModule, NzButtonModule, NzCodeEditorModule],
     template: `
         <nz-form-item>
           <nz-form-label>Python Code</nz-form-label>
           <nz-form-control>
-            <textarea
-              nz-input
+            <nz-code-editor
+              class="editor"
+              [nzEditorOption]="editorOpt"
               [ngModel]="config().code"
               (ngModelChange)="updateConfig('code', $event)"
-              name="code"
-              rows="6"
-              placeholder="import os&#10;args['file']['size'] / os.path.getsize(args['original_file_path'])"
-            ></textarea>
+              style=""
+            ></nz-code-editor>
           </nz-form-control>
         </nz-form-item>
         <nz-form-item>
@@ -52,13 +50,30 @@ import { PropsBase } from './props-base';
             />
           </nz-form-control>
         </nz-form-item>
-    `
+    `,
+    styles: [`
+      .editor {
+        overflow: hidden;
+        height: 200px;
+        border: 1px solid #d9d9d9;
+        border-radius: 2px;
+      }
+    `]
 })
 export class PropsCodeEvalComponent extends PropsBase implements OnChanges {
+    editorOpt = {
+        language: 'python',
+        minimap: { enabled: false },
+        lineNumbersMinChars: 3,
+        glyphMargin: false,
+        folding: false,
+        // lineDecorationsWidth: 0
+    }
+
     get availableVariables(): string[] {
         return this.editorService.getAvailableVariables(this.nodeId);
     }
-    
+
     selectedVarForInsert: string = 'args["file"]["size"]';
 
     formatVarForCode(varName: string): string {
