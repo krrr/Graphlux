@@ -9,7 +9,7 @@ import { AutoArrangePlugin, Presets as ArrangePresets } from 'rete-auto-arrange-
 import { AngularPlugin, Presets, AngularArea2D } from 'rete-angular-plugin/18';
 import { CustomNodeComponent } from './custom-node/custom-node.component';
 import { ApiService } from '../api.service';
-import { Subscription } from 'rxjs';
+import { lastValueFrom, Subscription } from 'rxjs';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzContextMenuService, NzDropdownMenuComponent, NzDropdownModule } from 'ng-zorro-antd/dropdown';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
@@ -76,6 +76,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     selectedNode = signal<any>(null);
     isPropertyPanelVisible = signal(true);
 
+    private task: any;
     taskId = signal<number | null>(null);
     arrange!: AutoArrangePlugin<any>;
     zoomLevel = signal<string>('100%');
@@ -123,9 +124,8 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         const tid = this.taskId();
         if (!tid) return;
         this.apiService.getTask(tid).subscribe((task) => {
-            if (task) {
-                this.loadDag(task);
-            }
+            this.task = task;
+            this.loadDag(task);
         });
     }
 
@@ -465,7 +465,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         return dagJson;
     }
 
-    saveDag() {
+    async saveDag() {
         const taskId = this.taskId();
         if (!taskId) {
             this.message.error('No Task ID associated with this editor');
@@ -473,18 +473,12 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         }
 
         const dagJson = this.serializeDag();
-
-        this.apiService.getTask(taskId).subscribe((currentTask) => {
-            const payload = {
-                name: currentTask.name,
-                description: currentTask.description,
-                json_data: dagJson,
-            };
-
-            this.apiService.updateTask(taskId, payload).subscribe(() => {
-                this.message.success('Task Saved successfully');
-            });
-        });
+        try {
+            await lastValueFrom(this.apiService.updateTask(taskId, { json_data: dagJson }))
+            this.message.success('Task Saved successfully');
+        } catch (e: any) {
+            this.message.error(e.error.detail);
+        }
     }
 
     async loadDag(taskDef: any) {

@@ -24,6 +24,8 @@ def get_task(task_id: int, session: Session = Depends(get_session)):
 
 @router.post("/tasks", response_model=Task)
 def create_task(task: Task, session: Session = Depends(get_session)):
+    if task.json_data:
+        validate_dag(task.json_data)
     session.add(task)
     session.commit()
     session.refresh(task)
@@ -36,6 +38,10 @@ def update_task(task_id: int, task_update: Task, session: Session = Depends(get_
         raise HTTPException(status_code=404, detail="Task not found")
 
     update_data = task_update.model_dump(exclude_unset=True)
+    
+    if "json_data" in update_data:
+        validate_dag(update_data["json_data"])
+
     for key, value in update_data.items():
         if key != "id": # Don't update ID
             setattr(task, key, value)
@@ -207,3 +213,73 @@ def update_settings(settings_update: SystemSettings, session: Session = Depends(
     session.commit()
     session.refresh(settings)
     return settings
+
+
+def validate_dag(dag_json: Any):
+    if not dag_json or not isinstance(dag_json, dict) or not dag_json.get("nodes"):
+        return
+
+    nodes = dag_json.get("nodes", {})
+    edges = dag_json.get("edges", [])
+    start_node_id = dag_json.get("start_node")
+
+    if not start_node_id:
+        raise HTTPException(status_code=400, detail="Start node is missing.")
+    if start_node_id not in nodes:
+        raise HTTPException(status_code=400, detail="Start node ID not found in nodes.")
+
+    # Adjacency list: node -> branch -> [targets]
+    adj = {node_id: {} for node_id in nodes}
+    for edge in edges:
+        source = edge.get("source")
+        branch = edge.get("branch", "default")
+        target = edge.get("target")
+        if source in adj:
+            if branch not in adj[source]:
+                adj[source][branch] = []
+            adj[source][branch].append(target)
+
+    memo = {}
+    visiting = set()
+
+    def check_node(node_id: str) -> bool:
+        node = nodes.get(node_id)
+        if not node:
+            return False
+
+        if node.get("type") == "FinishNode":
+            return True
+        if node_id in visiting:
+            return False # Cycle detected (reachable from Start and doesn't reach Finish)
+        if node_id in memo:
+            return memo[node_id]
+
+        visiting.add(node_id)
+
+        node_type = node.get("type")
+        if node_type == "ConditionNode":
+            required_branches = ["true_branch", "false_branch"]
+        else:
+            required_branches = ["default"]
+
+        for branch in required_branches:
+            targets = adj[node_id].get(branch, [])
+            if not targets:
+                # This branch is not connected, leading to an incomplete path
+                visiting.remove(node_id)
+                memo[node_id] = False
+                return False
+
+            for target_id in targets:
+                if not check_node(target_id):
+                    visiting.remove(node_id)
+                    memo[node_id] = False
+                    return False
+
+        visiting.remove(node_id)
+        memo[node_id] = True
+        return True
+
+    if not check_node(start_node_id):
+        raise HTTPException(status_code=400, detail="Validation Failed: Every path from Start must lead to a Finish node")
+

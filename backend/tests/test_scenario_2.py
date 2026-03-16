@@ -14,8 +14,9 @@ def dummy_mp4():
         os.remove(path)
 
 SCENARIO_2_DAG = {
-    "start_node": "node_1",
+    "start_node": "node_0",
     "nodes": {
+        "node_0": {"type": "StartNode", "name": "Start", "config": {}},
         "node_1": {"type": "MetadataReadNode", "name": "Read MP4", "config": {}},
         "node_2": {"type": "FFmpegActionNode", "name": "Streamline Audio", "config": {
             "args": "-map 0:v -map 0:a:0 -c:v copy -c:a aac -b:a 128k",
@@ -30,6 +31,7 @@ SCENARIO_2_DAG = {
         }}
     },
     "edges": [
+        {"source": "node_0", "target": "node_1", "branch": "default"},
         {"source": "node_1", "target": "node_2", "branch": "default"},
         {"source": "node_2", "target": "node_3", "branch": "default"},
         {"source": "node_3", "target": "node_4", "branch": "default"}

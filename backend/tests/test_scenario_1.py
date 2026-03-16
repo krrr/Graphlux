@@ -17,17 +17,19 @@ def dummy_image():
 
 # Scenario 1 DAG definition
 SCENARIO_1_DAG = {
-    "start_node": "node_1",
+    "start_node": "node_0",
     "nodes": {
-        "node_1": {"type": "MetadataReadNode", "name": "Read JPG", "config": {}},
+        "node_0": {"type": "StartNode", "name": "Start", "config": {}},
+        "node_1": {"type": "MetadataReadNode", "name": "Read Metadata", "config": {}},
         "node_2": {"type": "ConvertNode", "name": "Convert AVIF", "config": {"tool": "imagemagick", "target_extension": ".avif"}},
         "node_3": {"type": "CodeEvalNode", "name": "Calc Comp", "config": {"code": "import os\nos.path.getsize(args['file']['path']) / os.path.getsize(args['original_file_path'])", "output_var": "compression_ratio"}},
-        "node_4": {"type": "ConditionNode", "name": "Check Threshold", "config": {"relation": "and", "conditions": [{"variable": "compression_ratio", "operator": "<", "threshold": 0.8}]}},
+        "node_4": {"type": "ConditionNode", "name": "Check Threshold", "config": {"relation": "and", "conditions": [{"variable": "compression_ratio", "operator": "<", "target": 0.8}]}},
         "node_5": {"type": "FileOperationNode", "name": "Replace", "config": {"action": "overwrite", "target_extension": ".avif"}},
         "node_6": {"type": "FileOperationNode", "name": "Cleanup", "config": {"action": "cleanup"}},
         "node_7": {"type": "MetadataWriteNode", "name": "Write Meta", "config": {"tags": {"XMP:ProcessingStatus": "LowCompression_Skipped"}, "write_to_original": True}}
     },
     "edges": [
+        {"source": "node_0", "target": "node_1", "branch": "default"},
         {"source": "node_1", "target": "node_2", "branch": "default"},
         {"source": "node_2", "target": "node_3", "branch": "default"},
         {"source": "node_3", "target": "node_4", "branch": "default"},

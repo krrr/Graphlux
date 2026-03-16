@@ -1,7 +1,7 @@
 import os
 from typing import Dict, Any, List
 from .context import FileContext
-from .nodes import NODE_TYPES
+from .nodes import NODE_TYPES, StartNode
 from ..logger import logger
 
 class TaskExecutor:
@@ -93,6 +93,8 @@ class TaskExecutor:
         logger.info(f"Starting DAG execution for file: {file_path}")
         context = FileContext(original_file_path=file_path)
         current_node_id = self.start_node_id
+        start_node = self.nodes.get(self.start_node_id)
+        assert start_node and isinstance(start_node, StartNode)
         
         if not current_node_id:
             logger.error("No start node defined in DAG.")
