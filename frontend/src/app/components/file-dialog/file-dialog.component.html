@@ -8,7 +8,7 @@
   <ng-container *nzModalContent>
     <div class="file-dialog-container">
       <div class="path-header">
-        <button nz-button nzType="default" (click)="goUp()" [disabled]="!currentPath">
+        <button nz-button nzType="default" (click)="goUp()" [disabled]="!currentPath" aria-label="Go up one directory" title="Go up one directory">
           <i nz-icon nzType="arrow-up"></i>
         </button>
         <input nz-input #pathInput [ngModel]="currentPath || 'System Roots'" (keydown.enter)="onPathInputChange(pathInput.value)" class="path-input" />
