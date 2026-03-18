@@ -32,7 +32,7 @@ import { PropsBase } from './props-base';
         <div *ngFor="let cond of config().conditions; let i = index" style="border: 1px solid #d9d9d9; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <strong>Condition {{ i + 1 }}</strong>
-            <button nz-button nzType="text" nzDanger nzSize="small" (click)="removeCondition(i)"><span nz-icon nzType="delete"></span></button>
+            <button nz-button nzType="text" nzDanger nzSize="small" (click)="removeCondition(i)" aria-label="Remove Condition" title="Remove Condition"><span nz-icon nzType="delete"></span></button>
           </div>
           <nz-form-item style="margin-bottom: 8px;">
             <nz-form-label>Variable</nz-form-label>

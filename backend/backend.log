@@ -1,18 +1,24 @@
 INFO:     Will watch for changes in these directories: ['/app/backend']
 INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [8394] using WatchFiles
-INFO:     Started server process [8522]
+INFO:     Started reloader process [3815] using WatchFiles
+INFO:     Started server process [3944]
 INFO:     Waiting for application startup.
-2026-03-08 10:58:44,204 - cyberhamster - INFO - Starting TaskManager...
+2026-03-18 04:40:53,875 - cyberhamster - INFO - Starting TaskManager...
 INFO:     Application startup complete.
-INFO:     127.0.0.1:48022 - "WebSocket /api/logs" [accepted]
+INFO:     127.0.0.1:34848 - "GET /api/tasks HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34860 - "GET /api/folders HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34874 - "POST /api/tasks HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34876 - "GET /api/tasks HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34882 - "WebSocket /api/logs" [accepted]
 INFO:     connection open
-INFO:     127.0.0.1:48036 - "GET /api/dags HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34898 - "GET /api/tasks/1 HTTP/1.1" 200 OK
 INFO:     connection closed
-INFO:     127.0.0.1:48050 - "WebSocket /api/logs" [accepted]
+INFO:     127.0.0.1:49728 - "GET /api/tasks HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41810 - "WebSocket /api/logs" [accepted]
 INFO:     connection open
-INFO:     127.0.0.1:48054 - "GET /api/dags HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41822 - "GET /api/tasks/1 HTTP/1.1" 200 OK
 INFO:     connection closed
-INFO:     127.0.0.1:48070 - "GET /api/dags HTTP/1.1" 200 OK
-INFO:     127.0.0.1:48064 - "GET /api/tasks HTTP/1.1" 200 OK
-INFO:     127.0.0.1:48076 - "GET /api/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58784 - "WebSocket /api/logs" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:58798 - "GET /api/tasks/1 HTTP/1.1" 200 OK
+INFO:     connection closed
