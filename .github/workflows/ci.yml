@@ -34,7 +34,7 @@ jobs:
         run: pnpm run build
 
       - name: Run tests
-        run: pnpm run test -- --watch=false
+        run: pnpm run test
 
   backend:
     runs-on: ubuntu-latest
