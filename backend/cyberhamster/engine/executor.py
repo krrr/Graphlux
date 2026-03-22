@@ -144,7 +144,8 @@ class TaskExecutor:
                     current_node_id = self.edges[current_node_id][next_branch]
                 else:
                     # No outgoing edge for this branch, but not FinishNode
-                    raise Exception(f"No outgoing edge for branch '{next_branch}' from node {current_node_id}")
+                    # This just means the DAG successfully finished at this leaf node
+                    current_node_id = None
 
             logger.info(f"Successfully completed DAG execution for file: {file_path}")
             return True

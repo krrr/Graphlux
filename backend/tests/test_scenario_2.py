@@ -25,6 +25,7 @@ SCENARIO_2_DAG = {
         }},
         "node_3": {"type": "FileOperationNode", "name": "Replace", "config": {
             "input_file_var": "node_2:file",
+            "target_file_var": "node_0:file",
             "action": "overwrite"
         }},
         "node_4": {"type": "MetadataWriteNode", "name": "Write Meta", "config": {
