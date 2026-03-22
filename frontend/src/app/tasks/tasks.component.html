@@ -19,7 +19,7 @@
         <nz-dropdown-menu #menu="nzDropdownMenu">
           <ul nz-menu>
             <li nz-menu-item (click)="showModal(task)"><nz-icon nzType="edit" />Edit Properties</li>
-            <li nz-menu-item (click)="deleteTask(task.id)"><nz-icon nzType="delete" />Delete</li>
+            <li nz-menu-item (click)="confirmDeleteTask(task)"><nz-icon nzType="delete" />Delete</li>
           </ul>
         </nz-dropdown-menu>
       </div>

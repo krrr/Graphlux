@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../api.service';
 import { Router } from '@angular/router';
 import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -49,6 +49,7 @@ export class TasksComponent implements OnInit {
         private apiService: ApiService,
         private router: Router,
         private message: NzMessageService,
+        private modal: NzModalService,
     ) {}
 
     ngOnInit() {
@@ -120,6 +121,18 @@ export class TasksComponent implements OnInit {
                 this.isModalVisible.set(false);
             });
         }
+    }
+
+    confirmDeleteTask(task: any) {
+        this.modal.confirm({
+            nzTitle: 'Are you sure you want to delete this task?',
+            nzContent: `<b>${task.name}</b>`,
+            nzOkText: 'Yes',
+            nzOkType: 'primary',
+            nzOkDanger: true,
+            nzOnOk: () => this.deleteTask(task.id),
+            nzCancelText: 'No',
+        });
     }
 
     deleteTask(id: number) {
