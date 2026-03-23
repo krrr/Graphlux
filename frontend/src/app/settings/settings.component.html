@@ -22,14 +22,13 @@
     </nz-form-item>
 
     <nz-form-item>
-      <nz-form-label>ImageMagick Pool Max Size (Concurrent Processes)</nz-form-label>
+      <nz-form-label>Max Concurrent Tasks</nz-form-label>
       <nz-form-control>
         <nz-input-number
-          [ngModel]="settings().magick_pool_max_size"
-          (ngModelChange)="updateField('magick_pool_max_size', $event)"
-          name="magick_pool_max_size"
+          [ngModel]="settings().max_concurrent_tasks"
+          (ngModelChange)="updateField('max_concurrent_tasks', $event)"
+          name="max_concurrent_tasks"
           [nzMin]="1"
-          [nzMax]="32"
           [nzStep]="1"
           style="width: 100%"
         ></nz-input-number>

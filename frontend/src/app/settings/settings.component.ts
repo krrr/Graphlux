@@ -18,7 +18,7 @@ export class SettingsComponent implements OnInit {
     settings = signal({
         ffmpeg_path: 'ffmpeg',
         imagemagick_path: 'magick',
-        magick_pool_max_size: 4,
+        max_concurrent_tasks: 4,
     });
 
     constructor(

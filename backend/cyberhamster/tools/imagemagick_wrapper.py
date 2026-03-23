@@ -136,7 +136,7 @@ class MagickPool:
                     return settings
         except Exception as e:
             logger.warning(f"Could not load settings from DB: {e}")
-        return SystemSettings(id=1, imagemagick_path="magick", magick_pool_max_size=4)
+        return SystemSettings(id=1, imagemagick_path="magick", max_concurrent_tasks=4)
 
     def _create_process(self, path: str) -> Optional[MagickProcess]:
         try:
@@ -167,7 +167,7 @@ class MagickPool:
                 return proc
             except queue.Empty:
                 with self.lock:
-                    if self.active_count < settings.magick_pool_max_size:
+                    if self.active_count < settings.max_concurrent_tasks:
                         self.active_count += 1
                         proc = self._create_process(settings.imagemagick_path)
                         if proc:

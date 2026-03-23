@@ -26,5 +26,4 @@ class SystemSettings(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     ffmpeg_path: str = Field(default="ffmpeg")
     imagemagick_path: str = Field(default="magick")
-    exiftool_path: str = Field(default="pyexiv2") # legacy field name; pyexiv2 is used for metadata
-    magick_pool_max_size: int = Field(default=4)
+    max_concurrent_tasks: int = Field(default=4)

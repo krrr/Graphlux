@@ -1,21 +1,22 @@
 import os
 import time
-import asyncio
 import re
 import threading
+from concurrent.futures import ThreadPoolExecutor
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from sqlmodel import Session, select
 from typing import Dict, Any, Optional
 
 from .db import engine
-from .models import Task, Folder
+from .models import Task, Folder, SystemSettings
 from .engine.executor import TaskExecutor
 from .logger import logger
 
 class FolderEventHandler(FileSystemEventHandler):
-    def __init__(self, folder_id: int):
+    def __init__(self, folder_id: int, executor_pool: ThreadPoolExecutor):
         self.folder_id = folder_id
+        self.executor_pool = executor_pool
         # Simple debounce to prevent multiple triggers for the same file rapidly
         self.recently_processed: Dict[str, float] = {}
 
@@ -59,8 +60,8 @@ class FolderEventHandler(FileSystemEventHandler):
             except Exception as e:
                 logger.error(f"Executor failed for {file_path}: {e}")
 
-        # In a real app we might use a task queue (e.g. Celery), but threading is okay for this demo
-        threading.Thread(target=run_executor, daemon=True).start()
+        # Use the thread pool to execute the task, respecting the max_workers limit
+        self.executor_pool.submit(run_executor)
 
     def on_created(self, event):
         self._handle_event(event.src_path)
@@ -74,12 +75,28 @@ class TaskManager:
         self.active_watches = {} # folder_id -> Watch
         self.active_scans = {} # folder_id -> threading.Event (to stop)
         self._is_running = False
+        self.executor_pool: Optional[ThreadPoolExecutor] = None
+
+    def _get_max_concurrent_tasks(self) -> int:
+        try:
+            with Session(engine) as session:
+                settings = session.get(SystemSettings, 1)
+                if settings:
+                    return settings.max_concurrent_tasks
+        except Exception as e:
+            logger.warning(f"Could not load max_concurrent_tasks from DB: {e}")
+        return 4
 
     def start(self):
         if self._is_running:
             return
 
         logger.info("Starting TaskManager...")
+        max_workers = self._get_max_concurrent_tasks()
+        
+        # Initialize pool with the latest settings
+        self.executor_pool = ThreadPoolExecutor(max_workers=max_workers)
+
         self.observer.start()
         self._is_running = True
         self._sync_folders()
@@ -95,6 +112,10 @@ class TaskManager:
         for stop_event in self.active_scans.values():
             stop_event.set()
 
+        if self.executor_pool:
+            self.executor_pool.shutdown(wait=False)
+            self.executor_pool = None
+            
         self._is_running = False
 
     def _sync_folders(self):
@@ -116,7 +137,7 @@ class TaskManager:
             logger.warning(f"Folder {folder.id}: Watch folder '{folder.watch_folder}' does not exist.")
             return
 
-        handler = FolderEventHandler(folder.id)
+        handler = FolderEventHandler(folder.id, self.executor_pool)
 
         if folder.real_time_watch:
             logger.info(f"Setting up real-time watch for Folder {folder.id} on path: {folder.watch_folder}")
@@ -159,7 +180,7 @@ class TaskManager:
             with Session(engine) as session:
                 folder = session.get(Folder, folder_id)
                 if folder and folder.status == "active":
-                    handler = FolderEventHandler(folder.id)
+                    handler = FolderEventHandler(folder.id, self.executor_pool)
                     self._scan_folder(folder, handler)
 
     def _scan_folder(self, folder: Folder, handler: FolderEventHandler):
