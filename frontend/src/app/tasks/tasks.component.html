@@ -1,19 +1,44 @@
 <div class="tasks-container">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px">
     <h2>Tasks Manager</h2>
-    <button nz-button nzType="primary" (click)="showModal()">Create Task</button>
+    <button nz-button nzType="primary" (click)="showModal()"><span nz-icon nzType="plus"></span>Create Task</button>
   </div>
 
-  <div class="task-list">
+  <nz-empty
+    *ngIf="tasks().length === 0"
+    nzNotFoundImage="simple"
+    [nzNotFoundContent]="contentTpl"
+    [nzNotFoundFooter]="footerTpl"
+    style="margin-top: 64px"
+  >
+    <ng-template #contentTpl>
+      <span style="color: #8c8c8c; font-size: 16px">No tasks created yet.</span>
+      <br />
+      <span style="color: #bfbfbf">Tasks define the processing pipeline for your files.</span>
+    </ng-template>
+    <ng-template #footerTpl>
+      <button nz-button nzType="primary" (click)="showModal()"><span nz-icon nzType="plus"></span> Create Your First Task</button>
+    </ng-template>
+  </nz-empty>
+
+  <div class="task-list" *ngIf="tasks().length > 0">
     <nz-card *ngFor="let task of tasks()" nzHoverable (click)="openEditor(task.id)" class="task-card">
-      <div class="card-header" >
+      <div class="card-header">
         <div style="display: flex; align-items: center; gap: 12px">
           <div class="task-icon">{{ task.icon || '🐹' }}</div>
           <div>
             <h3 style="margin: 0">{{ task.name }}</h3>
           </div>
         </div>
-        <button nz-button nzType="text" nz-dropdown [nzDropdownMenu]="menu" (click)="$event.stopPropagation()" aria-label="More Options" title="More Options">
+        <button
+          nz-button
+          nzType="text"
+          nz-dropdown
+          [nzDropdownMenu]="menu"
+          (click)="$event.stopPropagation()"
+          aria-label="More Options"
+          title="More Options"
+        >
           <span nz-icon nzType="more"></span>
         </button>
         <nz-dropdown-menu #menu="nzDropdownMenu">
@@ -23,16 +48,15 @@
           </ul>
         </nz-dropdown-menu>
       </div>
-  
+
       <p style="color: #595959; margin-bottom: 16px; min-height: 40px" (click)="openEditor(task.id)">
         {{ task.description || 'No description.' }}
       </p>
-  
+
       <div class="folder-list" (click)="openEditor(task.id)">
         <span nz-icon nzType="folder"></span>
         <div style="margin-left: 10px; color: #595959">
-          <nz-tag *ngFor="let folder of getAssociatedFolders(task.id)" [title]="folder.watch_folder">{{ folder.name
-            }}</nz-tag>
+          <nz-tag *ngFor="let folder of getAssociatedFolders(task.id)" [title]="folder.watch_folder">{{ folder.name }}</nz-tag>
           <div *ngIf="getAssociatedFolders(task.id).length === 0">
             <i>None</i>
           </div>
@@ -55,10 +79,10 @@
             <nz-form-item>
               <nz-form-label nzRequired>Icon</nz-form-label>
               <nz-form-control>
-                <div 
-                  class="emoji-trigger" 
-                  nz-popover 
-                  [nzPopoverContent]="emojiPickerTpl" 
+                <div
+                  class="emoji-trigger"
+                  nz-popover
+                  [nzPopoverContent]="emojiPickerTpl"
                   nzPopoverTrigger="click"
                   nzPopoverPlacement="bottomLeft"
                   nzPopoverOverlayClassName="nz-popover-no-padding"
