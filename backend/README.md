@@ -7,7 +7,7 @@ A DAG-based image and video processing backend built with FastAPI.
 - Python 3.10+
 - FFmpeg (for video/audio processing)
 - ImageMagick (for image conversion)
-- ExifTool (handled via pyexiv2)
+- pyexiv2 (for metadata read/write; ExifTool CLI is not required)
 
 ## Installation
 

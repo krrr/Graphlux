@@ -77,7 +77,7 @@ describe('EditorComponent', () => {
         expect(apiServiceSpy.updateTask).toHaveBeenCalledWith(1, {
             json_data: { nodes: {}, edges: [], start_node: null }
         });
-        expect(messageServiceSpy.success).toHaveBeenCalledWith('Task Saved successfully');
+        expect(messageServiceSpy.success).toHaveBeenCalledWith('Task saved successfully');
     });
 
     it('should execute DAG', () => {
@@ -98,5 +98,13 @@ describe('EditorComponent', () => {
         component.executeDag();
 
         expect(messageServiceSpy.error).toHaveBeenCalledWith('Execution failed');
+    });
+
+    it('should unregister the same keydown listener on destroy', () => {
+        const removeEventListenerSpy = vi.spyOn(document, 'removeEventListener');
+
+        component.ngOnDestroy();
+
+        expect(removeEventListenerSpy).toHaveBeenCalledWith('keydown', (component as any).keydownListener);
     });
 });

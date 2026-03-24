@@ -6,7 +6,7 @@ import ast
 from typing import Any, Dict, Optional, Tuple, TypedDict
 from .context import FileContext
 from ..tools.ffmpeg_wrapper import FFmpegWrapper
-from ..tools.exiftool_wrapper import ExifToolWrapper
+from ..tools.pyexiv2_wrapper import Pyexiv2Wrapper
 from ..tools.imagemagick_wrapper import ImageMagickWrapper
 from ..logger import logger
 
@@ -95,7 +95,7 @@ class MetadataReadNode(DAGNode):
             return False, None, {}
 
         logger.info(f"[{self.name}] Reading metadata for {file_path}")
-        metadata = ExifToolWrapper.read_metadata(file_path)
+        metadata = Pyexiv2Wrapper.read_metadata(file_path)
         if metadata is None:
             logger.error(f"[{self.name}] Failed to read metadata from {file_path}")
             return False, None, {}
@@ -304,7 +304,7 @@ class MetadataWriteNode(DAGNode):
             return False, None, {}
 
         logger.info(f"[{self.name}] Writing tags to {target_file}: {tags}")
-        success = ExifToolWrapper.write_metadata(target_file, tags)
+        success = Pyexiv2Wrapper.write_metadata(target_file, tags)
         if success:
             return True, "default", {"file": file_obj}
         else:

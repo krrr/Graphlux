@@ -87,6 +87,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     isLogsModalVisible = signal(false);
     isFileDialogVisible = false;
     executeFilePath = signal('');
+    private readonly keydownListener = this.handleKeyDown.bind(this);
 
     availableNodes = ['FinishNode', 'MetadataReadNode', 'ConvertNode', 'CodeEvalNode', 'ConditionNode', 'FileOperationNode',
         'MetadataWriteNode', 'FFmpegActionNode'];
@@ -138,7 +139,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         if (this.routeSub) {
             this.routeSub.unsubscribe();
         }
-        document.removeEventListener('keydown', this.handleKeyDown.bind(this));
+        document.removeEventListener('keydown', this.keydownListener);
     }
 
     async ngAfterViewInit() {
@@ -233,7 +234,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
 
         AreaExtensions.simpleNodesOrder(this.area);
 
-        document.addEventListener('keydown', this.handleKeyDown.bind(this));
+        document.addEventListener('keydown', this.keydownListener);
     }
 
     zoomIn() {
@@ -479,7 +480,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         const dagJson = this.serializeDag();
         try {
             await lastValueFrom(this.apiService.updateTask(taskId, { json_data: dagJson }))
-            this.message.success('Task Saved successfully');
+            this.message.success('Task saved successfully');
         } catch (e: any) {
             this.message.error(e.error.detail);
         }

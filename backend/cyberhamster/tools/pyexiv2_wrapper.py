@@ -2,7 +2,7 @@ import pyexiv2
 from typing import Dict, Any, Optional
 from ..logger import logger
 
-class ExifToolWrapper:
+class Pyexiv2Wrapper:
     @staticmethod
     def read_metadata(file_path: str) -> Optional[Dict[str, Any]]:
         """
