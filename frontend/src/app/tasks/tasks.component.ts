@@ -14,6 +14,7 @@ import { COMMON_IMPORTS } from '../shared-imports';
 import { NzTagComponent } from 'ng-zorro-antd/tag';
 import { EmojiPickerComponent } from '../components/emoji-picker/emoji-picker.component';
 import { NzPopoverModule } from 'ng-zorro-antd/popover';
+import { NzEmptyModule } from 'ng-zorro-antd/empty';
 
 @Component({
     selector: 'app-tasks',
@@ -31,6 +32,7 @@ import { NzPopoverModule } from 'ng-zorro-antd/popover';
         NzTagComponent,
         EmojiPickerComponent,
         NzPopoverModule,
+        NzEmptyModule,
     ],
     templateUrl: './tasks.component.html',
     styleUrls: ['./tasks.component.scss'],
