@@ -51,10 +51,48 @@ export class CustomNodeComponent implements OnChanges {
     }
 
     get configDisplayKeys() {
+        const info = NODE_INFO[this.data.type];
         const config = (this.data as any).customConfig || {};
+
+        if (info?.footerKeys) {
+            return info.footerKeys.filter((key) => config[key] !== undefined && config[key] !== null && config[key] !== '');
+        }
+
         return Object.keys(config)
             .filter((key) => config[key] !== undefined && config[key] !== null && config[key] !== '')
             .slice(0, 3); // show up to 3 properties
+    }
+
+    getOutputLabel(key: string): string {
+        const info = NODE_INFO[this.data.type];
+        if (key === 'default') {
+            if (info?.outputVar) {
+                const config = (this.data as any).customConfig || {};
+                if (typeof info.outputVar === 'function') {
+                    return info.outputVar(config);
+                }
+                return info.outputVar;
+            }
+            return ''; // keep hidden if no outputVar defined
+        }
+        return key;
+    }
+
+    getConfigKeyLabel(key: string): string {
+        const labels: Record<string, string> = {
+            input_file_var: 'input',
+            target_file_var: 'target',
+            result_var: 'result',
+            read_single_tag: 'tag',
+            target_extension: 'ext',
+            output_var: 'output',
+            relation: 'logic',
+            action: 'action',
+            format: 'format',
+            extension: 'ext',
+            tool: 'tool'
+        };
+        return labels[key] || key;
     }
 
     getConfigValue(key: string) {

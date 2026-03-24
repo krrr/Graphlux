@@ -21,8 +21,13 @@
     </div>
 
     <div class="sockets output-sockets">
+      <!-- Special for FinishNode which has no Rete outputs but we want to show result -->
+      <div class="socket-wrapper" *ngIf="data.type === 'FinishNode'">
+        <div class="socket-label finish-node">{{ getOutputLabel('default') }}</div>
+      </div>
+
       <div class="socket-wrapper" *ngFor="let item of outputs">
-        <div class="socket-label" *ngIf="item.key !== 'default'">{{ item.key }}</div>
+        <div class="socket-label" *ngIf="getOutputLabel(item.key)">{{ getOutputLabel(item.key) }}</div>
         <div
           class="socket-point"
           refComponent
@@ -36,7 +41,7 @@
 
   <div class="node-footer" *ngIf="configDisplayKeys.length > 0">
     <div class="config-row" *ngFor="let key of configDisplayKeys">
-      <span class="config-key">{{ key }}:</span>
+      <span class="config-key">{{ getConfigKeyLabel(key) }}:</span>
       <span class="config-value" [title]="getConfigValue(key)">{{ getConfigValue(key) }}</span>
     </div>
   </div>

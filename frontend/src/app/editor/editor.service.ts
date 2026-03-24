@@ -143,16 +143,58 @@ export class EditorService {
 }
 
 
-export const NODE_INFO: Record<string, { icon: string; color: string, label: string }> = {
-    StartNode: { icon: 'home', color: '#1890ff', label: 'Start' },
-    FinishNode: { icon: 'check-circle', color: '#52c41a', label: 'Finish / Output' },
-    MetadataReadNode: { icon: 'folder-open', color: '#c655df', label: 'Read Media Metadata' },
-    ConvertNode: { icon: 'sync', color: '#f04951', label: 'Convert Format' },
-    CodeEvalNode: { icon: 'code', color: '#945de1', label: 'Code Eval' },
-    ConditionNode: { icon: 'branches', color: '#faad14', label: 'Condition Branch' },
-    FileOperationNode: { icon: 'file-text', color: '#e1449b', label: 'File Operation' },
-    MetadataWriteNode: { icon: 'edit', color: '#13c2c2', label: 'Write Media Metadata' },
-    FFmpegActionNode: { icon: 'video-camera', color: '#c2dd2f', label: 'FFmpeg Action' },
+export interface NodeInfo {
+    icon: string;
+    color: string;
+    label: string;
+    footerKeys?: string[];
+    outputVar?: string | ((config: any) => string);
+}
+
+export const NODE_INFO: Record<string, NodeInfo> = {
+    StartNode: {
+        icon: 'home', color: '#1890ff', label: 'Start',
+        outputVar: 'file'
+    },
+    FinishNode: {
+        icon: 'check-circle', color: '#52c41a', label: 'Finish / Output',
+        footerKeys: [],
+        outputVar: (config) => config.result_var ? `result: ${config.result_var.split(':').pop()}` : 'no result'
+    },
+    MetadataReadNode: {
+        icon: 'folder-open', color: '#c655df', label: 'Read Media Metadata',
+        footerKeys: ['input_file_var', 'read_single_tag'],
+        outputVar: 'metadata'
+    },
+    ConvertNode: {
+        icon: 'sync', color: '#f04951', label: 'Convert Format',
+        footerKeys: ['format', 'target_extension'],
+        outputVar: 'file'
+    },
+    CodeEvalNode: {
+        icon: 'code', color: '#945de1', label: 'Code Eval',
+        footerKeys: ['output_var'],
+        outputVar: (config) => config.output_var || 'eval_result'
+    },
+    ConditionNode: {
+        icon: 'branches', color: '#faad14', label: 'Condition Branch',
+        footerKeys: ['relation']
+    },
+    FileOperationNode: {
+        icon: 'file-text', color: '#e1449b', label: 'File Operation',
+        footerKeys: ['action', 'target_extension'],
+        outputVar: 'file'
+    },
+    MetadataWriteNode: {
+        icon: 'edit', color: '#13c2c2', label: 'Write Media Metadata',
+        footerKeys: ['target_file_var'],
+        outputVar: 'file'
+    },
+    FFmpegActionNode: {
+        icon: 'video-camera', color: '#c2dd2f', label: 'FFmpeg Action',
+        footerKeys: ['extension'],
+        outputVar: 'file'
+    },
 };
 
 export class TaskNode extends ClassicPreset.Node {

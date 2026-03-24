@@ -92,7 +92,10 @@
 .socket-label {
     font-size: 12px;
     color: #666;
-    padding: 0 8px;
+    padding: 0 2px;
+}
+.socket-label.finish-node {
+    padding: 0 10px;
 }
 
 .node-footer {
