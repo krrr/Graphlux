@@ -162,7 +162,7 @@ export const NODE_INFO: Record<string, NodeInfo> = {
         outputVar: (config) => config.result_var ? `result: ${config.result_var.split(':').pop()}` : 'no result'
     },
     MetadataReadNode: {
-        icon: 'folder-open', color: '#c655df', label: 'Read Media Metadata',
+        icon: 'tag', color: '#c655df', label: 'Read Media Metadata',
         footerKeys: ['input_file_var', 'read_single_tag'],
         outputVar: 'metadata'
     },
@@ -177,7 +177,7 @@ export const NODE_INFO: Record<string, NodeInfo> = {
         outputVar: (config) => config.output_var || 'eval_result'
     },
     ConditionNode: {
-        icon: 'branches', color: '#faad14', label: 'Condition Branch',
+        icon: 'icon:branches', color: '#faad14', label: 'Condition Branch',
         footerKeys: ['relation']
     },
     FileOperationNode: {
