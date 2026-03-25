@@ -1,14 +1,88 @@
 import os
 import sys
 import ctypes
-from fastapi import APIRouter, Depends, HTTPException
+import asyncio
+from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from sqlmodel import Session, select
-from typing import List, Any
+from typing import List, Any, Dict
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 from .db import get_session
 from .models import Task, Folder, SystemSettings
+from .engine.executor import TaskExecutor
 
 router = APIRouter()
 
+class ExecutionRequest(BaseModel):
+    task: Dict[str, Any] = None
+    task_id: int = None
+    file_path: str
+
+@router.post("/execute")
+async def execute_task_endpoint(request: ExecutionRequest):
+    """
+    Endpoint to trigger Task execution.
+    """
+    if not os.path.exists(request.file_path):
+        return JSONResponse(status_code=400, content={"error": "File not found"})
+
+    task_json = request.task
+    if request.task_id is not None:
+        from cyberhamster.db import engine
+        from cyberhamster.models import Task
+        with Session(engine) as session:
+            task_obj = session.get(Task, request.task_id)
+            if not task_obj:
+                return JSONResponse(status_code=404, content={"error": "Task not found"})
+            task_json = task_obj.json_data
+
+    if not task_json:
+        return JSONResponse(status_code=400, content={"error": "No Task provided"})
+
+    # Send a log message via websocket
+    await manager.broadcast(f"Starting execution for: {request.file_path}")
+
+    executor = TaskExecutor(task_json)
+
+    # Run in threadpool to not block the asyncio loop
+    loop = asyncio.get_event_loop()
+    success = await loop.run_in_executor(None, executor.execute, request.file_path)
+
+    if success:
+        await manager.broadcast(f"Successfully finished execution for: {request.file_path}")
+        return {"status": "success", "message": "Task execution completed"}
+    else:
+        await manager.broadcast(f"Failed execution for: {request.file_path}")
+        return JSONResponse(status_code=500, content={"status": "error", "message": "Task execution failed"})
+
+# In-memory store for connected websocket clients for logs
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+
+    async def broadcast(self, message: str):
+        for connection in self.active_connections:
+            await connection.send_text(message)
+
+manager = ConnectionManager()
+
+@router.websocket("/logs")
+async def websocket_endpoint(websocket: WebSocket):
+    await manager.connect(websocket)
+    try:
+        while True:
+            # We keep the connection open and wait for messages from client if any
+            data = await websocket.receive_text()
+            # Could handle ping/pong or other client messages here
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
 # --- Task ---
 
 @router.get("/tasks", response_model=List[Task])

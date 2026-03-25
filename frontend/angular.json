@@ -30,7 +30,28 @@
                 "input": "public"
               },
               {
-                "glob": "**/*",
+                "glob": "{loader.js,nls.messages-loader.js,nls.messages.js.js}",
+                "input": "node_modules/monaco-editor/min/vs",
+                "output": "/assets/vs"
+              },
+              {
+                "glob": "{editor,assets}/**/*",
+                "input": "node_modules/monaco-editor/min/vs",
+                "output": "/assets/vs",
+                "ignore": [
+                  "**/json.worker-*.js",
+                  "**/css.worker-*.js",
+                  "**/html.worker-*.js",
+                  "**/ts.worker-*.js"
+                ]
+              },
+              {
+                "glob": "basic-languages/monaco.contribution.js",
+                "input": "node_modules/monaco-editor/min/vs",
+                "output": "/assets/vs"
+              },
+              {
+                "glob": "{_commonjsHelpers,editor.api,monaco.contribution,workers,lspLanguageFeatures,python}-*.js",
                 "input": "node_modules/monaco-editor/min/vs",
                 "output": "/assets/vs"
               }
