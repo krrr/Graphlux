@@ -13,6 +13,7 @@ import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
+import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { COMMON_IMPORTS } from '../shared-imports';
 import { FileDialogComponent } from '../components/file-dialog/file-dialog.component';
 
@@ -31,6 +32,7 @@ import { FileDialogComponent } from '../components/file-dialog/file-dialog.compo
         NzSelectModule,
         NzCheckboxModule,
         NzTabsModule,
+        NzEmptyModule,
         FileDialogComponent,
         ...COMMON_IMPORTS,
     ],
