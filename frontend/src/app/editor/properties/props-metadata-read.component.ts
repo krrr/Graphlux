@@ -15,37 +15,26 @@ import { PropsBase } from './props-base';
     imports: [CommonModule, FormsModule, NzFormModule, NzInputModule, NzSwitchModule, NzSelectModule],
     template: `
         <nz-form-item>
-          <nz-form-label>Input File Source</nz-form-label>
-          <nz-form-control>
-            <nz-select
-              [ngModel]="config().input_file_var"
-              (ngModelChange)="updateConfig('input_file_var', $event)"
-              nzPlaceHolder="Select source node"
-              name="input_file_var"
-            >
-              <nz-option *ngFor="let i of availableVariables" [nzValue]="i.value" [nzLabel]="i.label"></nz-option>
-            </nz-select>
-          </nz-form-control>
+            <nz-form-label>Input File Source</nz-form-label>
+            <nz-form-control>
+                <nz-select [ngModel]="config().input_file_var" (ngModelChange)="updateConfig('input_file_var', $event)"
+                    nzPlaceHolder="Select source node" name="input_file_var">
+                    <nz-option *ngFor="let i of availableVariables" [nzValue]="i.value" [nzLabel]="i.label"></nz-option>
+                </nz-select>
+            </nz-form-control>
         </nz-form-item>
         <nz-form-item>
             <nz-form-label>Enable single tag read</nz-form-label>
             <nz-form-control>
-                <nz-switch
-                    [ngModel]="config().enable_single_tag"
-                    (ngModelChange)="updateConfig('enable_single_tag', $event)"
-                ></nz-switch>
+                <nz-switch [ngModel]="config().enable_single_tag"
+                    (ngModelChange)="updateConfig('enable_single_tag', $event)"></nz-switch>
             </nz-form-control>
         </nz-form-item>
         <nz-form-item *ngIf="config().enable_single_tag">
             <nz-form-label>Read single tag</nz-form-label>
             <nz-form-control>
-            <input
-                nz-input
-                [ngModel]="config().read_single_tag"
-                (ngModelChange)="updateConfig('read_single_tag', $event)"
-                name="read_single_tag"
-                placeholder="e.g. Xmp.ProcessingStatus"
-            />
+                <input nz-input [ngModel]="config().read_single_tag" (ngModelChange)="updateConfig('read_single_tag', $event)"
+                    name="read_single_tag" placeholder="e.g. Xmp.ProcessingStatus" />
             </nz-form-control>
         </nz-form-item>
     `

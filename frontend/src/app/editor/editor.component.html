@@ -1,141 +1,135 @@
 <div class="editor-container">
-  <div class="toolbar">
-    <button nz-button nzType="primary" (click)="saveDag()"><span nz-icon nzType="save"></span>Save</button>
-    <button nz-button nzType="default" (click)="showExecuteModal()">Execute DAG</button>
-    <button nz-button nz-dropdown [nzDropdownMenu]="menu" nzTrigger="click">Add Node</button>
-    <nz-dropdown-menu #menu="nzDropdownMenu">
-      <ul nz-menu>
-        <li nz-menu-item *ngFor="let t of availableNodes" (click)="editorService.addNode(t)">{{ NODE_INFO[t].label }}</li>
-      </ul>
-    </nz-dropdown-menu>
-    <button nz-button nzType="default" (click)="autoArrange()">Auto Arrange</button>
-    <div style="flex-grow: 1"></div>
-    <div class="zoom-controls">
-      <button nz-button nzType="text" (click)="zoomOut()" nzSize="small" aria-label="Zoom Out" title="Zoom Out"><span nz-icon nzType="minus"></span></button>
-      <span class="zoom-indicator">{{ zoomLevel() }}</span>
-      <button nz-button nzType="text" (click)="zoomIn()" nzSize="small" aria-label="Zoom In" title="Zoom In"><span nz-icon nzType="plus"></span></button>
-      <button nz-button nzType="text" (click)="zoomFit()" nzSize="small" aria-label="Fit to Screen" title="Fit to Screen">Fit</button>
-    </div>
-    <span style="color: #888; font-size: 14px; margin-left: 20px" *ngIf="taskId()">Task ID: {{ taskId() }}</span>
-  </div>
-  <div class="main-content">
-    <div class="rete-area" #rete></div>
-
-    <div class="property-editor" *ngIf="selectedNode() && isPropertyPanelVisible()">
-      <div class="title-area">
-        <button nz-button nzType="text" (click)="isPropertyPanelVisible.set(false)" class="close-btn" aria-label="Close Properties Panel" title="Close Properties Panel">
-          <span nz-icon nzType="close"></span>
-        </button>
-        <div class="title">Node Properties</div>
-      </div>
-
-      <div class="props-area">
-        <div class="ant-form">
-          <nz-form-item>
-            <nz-form-label>Type</nz-form-label>
-            <nz-form-control><span nz-icon [nzType]="getNodeIcon(selectedNode().type)"></span> {{ selectedNode().type }}</nz-form-control>
-          </nz-form-item>
-          <nz-form-item>
-            <nz-form-label>Name</nz-form-label>
-            <nz-form-control>
-              <input
-                nz-input
-                [ngModel]="selectedNode().label"
-                (ngModelChange)="updateNodeName(selectedNode().id, $event)"
-                name="nodeName"
-                placeholder="Node Name"
-              />
-            </nz-form-control>
-          </nz-form-item>
+    <div class="toolbar">
+        <button nz-button nzType="primary" (click)="saveDag()"><span nz-icon nzType="save"></span>Save</button>
+        <button nz-button nzType="default" (click)="showExecuteModal()">Execute DAG</button>
+        <button nz-button nz-dropdown [nzDropdownMenu]="menu" nzTrigger="click">Add Node</button>
+        <nz-dropdown-menu #menu="nzDropdownMenu">
+            <ul nz-menu>
+                <li nz-menu-item *ngFor="let t of availableNodes" (click)="editorService.addNode(t)">{{
+                    NODE_INFO[t].label }}</li>
+            </ul>
+        </nz-dropdown-menu>
+        <button nz-button nzType="default" (click)="autoArrange()">Auto Arrange</button>
+        <div style="flex-grow: 1"></div>
+        <div class="zoom-controls">
+            <button nz-button nzType="text" (click)="zoomOut()" nzSize="small" aria-label="Zoom Out"
+                title="Zoom Out"><span nz-icon nzType="minus"></span></button>
+            <span class="zoom-indicator">{{ zoomLevel() }}</span>
+            <button nz-button nzType="text" (click)="zoomIn()" nzSize="small" aria-label="Zoom In" title="Zoom In"><span
+                    nz-icon nzType="plus"></span></button>
+            <button nz-button nzType="text" (click)="zoomFit()" nzSize="small" aria-label="Fit to Screen"
+                title="Fit to Screen">Fit</button>
         </div>
-
-        <h4>Configuration</h4>
-        <div [ngSwitch]="selectedNode().type" class="ant-form">
-          <app-read-input-props *ngSwitchCase="'MetadataReadNode'" [nodeId]="selectedNode().id"/>
-          <app-convert-props *ngSwitchCase="'ConvertNode'" [nodeId]="selectedNode().id"/>
-          <app-code-eval-props *ngSwitchCase="'CodeEvalNode'" [nodeId]="selectedNode().id"/>
-          <app-condition-props *ngSwitchCase="'ConditionNode'" [nodeId]="selectedNode().id"/>
-          <app-file-operation-props *ngSwitchCase="'FileOperationNode'" [nodeId]="selectedNode().id"/>
-          <app-metadata-write-props *ngSwitchCase="'MetadataWriteNode'" [nodeId]="selectedNode().id"/>
-          <app-ffmpeg-action-props *ngSwitchCase="'FFmpegActionNode'" [nodeId]="selectedNode().id"/>
-          <app-finish-props *ngSwitchCase="'FinishNode'" [nodeId]="selectedNode().id"/>
-          <div *ngSwitchDefault>
-            <i style="color: #6e6e6e">no properties.</i>
-          </div>
-        </div>
-      </div>
+        <span style="color: #888; font-size: 14px; margin-left: 20px" *ngIf="taskId()">Task ID: {{ taskId() }}</span>
     </div>
-  </div>
+    <div class="main-content">
+        <div class="rete-area" #rete></div>
 
-  <nz-modal
-    [nzVisible]="isExecuteModalVisible()"
-    (nzVisibleChange)="isExecuteModalVisible.set($event)"
-    nzTitle="Execute DAG"
-    (nzOnCancel)="handleExecuteCancel()"
-    (nzOnOk)="handleExecuteOk()"
-  >
-    <ng-container *nzModalContent>
-      <form nz-form nzLayout="vertical">
-        <nz-form-item>
-          <nz-form-label nzRequired>Input File Path (Absolute)</nz-form-label>
-          <nz-form-control nzErrorTip="Please input the file path!">
-            <div style="display: flex; gap: 8px">
-              <input nz-input [(ngModel)]="executeFilePath" name="executeFilePath" />
-              <button nz-button type="button" (click)="openFileDialog()">Browse...</button>
+        <div class="property-editor" *ngIf="selectedNode() && isPropertyPanelVisible()">
+            <div class="title-area">
+                <button nz-button nzType="text" (click)="isPropertyPanelVisible.set(false)" class="close-btn"
+                    aria-label="Close Properties Panel" title="Close Properties Panel">
+                    <span nz-icon nzType="close"></span>
+                </button>
+                <div class="title">Node Properties</div>
             </div>
-          </nz-form-control>
-        </nz-form-item>
-      </form>
-    </ng-container>
-  </nz-modal>
 
-  <nz-modal
-    [nzVisible]="isLogsModalVisible()"
-    (nzVisibleChange)="isLogsModalVisible.set($event)"
-    nzTitle="Console Logs"
-    (nzOnCancel)="handleLogsClose()"
-    [nzFooter]="null"
-    nzWidth="800px"
-  >
-    <ng-container *nzModalContent>
-      <div class="console">
-        <div class="logs-container">
-          <div *ngFor="let log of logs()">{{ log }}</div>
-          <div *ngIf="logs().length === 0" style="color: #666">Waiting for logs...</div>
+            <div class="props-area">
+                <div class="ant-form">
+                    <nz-form-item>
+                        <nz-form-label>Type</nz-form-label>
+                        <nz-form-control><span nz-icon [nzType]="getNodeIcon(selectedNode().type)"></span> {{
+                            selectedNode().type }}</nz-form-control>
+                    </nz-form-item>
+                    <nz-form-item>
+                        <nz-form-label>Name</nz-form-label>
+                        <nz-form-control>
+                            <input nz-input [ngModel]="selectedNode().label"
+                                (ngModelChange)="updateNodeName(selectedNode().id, $event)" name="nodeName"
+                                placeholder="Node Name" />
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+
+                <h4>Configuration</h4>
+                <div [ngSwitch]="selectedNode().type" class="ant-form">
+                    <app-read-input-props *ngSwitchCase="'MetadataReadNode'" [nodeId]="selectedNode().id" />
+                    <app-convert-props *ngSwitchCase="'ConvertNode'" [nodeId]="selectedNode().id" />
+                    <app-code-eval-props *ngSwitchCase="'CodeEvalNode'" [nodeId]="selectedNode().id" />
+                    <app-condition-props *ngSwitchCase="'ConditionNode'" [nodeId]="selectedNode().id" />
+                    <app-file-operation-props *ngSwitchCase="'FileOperationNode'" [nodeId]="selectedNode().id" />
+                    <app-metadata-write-props *ngSwitchCase="'MetadataWriteNode'" [nodeId]="selectedNode().id" />
+                    <app-ffmpeg-action-props *ngSwitchCase="'FFmpegActionNode'" [nodeId]="selectedNode().id" />
+                    <app-finish-props *ngSwitchCase="'FinishNode'" [nodeId]="selectedNode().id" />
+                    <div *ngSwitchDefault>
+                        <i style="color: #6e6e6e">no properties.</i>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </ng-container>
-  </nz-modal>
+    </div>
 
-  <!-- Context Menus -->
-  <nz-dropdown-menu #contextMenu="nzDropdownMenu">
-    <ul nz-menu *ngIf="!!selectedNode()">
-      <li nz-menu-item (click)="cloneSelectedNode()"><span nz-icon nzType="copy" nzTheme="outline"></span>Clone</li>
-      <li nz-menu-item (click)="deleteSelectedNode()"><span nz-icon nzType="delete" nzTheme="outline"></span>Delete</li>
-      <li nz-menu-divider></li>
-      <li nz-submenu nzTitle="Change Type" nzIcon="swap">
-        <ul>
-          <li nz-menu-item *ngFor="let t of availableNodes" (click)="changeSelectedNodeType(t)">{{ NODE_INFO[t].label }}</li>
-        </ul>
-      </li>
-    </ul>
+    <nz-modal [nzVisible]="isExecuteModalVisible()" (nzVisibleChange)="isExecuteModalVisible.set($event)"
+        nzTitle="Execute DAG" (nzOnCancel)="handleExecuteCancel()" (nzOnOk)="handleExecuteOk()">
+        <ng-container *nzModalContent>
+            <form nz-form nzLayout="vertical">
+                <nz-form-item>
+                    <nz-form-label nzRequired>Input File Path (Absolute)</nz-form-label>
+                    <nz-form-control nzErrorTip="Please input the file path!">
+                        <div style="display: flex; gap: 8px">
+                            <input nz-input [(ngModel)]="executeFilePath" name="executeFilePath" />
+                            <button nz-button type="button" (click)="openFileDialog()">Browse...</button>
+                        </div>
+                    </nz-form-control>
+                </nz-form-item>
+            </form>
+        </ng-container>
+    </nz-modal>
 
-    <ul nz-menu *ngIf="!selectedNode()">
-      <li nz-submenu nzTitle="Add Node" nzIcon="plus">
-        <ul>
-          <li nz-menu-item *ngFor="let t of availableNodes" (click)="editorService.addNode(t)">{{ NODE_INFO[t].label }}</li>
+    <nz-modal [nzVisible]="isLogsModalVisible()" (nzVisibleChange)="isLogsModalVisible.set($event)"
+        nzTitle="Console Logs" (nzOnCancel)="handleLogsClose()" [nzFooter]="null" nzWidth="800px">
+        <ng-container *nzModalContent>
+            <div class="console">
+                <div class="logs-container">
+                    <div *ngFor="let log of logs()">{{ log }}</div>
+                    <div *ngIf="logs().length === 0" style="color: #666">Waiting for logs...</div>
+                </div>
+            </div>
+        </ng-container>
+    </nz-modal>
+
+    <!-- Context Menus -->
+    <nz-dropdown-menu #contextMenu="nzDropdownMenu">
+        <ul nz-menu *ngIf="!!selectedNode()">
+            <li nz-menu-item (click)="cloneSelectedNode()"><span nz-icon nzType="copy" nzTheme="outline"></span>Clone
+            </li>
+            <li nz-menu-item (click)="deleteSelectedNode()"><span nz-icon nzType="delete"
+                    nzTheme="outline"></span>Delete</li>
+            <li nz-menu-divider></li>
+            <li nz-submenu nzTitle="Change Type" nzIcon="swap">
+                <ul>
+                    <li nz-menu-item *ngFor="let t of availableNodes" (click)="changeSelectedNodeType(t)">{{
+                        NODE_INFO[t].label }}</li>
+                </ul>
+            </li>
         </ul>
-      </li>
-      <li nz-menu-divider></li>
-      <li nz-menu-item (click)="autoArrange()">
-        <span nz-icon nzType="layout" nzTheme="outline"></span>
-        <span>Auto Arrange</span>
-      </li>
-    </ul>
-  </nz-dropdown-menu>
+
+        <ul nz-menu *ngIf="!selectedNode()">
+            <li nz-submenu nzTitle="Add Node" nzIcon="plus">
+                <ul>
+                    <li nz-menu-item *ngFor="let t of availableNodes" (click)="editorService.addNode(t)">{{
+                        NODE_INFO[t].label }}</li>
+                </ul>
+            </li>
+            <li nz-menu-divider></li>
+            <li nz-menu-item (click)="autoArrange()">
+                <span nz-icon nzType="layout" nzTheme="outline"></span>
+                <span>Auto Arrange</span>
+            </li>
+        </ul>
+    </nz-dropdown-menu>
 </div>
 
 
-<app-file-dialog [(isVisible)]="isFileDialogVisible" mode="file"
-  [currentPath]="executeFilePath()" (fileSelected)="executeFilePath.set($event)"
-/>
+<app-file-dialog [(isVisible)]="isFileDialogVisible" mode="file" [currentPath]="executeFilePath()"
+    (fileSelected)="executeFilePath.set($event)" />

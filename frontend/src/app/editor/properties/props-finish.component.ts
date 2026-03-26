@@ -15,17 +15,14 @@ import { PropsBase } from './props-base';
     imports: [CommonModule, FormsModule, NzFormModule, NzInputModule, NzSwitchModule, NzSelectModule],
     template: `
         <nz-form-item>
-          <nz-form-label>Result</nz-form-label>
-          <nz-form-control>
-            <nz-select
-              [ngModel]="config().result_var"
-              (ngModelChange)="updateConfig('result_var', $event)"
-              name="finish_result_var"
-            >
-              <nz-option [nzValue]="null" nzLabel="None" />
-              <nz-option *ngFor="let i of availableVariables" [nzValue]="i.value" [nzLabel]="i.label"></nz-option>
-            </nz-select>
-          </nz-form-control>
+            <nz-form-label>Result</nz-form-label>
+            <nz-form-control>
+                <nz-select [ngModel]="config().result_var" (ngModelChange)="updateConfig('result_var', $event)"
+                    name="finish_result_var">
+                    <nz-option [nzValue]="null" nzLabel="None" />
+                    <nz-option *ngFor="let i of availableVariables" [nzValue]="i.value" [nzLabel]="i.label"></nz-option>
+                </nz-select>
+            </nz-form-control>
         </nz-form-item>
     `
 })

@@ -1,48 +1,40 @@
 <div class="node-wrapper" [class.selected]="data.selected" data-testid="node">
-  <div class="node-header" [style.background-color]="headerBgColor">
-    <div class="icon-container" [style.background-color]="iconColor">
-      <span nz-icon [nzType]="iconType" nzTheme="outline"></span>
-    </div>
-    <div class="title">{{ data.label }}</div>
-  </div>
-
-  <div class="node-content">
-    <div class="sockets input-sockets">
-      <div class="socket-wrapper" *ngFor="let item of inputs">
-        <div
-          class="socket-point"
-          refComponent
-          [data]="{ type: 'socket', side: 'input', key: item.key, nodeId: data.id, payload: item.input.socket, seed: seed }"
-          [emit]="emit"
-          [attr.data-testid]="'input-' + item.key"
-        ></div>
-        <div class="socket-label" *ngIf="item.key !== 'input'">{{ item.key }}</div>
-      </div>
+    <div class="node-header" [style.background-color]="headerBgColor">
+        <div class="icon-container" [style.background-color]="iconColor">
+            <span nz-icon [nzType]="iconType" nzTheme="outline"></span>
+        </div>
+        <div class="title">{{ data.label }}</div>
     </div>
 
-    <div class="sockets output-sockets">
-      <!-- Special for FinishNode which has no Rete outputs but we want to show result -->
-      <div class="socket-wrapper" *ngIf="data.type === 'FinishNode'">
-        <div class="socket-label finish-node">{{ getOutputLabel('default') }}</div>
-      </div>
+    <div class="node-content">
+        <div class="sockets input-sockets">
+            <div class="socket-wrapper" *ngFor="let item of inputs">
+                <div class="socket-point" refComponent
+                    [data]="{ type: 'socket', side: 'input', key: item.key, nodeId: data.id, payload: item.input.socket, seed: seed }"
+                    [emit]="emit" [attr.data-testid]="'input-' + item.key"></div>
+                <div class="socket-label" *ngIf="item.key !== 'input'">{{ item.key }}</div>
+            </div>
+        </div>
 
-      <div class="socket-wrapper" *ngFor="let item of outputs">
-        <div class="socket-label" *ngIf="getOutputLabel(item.key)">{{ getOutputLabel(item.key) }}</div>
-        <div
-          class="socket-point"
-          refComponent
-          [data]="{ type: 'socket', side: 'output', key: item.key, nodeId: data.id, payload: item.output.socket, seed: seed }"
-          [emit]="emit"
-          [attr.data-testid]="'output-' + item.key"
-        ></div>
-      </div>
-    </div>
-  </div>
+        <div class="sockets output-sockets">
+            <!-- Special for FinishNode which has no Rete outputs but we want to show result -->
+            <div class="socket-wrapper" *ngIf="data.type === 'FinishNode'">
+                <div class="socket-label finish-node">{{ getOutputLabel('default') }}</div>
+            </div>
 
-  <div class="node-footer" *ngIf="configDisplayKeys.length > 0">
-    <div class="config-row" *ngFor="let key of configDisplayKeys">
-      <span class="config-key">{{ getConfigKeyLabel(key) }}:</span>
-      <span class="config-value" [title]="getConfigValue(key)">{{ getConfigValue(key) }}</span>
+            <div class="socket-wrapper" *ngFor="let item of outputs">
+                <div class="socket-label" *ngIf="getOutputLabel(item.key)">{{ getOutputLabel(item.key) }}</div>
+                <div class="socket-point" refComponent
+                    [data]="{ type: 'socket', side: 'output', key: item.key, nodeId: data.id, payload: item.output.socket, seed: seed }"
+                    [emit]="emit" [attr.data-testid]="'output-' + item.key"></div>
+            </div>
+        </div>
     </div>
-  </div>
+
+    <div class="node-footer" *ngIf="configDisplayKeys.length > 0">
+        <div class="config-row" *ngFor="let key of configDisplayKeys">
+            <span class="config-key">{{ getConfigKeyLabel(key) }}:</span>
+            <span class="config-value" [title]="getConfigValue(key)">{{ getConfigValue(key) }}</span>
+        </div>
+    </div>
 </div>

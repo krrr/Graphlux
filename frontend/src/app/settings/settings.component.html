@@ -1,40 +1,32 @@
 <div class="settings-container">
-  <h2>Settings</h2>
-  <form nz-form nzLayout="vertical">
-    <nz-form-item>
-      <nz-form-label>FFmpeg Executable Path</nz-form-label>
-      <nz-form-control>
-        <input nz-input [ngModel]="settings().ffmpeg_path" (ngModelChange)="updateField('ffmpeg_path', $event)" name="ffmpeg" placeholder="ffmpeg" />
-      </nz-form-control>
-    </nz-form-item>
+    <h2>Settings</h2>
+    <form nz-form nzLayout="vertical">
+        <nz-form-item>
+            <nz-form-label>FFmpeg Executable Path</nz-form-label>
+            <nz-form-control>
+                <input nz-input [ngModel]="settings().ffmpeg_path" (ngModelChange)="updateField('ffmpeg_path', $event)"
+                    name="ffmpeg" placeholder="ffmpeg" />
+            </nz-form-control>
+        </nz-form-item>
 
-    <nz-form-item>
-      <nz-form-label>ImageMagick (magick) Path</nz-form-label>
-      <nz-form-control>
-        <input
-          nz-input
-          [ngModel]="settings().imagemagick_path"
-          (ngModelChange)="updateField('imagemagick_path', $event)"
-          name="magick"
-          placeholder="magick"
-        />
-      </nz-form-control>
-    </nz-form-item>
+        <nz-form-item>
+            <nz-form-label>ImageMagick (magick) Path</nz-form-label>
+            <nz-form-control>
+                <input nz-input [ngModel]="settings().imagemagick_path"
+                    (ngModelChange)="updateField('imagemagick_path', $event)" name="magick" placeholder="magick" />
+            </nz-form-control>
+        </nz-form-item>
 
-    <nz-form-item>
-      <nz-form-label>Max Concurrent Tasks</nz-form-label>
-      <nz-form-control>
-        <nz-input-number
-          [ngModel]="settings().max_concurrent_tasks"
-          (ngModelChange)="updateField('max_concurrent_tasks', $event)"
-          name="max_concurrent_tasks"
-          [nzMin]="1"
-          [nzStep]="1"
-          style="width: 100%"
-        ></nz-input-number>
-      </nz-form-control>
-    </nz-form-item>
+        <nz-form-item>
+            <nz-form-label>Max Concurrent Tasks</nz-form-label>
+            <nz-form-control>
+                <nz-input-number [ngModel]="settings().max_concurrent_tasks"
+                    (ngModelChange)="updateField('max_concurrent_tasks', $event)" name="max_concurrent_tasks"
+                    [nzMin]="1" [nzStep]="1" style="width: 100%"></nz-input-number>
+            </nz-form-control>
+        </nz-form-item>
 
-    <button nz-button nzType="primary" (click)="saveSettings()"><nz-icon nzType="save" nzTheme="outline" />Save</button>
-  </form>
+        <button nz-button nzType="primary" (click)="saveSettings()"><nz-icon nzType="save"
+                nzTheme="outline" />Save</button>
+    </form>
 </div>

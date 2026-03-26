@@ -1,119 +1,94 @@
 <div class="tasks-container">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px">
-    <h2>Tasks Manager</h2>
-    <button nz-button nzType="primary" (click)="showModal()">Create Task</button>
-  </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px">
+        <h2>Tasks Manager</h2>
+        <button nz-button nzType="primary" (click)="showModal()">Create Task</button>
+    </div>
 
-  <div class="task-list" *ngIf="tasks().length > 0">
-    <nz-card *ngFor="let task of tasks()" nzHoverable (click)="openEditor(task.id)" class="task-card">
-      <div class="card-header">
-        <div style="display: flex; align-items: center; gap: 12px">
-          <div class="task-icon">{{ task.icon || '🐹' }}</div>
-          <div>
-            <h3 style="margin: 0">{{ task.name }}</h3>
-          </div>
-        </div>
-        <button
-          nz-button
-          nzType="text"
-          nz-dropdown
-          [nzDropdownMenu]="menu"
-          (click)="$event.stopPropagation()"
-          aria-label="More Options"
-          title="More Options"
-        >
-          <span nz-icon nzType="more"></span>
-        </button>
-        <nz-dropdown-menu #menu="nzDropdownMenu">
-          <ul nz-menu>
-            <li nz-menu-item (click)="showModal(task)"><nz-icon nzType="edit" />Edit Properties</li>
-            <li nz-menu-item (click)="confirmDeleteTask(task)"><nz-icon nzType="delete" />Delete</li>
-          </ul>
-        </nz-dropdown-menu>
-      </div>
-
-      <p style="color: #595959; margin-bottom: 16px; min-height: 40px" (click)="openEditor(task.id)">
-        {{ task.description || 'No description.' }}
-      </p>
-
-      <div class="folder-list" (click)="openEditor(task.id)">
-        <span nz-icon nzType="folder"></span>
-        <div style="margin-left: 10px; color: #595959">
-          <nz-tag *ngFor="let f of task.folders" [title]="f.watch_folder">{{ f.name }}</nz-tag>
-          <div *ngIf="task.folders.length === 0">
-            <i>None</i>
-          </div>
-        </div>
-      </div>
-    </nz-card>
-  </div>
-
-  <nz-empty
-    *ngIf="tasks().length === 0"
-    nzNotFoundImage="assets/empty.svg"
-     [nzNotFoundContent]="contentTpl"
-  >
-    <ng-template #contentTpl>
-      <span style="color: #8c8c8c; font-size: 16px">No tasks created yet</span>
-      <br />
-      <span style="color: #bfbfbf">Task define the processing pipeline for your files.</span>
-    </ng-template>
-  </nz-empty>
-
-  <nz-modal
-    [nzVisible]="isModalVisible()"
-    (nzVisibleChange)="isModalVisible.set($event)"
-    [nzTitle]="isEditing() ? 'Edit Task' : 'Create Task'"
-    (nzOnCancel)="handleCancel()"
-    (nzOnOk)="handleOk()"
-  >
-    <ng-container *nzModalContent>
-      <form nz-form nzLayout="vertical">
-        <div nz-row [nzGutter]="16">
-          <div nz-col [nzSpan]="3">
-            <nz-form-item>
-              <nz-form-label nzRequired>Icon</nz-form-label>
-              <nz-form-control>
-                <div
-                  class="emoji-trigger"
-                  nz-popover
-                  [nzPopoverContent]="emojiPickerTpl"
-                  nzPopoverTrigger="click"
-                  nzPopoverPlacement="bottomLeft"
-                  nzPopoverOverlayClassName="nz-popover-no-padding"
-                >
-                  {{ taskForm().icon }}
+    <div class="task-list" *ngIf="tasks().length > 0">
+        <nz-card *ngFor="let task of tasks()" nzHoverable (click)="openEditor(task.id)" class="task-card">
+            <div class="card-header">
+                <div style="display: flex; align-items: center; gap: 12px">
+                    <div class="task-icon">{{ task.icon || '🐹' }}</div>
+                    <div>
+                        <h3 style="margin: 0">{{ task.name }}</h3>
+                    </div>
                 </div>
-                <ng-template #emojiPickerTpl>
-                  <app-emoji-picker (emojiSelect)="updateForm('icon', $event)"></app-emoji-picker>
-                </ng-template>
-              </nz-form-control>
-            </nz-form-item>
-          </div>
-          <div nz-col [nzSpan]="21">
-            <nz-form-item>
-              <nz-form-label nzRequired>Name</nz-form-label>
-              <nz-form-control nzErrorTip="Please input the task name!">
-                <input nz-input [ngModel]="taskForm().name" (ngModelChange)="updateForm('name', $event)" name="name" placeholder="Task Name" />
-              </nz-form-control>
-            </nz-form-item>
-          </div>
-        </div>
+                <button nz-button nzType="text" nz-dropdown [nzDropdownMenu]="menu" (click)="$event.stopPropagation()"
+                    aria-label="More Options" title="More Options">
+                    <span nz-icon nzType="more"></span>
+                </button>
+                <nz-dropdown-menu #menu="nzDropdownMenu">
+                    <ul nz-menu>
+                        <li nz-menu-item (click)="showModal(task)"><nz-icon nzType="edit" />Edit Properties</li>
+                        <li nz-menu-item (click)="confirmDeleteTask(task)"><nz-icon nzType="delete" />Delete</li>
+                    </ul>
+                </nz-dropdown-menu>
+            </div>
 
-        <nz-form-item>
-          <nz-form-label>Description</nz-form-label>
-          <nz-form-control>
-            <textarea
-              nz-input
-              [ngModel]="taskForm().description"
-              (ngModelChange)="updateForm('description', $event)"
-              name="description"
-              placeholder="Description"
-              rows="3"
-            ></textarea>
-          </nz-form-control>
-        </nz-form-item>
-      </form>
-    </ng-container>
-  </nz-modal>
+            <p style="color: #595959; margin-bottom: 16px; min-height: 40px" (click)="openEditor(task.id)">
+                {{ task.description || 'No description.' }}
+            </p>
+
+            <div class="folder-list" (click)="openEditor(task.id)">
+                <span nz-icon nzType="folder"></span>
+                <div style="margin-left: 10px; color: #595959">
+                    <nz-tag *ngFor="let f of task.folders" [title]="f.watch_folder">{{ f.name }}</nz-tag>
+                    <div *ngIf="task.folders.length === 0">
+                        <i>None</i>
+                    </div>
+                </div>
+            </div>
+        </nz-card>
+    </div>
+
+    <nz-empty *ngIf="tasks().length === 0" nzNotFoundImage="assets/empty.svg" [nzNotFoundContent]="contentTpl">
+        <ng-template #contentTpl>
+            <span style="color: #8c8c8c; font-size: 16px">No tasks created yet</span>
+            <br />
+            <span style="color: #bfbfbf">Task define the processing pipeline for your files.</span>
+        </ng-template>
+    </nz-empty>
+
+    <nz-modal [nzVisible]="isModalVisible()" (nzVisibleChange)="isModalVisible.set($event)"
+        [nzTitle]="isEditing() ? 'Edit Task' : 'Create Task'" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()">
+        <ng-container *nzModalContent>
+            <form nz-form nzLayout="vertical">
+                <div nz-row [nzGutter]="16">
+                    <div nz-col [nzSpan]="3">
+                        <nz-form-item>
+                            <nz-form-label nzRequired>Icon</nz-form-label>
+                            <nz-form-control>
+                                <div class="emoji-trigger" nz-popover [nzPopoverContent]="emojiPickerTpl"
+                                    nzPopoverTrigger="click" nzPopoverPlacement="bottomLeft"
+                                    nzPopoverOverlayClassName="nz-popover-no-padding">
+                                    {{ taskForm().icon }}
+                                </div>
+                                <ng-template #emojiPickerTpl>
+                                    <app-emoji-picker (emojiSelect)="updateForm('icon', $event)"></app-emoji-picker>
+                                </ng-template>
+                            </nz-form-control>
+                        </nz-form-item>
+                    </div>
+                    <div nz-col [nzSpan]="21">
+                        <nz-form-item>
+                            <nz-form-label nzRequired>Name</nz-form-label>
+                            <nz-form-control nzErrorTip="Please input the task name!">
+                                <input nz-input [ngModel]="taskForm().name" (ngModelChange)="updateForm('name', $event)"
+                                    name="name" placeholder="Task Name" />
+                            </nz-form-control>
+                        </nz-form-item>
+                    </div>
+                </div>
+
+                <nz-form-item>
+                    <nz-form-label>Description</nz-form-label>
+                    <nz-form-control>
+                        <textarea nz-input [ngModel]="taskForm().description"
+                            (ngModelChange)="updateForm('description', $event)" name="description"
+                            placeholder="Description" rows="3"></textarea>
+                    </nz-form-control>
+                </nz-form-item>
+            </form>
+        </ng-container>
+    </nz-modal>
 </div>
