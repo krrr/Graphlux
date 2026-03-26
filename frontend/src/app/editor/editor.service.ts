@@ -110,6 +110,14 @@ export class EditorService {
         }
     }
 
+    addNodeToConfig(node: TaskNode, name: string, config: any = {}) {
+        this.nodeConfigs.update((configs) => ({
+            ...configs,
+            [node.id]: { name, config },
+        }));
+        this.patchNodeData(node, name, config);
+    }
+
     async addNode(nodeType: string) {
         if (nodeType === 'StartNode' && this.editor.getNodes().some((n: any) => n.type === 'StartNode')) {
             console.error('Only one Start node is allowed');
@@ -117,25 +125,8 @@ export class EditorService {
         }
 
         const node = new TaskNode(nodeType, NODE_INFO[nodeType].label);
-
-        if (nodeType !== 'StartNode') {
-            node.addInput('input', new ClassicPreset.Input(new ClassicPreset.Socket('Data')));
-        }
-
-        if (nodeType === 'ConditionNode') {
-            node.addOutput('true_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-            node.addOutput('false_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-        } else if (nodeType !== 'FinishNode') {
-            node.addOutput('default', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-        }
-
         await this.editor.addNode(node);
-
-        this.nodeConfigs.update((configs) => ({
-            ...configs,
-            [node.id]: { name: NODE_INFO[nodeType].label, config: {} },
-        }));
-        this.patchNodeData(node, NODE_INFO[nodeType].label, {});
+        this.addNodeToConfig(node, node.label, {});
 
         const center = this.area.area.pointer;
         await this.area.translate(node.id, { x: center.x, y: center.y });
@@ -173,7 +164,7 @@ export const NODE_INFO: Record<string, NodeInfo> = {
     },
     CodeEvalNode: {
         icon: 'code', color: '#945de1', label: 'Code Eval',
-        footerKeys: ['output_var'],
+        footerKeys: [],
         outputVar: (config) => config.output_var || 'eval_result'
     },
     ConditionNode: {
@@ -203,6 +194,17 @@ export class TaskNode extends ClassicPreset.Node {
     constructor(type: string, label: string) {
         super(label);
         this.type = type;
+
+        if (type !== 'StartNode') {
+            this.addInput('input', new ClassicPreset.Input(new ClassicPreset.Socket('Data')));
+        }
+
+        if (type === 'ConditionNode') {
+            this.addOutput('true_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
+            this.addOutput('false_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
+        } else if (type !== 'FinishNode') {
+            this.addOutput('default', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
+        }
     }
 }
 

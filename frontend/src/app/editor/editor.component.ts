@@ -279,28 +279,11 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
             return;
         }
 
-        const newNodeType = node.type;
-        const newNode = new TaskNode(newNodeType, node.label + ' (Copy)');
-
-        if (newNodeType !== 'StartNode') {
-            newNode.addInput('input', new ClassicPreset.Input(new ClassicPreset.Socket('Data')));
-        }
-
-        if (newNodeType === 'ConditionNode') {
-            newNode.addOutput('true_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-            newNode.addOutput('false_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-        } else if (newNodeType !== 'FinishNode') {
-            newNode.addOutput('default', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-        }
-
+        const newNode = new TaskNode(node.type, node.label + ' (Copy)');
         await this.editor.addNode(newNode);
 
-        const config = this.editorService.nodeConfigs()[node.id] || { config: {} };
-        this.editorService.nodeConfigs.update((configs) => ({
-            ...configs,
-            [newNode.id]: { name: node.label + ' (Copy)', config: JSON.parse(JSON.stringify(config.config)) },
-        }));
-        this.editorService.patchNodeData(newNode, node.label + ' (Copy)', config.config);
+        const config = this.editorService.nodeConfigs()[node.id]?.config || {};
+        this.editorService.addNodeToConfig(newNode, newNode.label, JSON.parse(JSON.stringify(config)));
 
         const view = this.area.nodeViews.get(node.id);
         if (view) {
@@ -340,27 +323,9 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         const pos = view ? { x: view.position.x, y: view.position.y } : { x: 0, y: 0 };
 
         const newNode = new TaskNode(newType, NODE_INFO[newType].label);
-
-        if (newType !== 'StartNode') {
-            newNode.addInput('input', new ClassicPreset.Input(new ClassicPreset.Socket('Data')));
-        }
-
-        if (newType === 'ConditionNode') {
-            newNode.addOutput('true_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-            newNode.addOutput('false_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-        } else if (newType !== 'FinishNode') {
-            newNode.addOutput('default', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-        }
-
         await this.editor.addNode(newNode);
         await this.area.translate(newNode.id, pos);
-
-        const config = this.editorService.nodeConfigs()[oldId] || { config: {} };
-        this.editorService.nodeConfigs.update((configs) => ({
-            ...configs,
-            [newNode.id]: { name: newNode.label, config: {} },
-        }));
-        this.editorService.patchNodeData(newNode, newNode.label, {});
+        this.editorService.addNodeToConfig(newNode, newNode.label, {});
 
         // reconnect edges where possible
         const conns = this.editor.getConnections().filter((c) => c.source === oldId || c.target === oldId);
@@ -501,30 +466,13 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         }
 
         const nodeMap = new Map<string, any>();
-        const newConfigs: { [id: string]: any } = {};
-
         for (const [id, nodeData] of Object.entries<any>(dagJson.nodes)) {
             const node = new TaskNode(nodeData.type, nodeData.name);
             node.id = id;
-
-            if (nodeData.type !== 'StartNode') {
-                node.addInput('input', new ClassicPreset.Input(new ClassicPreset.Socket('Data')));
-            }
-
-            if (nodeData.type === 'ConditionNode') {
-                node.addOutput('true_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-                node.addOutput('false_branch', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-            } else if (nodeData.type !== 'FinishNode') {
-                node.addOutput('default', new ClassicPreset.Output(new ClassicPreset.Socket('Data')));
-            }
-
-            newConfigs[node.id] = { name: nodeData.name, config: nodeData.config || {} };
-            this.editorService.patchNodeData(node, nodeData.name, nodeData.config || {});
+            this.editorService.addNodeToConfig(node, nodeData.name, nodeData.config || {});
             nodeMap.set(id, node);
             await this.editor.addNode(node);
         }
-
-        this.editorService.nodeConfigs.set(newConfigs);
 
         for (const edge of dagJson.edges) {
             const sourceNode = nodeMap.get(edge.source);
