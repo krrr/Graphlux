@@ -6,8 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "generator": "openapi-generator-cli generate"
+    "test": "ng test"
   },
   "private": true,
   "dependencies": {
@@ -34,7 +33,6 @@
     "@angular/build": "^21.2.1",
     "@angular/cli": "^21.2.1",
     "@angular/compiler-cli": "^21.2.0",
-    "@openapitools/openapi-generator-cli": "^2.30.2",
     "@types/node": "^25.3.5",
     "@vitest/coverage-v8": "^4.1.0",
     "jsdom": "^28.0.0",
