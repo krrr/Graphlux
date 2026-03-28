@@ -17,7 +17,8 @@ import type { editor } from 'monaco-editor';
             <nz-form-control>
                 <div class="editor-wrap" [class.expanded]="isExpanded()">
                     <button nz-button nzShape="circle" class="expand-btn" (click)="toggleExpand()"
-                        [nzSize]="isExpanded() ? 'default' : 'small'" [title]="isExpanded() ? 'Minimize' : 'Expand'">
+                        [nzSize]="isExpanded() ? 'default' : 'small'" [title]="isExpanded() ? 'Minimize' : 'Expand'"
+                        [attr.aria-label]="isExpanded() ? 'Minimize' : 'Expand'">
                         <i nz-icon [nzType]="isExpanded() ? 'fullscreen-exit' : 'fullscreen'"></i>
                     </button>
                     <nz-code-editor class="editor" [nzEditorOption]="editorOpt" [ngModel]="config().code"

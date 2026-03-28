@@ -36,7 +36,7 @@ import { PropsBase } from './props-base';
 
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
             <label style="color: rgba(0, 0, 0, 0.85); font-weight: 500;">Tags</label>
-            <button nz-button nzShape="circle" nzSize="small" (click)="addTag()" type="button">
+            <button nz-button nzShape="circle" nzSize="small" (click)="addTag()" type="button" aria-label="Add Tag" title="Add Tag">
                 <span nz-icon nzType="plus"></span>
             </button>
         </div>
@@ -60,7 +60,7 @@ import { PropsBase } from './props-base';
                                 <input nz-input [(ngModel)]="data.value" (ngModelChange)="syncTags()" placeholder="Value" />
                             </td>
                             <td class="sm-btn-cell">
-                                <button nz-button nzType="text" (click)="removeTag(i)" type="button" nzSize="small">
+                                <button nz-button nzType="text" (click)="removeTag(i)" type="button" nzSize="small" aria-label="Remove Tag" title="Remove Tag">
                                     <span nz-icon nzType="delete"></span>
                                 </button>
                             </td>
