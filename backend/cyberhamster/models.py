@@ -34,3 +34,4 @@ class SystemSettings(SQLModel, table=True):
     ffmpeg_path: str = Field(default="ffmpeg")
     imagemagick_path: str = Field(default="magick")
     max_concurrent_tasks: int = Field(default=4)
+    auto_start: bool = Field(default=False)

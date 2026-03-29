@@ -3,8 +3,8 @@ from fastapi.staticfiles import StaticFiles
 import asyncio
 import os
 
+from cyberhamster.api import router as api_router, __version__
 from cyberhamster.db import init_db, get_session
-from cyberhamster.api import router as api_router
 from cyberhamster.task_manager import task_manager
 from cyberhamster.tools.imagemagick_wrapper import magick_pool_reaper
 

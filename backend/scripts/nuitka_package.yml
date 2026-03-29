@@ -1,0 +1,9 @@
+- module-name: 'pyexiv2'
+  dlls:
+    - from_filenames:
+        relative_path: 'lib'
+        prefixes:
+          - '*'
+        suffixes:
+          - 'dll'
+          - 'pyd'

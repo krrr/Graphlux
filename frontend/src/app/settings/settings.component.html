@@ -1,5 +1,5 @@
 <div class="settings-container">
-    <h2>Settings</h2>
+    <h2>Settings <small style="font-weight: normal; font-size: 0.6em; color: #888;">v{{apiService.appInfo()?.version}}</small></h2>
     <form nz-form nzLayout="vertical">
         <nz-form-item>
             <nz-form-label>FFmpeg Executable Path</nz-form-label>
@@ -23,6 +23,14 @@
                 <nz-input-number [ngModel]="settings().max_concurrent_tasks"
                     (ngModelChange)="updateField('max_concurrent_tasks', $event)" name="max_concurrent_tasks"
                     [nzMin]="1" [nzStep]="1" style="width: 100%"></nz-input-number>
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item *ngIf="apiService.appInfo()?.is_packaged">
+            <nz-form-label>Start on Boot (Windows)</nz-form-label>
+            <nz-form-control>
+                <input type="checkbox" [ngModel]="settings().auto_start" (ngModelChange)="updateField('auto_start', $event)" name="auto_start" />
+                <span style="margin-left: 8px;">Enable</span>
             </nz-form-control>
         </nz-form-item>
 

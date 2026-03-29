@@ -19,10 +19,11 @@ export class SettingsComponent implements OnInit {
         ffmpeg_path: 'ffmpeg',
         imagemagick_path: 'magick',
         max_concurrent_tasks: 4,
+        auto_start: false,
     });
 
     constructor(
-        private apiService: ApiService,
+        public apiService: ApiService,
         private message: NzMessageService,
     ) {}
 

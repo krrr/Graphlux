@@ -2,6 +2,7 @@ import os
 import sys
 import ctypes
 import asyncio
+import winreg
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from sqlalchemy.orm import selectinload, defer
 from sqlmodel import Session, select
@@ -13,6 +14,41 @@ from .models import Task, Folder, SystemSettings, FolderTaskLink
 from .engine.executor import TaskExecutor
 
 router = APIRouter()
+
+__version__ = "0.1.0"
+
+def is_packaged() -> bool:
+    # Nuitka sets __compiled__
+    return "__compiled__" in globals() or getattr(sys, "frozen", False)
+
+class AppInfo(BaseModel):
+    version: str
+    is_packaged: bool
+
+@router.get("/info", response_model=AppInfo)
+def get_app_info():
+    return AppInfo(version=__version__, is_packaged=is_packaged())
+
+def update_autostart_registry(enable: bool):
+    try:
+        key = winreg.OpenKey(
+            winreg.HKEY_CURRENT_USER,
+            r"Software\Microsoft\Windows\CurrentVersion\Run",
+            0,
+            winreg.KEY_SET_VALUE
+        )
+        if enable:
+            # We assume sys.argv[0] is the correct path to the executable when packaged
+            executable_path = sys.executable if getattr(sys, "frozen", False) else sys.argv[0]
+            winreg.SetValueEx(key, "CyberHamster", 0, winreg.REG_SZ, f'"{executable_path}"')
+        else:
+            try:
+                winreg.DeleteValue(key, "CyberHamster")
+            except FileNotFoundError:
+                pass
+        winreg.CloseKey(key)
+    except Exception as e:
+        print(f"Failed to update registry: {e}")
 
 class ExecutionRequest(BaseModel):
     task: Dict[str, Any] = None
@@ -286,6 +322,11 @@ def update_settings(settings_update: SystemSettings, session: Session = Depends(
         settings = SystemSettings(id=1)
 
     update_data = settings_update.model_dump(exclude_unset=True)
+    
+    # Check if auto_start changed
+    if is_packaged() and "auto_start" in update_data and update_data["auto_start"] != settings.auto_start:
+        update_autostart_registry(update_data["auto_start"])
+
     for key, value in update_data.items():
         if key != "id":
             setattr(settings, key, value)
@@ -293,6 +334,7 @@ def update_settings(settings_update: SystemSettings, session: Session = Depends(
     session.add(settings)
     session.commit()
     session.refresh(settings)
+    
     return settings
 
 
