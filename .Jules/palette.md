@@ -1,3 +1,3 @@
-## 2024-05-20 - Adding Empty States using Ng-Zorro-Antd
-**Learning:** Utilizing `<nz-empty>` from `ng-zorro-antd` for empty states is effective. Adding a helpful CTA like "Create First Task" directly within the `<nz-empty>` tag works perfectly to guide new users, instead of displaying a blank or confusing UI when no tasks are present.
-**Action:** Consistently check lists or tables for empty states and implement `<nz-empty>` with clear, actionable CTAs where appropriate.
+## 2024-05-24 - Accessibility (a11y) improvements
+**Learning:** Found several buttons missing `aria-label` or `title` attributes which makes them difficult for screen reader users to understand their purpose, especially if they are icon-only buttons. Added `aria-label` and `title` to these buttons across `settings`, `tasks`, and `folders` components.
+**Action:** Always ensure that icon-only buttons have descriptive `aria-label` and `title` attributes.
