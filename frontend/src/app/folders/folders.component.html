@@ -1,7 +1,7 @@
 <div class="folders-container">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px">
         <h2>Folders Manager</h2>
-        <button nz-button nzType="primary" (click)="showModal()"><nz-icon nzType="plus"/> Folder</button>
+        <button nz-button nzType="primary" (click)="showModal()" aria-label="Create Folder" title="Create Folder"><nz-icon nzType="plus"/> Folder</button>
     </div>
 
     <nz-table #basicTable [nzData]="folders()" *ngIf="folders().length > 0">
@@ -80,7 +80,7 @@
                                         (ngModelChange)="updateForm('watch_folder', $event)" name="watch_folder"
                                         placeholder="/path/to/folder" />
                                     <button nz-button nzType="default" type="button"
-                                        (click)="openFileDialog()">Browse...</button>
+                                        (click)="openFileDialog()" aria-label="Browse for watch folder" title="Browse...">Browse...</button>
                                 </div>
                             </nz-form-control>
                         </nz-form-item>

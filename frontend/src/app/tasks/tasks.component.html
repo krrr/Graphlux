@@ -1,7 +1,7 @@
 <div class="tasks-container">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px">
         <h2>Tasks Manager</h2>
-        <button nz-button nzType="primary" (click)="showModal()"><nz-icon nzType="plus"/> Create Task</button>
+        <button nz-button nzType="primary" (click)="showModal()" aria-label="Create Task" title="Create Task"><nz-icon nzType="plus"/> Create Task</button>
     </div>
 
     <div class="task-list" *ngIf="tasks().length > 0">
