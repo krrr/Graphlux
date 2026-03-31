@@ -45,7 +45,8 @@
         <ng-template #contentTpl>
             <span style="color: #8c8c8c; font-size: 16px">No tasks created yet</span>
             <br />
-            <span style="color: #bfbfbf">Task define the processing pipeline for your files.</span>
+            <span style="color: #bfbfbf; display: block; margin-bottom: 16px;">Tasks define the processing pipeline for your files.</span>
+            <button nz-button nzType="primary" (click)="showModal()">Create First Task</button>
         </ng-template>
     </nz-empty>
 
