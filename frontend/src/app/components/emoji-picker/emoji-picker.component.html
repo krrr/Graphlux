@@ -2,12 +2,23 @@
     <nz-tabs nzTabPosition="bottom" [nzAnimated]="false" nzSize="small">
         <nz-tab *ngFor="let c of categories" [nzTitle]="titleTpl">
             <ng-template #titleTpl>
-                <span nz-icon [nzType]="c.icon"></span>
+                <span
+                    nz-icon
+                    [nzType]="c.icon"
+                    [attr.aria-label]="c.name"
+                    [attr.title]="c.name"
+                ></span>
             </ng-template>
             <div class="emoji-grid">
-                <div *ngFor="let i of getEmojis(c.ranges)" class="emoji-item" (click)="selectEmoji(i)">
+                <button
+                    type="button"
+                    *ngFor="let i of getEmojis(c.ranges)"
+                    class="emoji-item"
+                    (click)="selectEmoji(i)"
+                    [attr.aria-label]="'Emoji ' + i"
+                >
                     {{ i }}
-                </div>
+                </button>
             </div>
         </nz-tab>
     </nz-tabs>
