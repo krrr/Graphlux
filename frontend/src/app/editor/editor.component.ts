@@ -1,7 +1,7 @@
 import { Component, AfterViewInit, ViewChild, ElementRef, OnInit, Injector, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { NodeEditor, GetSchemes, ClassicPreset } from 'rete';
 import { AreaPlugin, AreaExtensions } from 'rete-area-plugin';
 import { ConnectionPlugin, Presets as ConnectionPresets } from 'rete-connection-plugin';
@@ -41,28 +41,29 @@ type AreaExtra = AngularArea2D<Schemes>;
     selector: 'app-editor',
     standalone: true,
     imports: [
-        CommonModule,
-        FormsModule,
-        NzButtonModule,
-        NzDropdownModule,
-        NzMenuModule,
-        NzModalModule,
-        NzFormModule,
-        NzInputModule,
-        NzSelectModule,
-        NzCheckboxModule,
-        ...COMMON_IMPORTS,
-        PropsMetadataReadComponent,
-        PropsConvertComponent,
-        PropsCodeEvalComponent,
-        PropsConditionComponent,
-        PropsFileOperationComponent,
-        PropsMetadataWriteComponent,
-        PropsFFmpegActionComponent,
-        PropsFinishComponent,
-        FileDialogComponent,
-        NzDividerComponent
-    ],
+    CommonModule,
+    FormsModule,
+    NzButtonModule,
+    NzDropdownModule,
+    NzMenuModule,
+    NzModalModule,
+    NzFormModule,
+    NzInputModule,
+    NzSelectModule,
+    NzCheckboxModule,
+    ...COMMON_IMPORTS,
+    PropsMetadataReadComponent,
+    PropsConvertComponent,
+    PropsCodeEvalComponent,
+    PropsConditionComponent,
+    PropsFileOperationComponent,
+    PropsMetadataWriteComponent,
+    PropsFFmpegActionComponent,
+    PropsFinishComponent,
+    FileDialogComponent,
+    NzDividerComponent,
+    RouterLink
+],
     providers: [EditorService],
     templateUrl: './editor.component.html',
     styleUrls: ['./editor.component.scss'],
@@ -83,7 +84,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     selectedNode = signal<any>(null);
     isPropertyPanelVisible = signal(true);
 
-    private task: any;
+    task = signal<any>(null);
     taskId?: number;
     arrange!: AutoArrangePlugin<any>;
     zoomLevel = signal<number>(100);
@@ -143,7 +144,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         const tid = this.taskId;
         if (!tid) return;
         this.apiService.getTask(tid).subscribe((task) => {
-            this.task = task;
+            this.task.set(task);
             this.editorService.loadDag(task, true);
             this.selectedNode.set(null);
         });

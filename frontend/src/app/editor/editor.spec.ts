@@ -58,11 +58,11 @@ describe('EditorComponent', () => {
         component = fixture.componentInstance;
 
         // Mock the internal signals and properties so we don't trigger rete logic
-        component.taskId = vi.fn().mockReturnValue(1) as any;
+        component.taskId = 1;
         component.executeFilePath = vi.fn().mockReturnValue('/test/path') as any;
 
         // Mock serializeDag because it needs Rete editor
-        component.serializeDag = vi.fn().mockReturnValue({ nodes: {}, edges: [], start_node: null }) as any;
+        component.editorService.serializeDag = vi.fn().mockReturnValue({ nodes: {}, edges: [], start_node: null }) as any;
 
         // Prevent ngAfterViewInit from running which requires Rete
         component.ngAfterViewInit = async () => {};
