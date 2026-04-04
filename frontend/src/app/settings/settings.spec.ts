@@ -21,6 +21,9 @@ describe('Settings', () => {
                 ffmpeg_path: '/usr/bin/ffmpeg',
                 imagemagick_path: '/usr/bin/magick'
             })),
+            appInfo: vi.fn().mockReturnValue(of({
+                is_packaged: false
+            })),
             updateSettings: vi.fn().mockReturnValue(of({}))
         };
 

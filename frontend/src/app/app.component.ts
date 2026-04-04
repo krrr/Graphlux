@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { COMMON_IMPORTS } from './shared-imports';
+import { ApiService } from './api.service';
+
 
 @Component({
     selector: 'app-root',
@@ -58,4 +60,10 @@ import { COMMON_IMPORTS } from './shared-imports';
         }
     `],
 })
-export class AppComponent {}
+export class AppComponent implements OnInit {
+    apiService = inject(ApiService);
+
+    ngOnInit() {
+        this.apiService.appInfo();  // preload, trigger manually
+    }
+}
