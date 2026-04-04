@@ -21,7 +21,8 @@ describe('Settings', () => {
                 ffmpeg_path: '/usr/bin/ffmpeg',
                 imagemagick_path: '/usr/bin/magick'
             })),
-            updateSettings: vi.fn().mockReturnValue(of({}))
+            updateSettings: vi.fn().mockReturnValue(of({})),
+            appInfo: vi.fn().mockReturnValue({ version: '1.0.0', is_packaged: false })
         };
 
         messageServiceSpy = {

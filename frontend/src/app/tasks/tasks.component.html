@@ -5,7 +5,14 @@
     </div>
 
     <div class="task-list" *ngIf="tasks().length > 0">
-        <nz-card *ngFor="let task of tasks()" nzHoverable (click)="openEditor(task.id)" class="task-card">
+        <nz-card *ngFor="let task of tasks()" nzHoverable
+            (click)="openEditor(task.id)"
+            (keydown.enter)="$event.preventDefault(); openEditor(task.id)"
+            (keydown.space)="$event.preventDefault(); openEditor(task.id)"
+            tabindex="0"
+            role="button"
+            [attr.aria-label]="'Open task ' + task.name"
+            class="task-card">
             <div class="card-header">
                 <div style="display: flex; align-items: center; gap: 12px">
                     <div class="task-icon">{{ task.icon || '🐹' }}</div>
@@ -58,11 +65,11 @@
                         <nz-form-item>
                             <nz-form-label nzRequired>Icon</nz-form-label>
                             <nz-form-control>
-                                <div class="emoji-trigger" nz-popover [nzPopoverContent]="emojiPickerTpl"
+                                <button type="button" class="emoji-trigger" aria-label="Select icon" nz-popover [nzPopoverContent]="emojiPickerTpl"
                                     nzPopoverTrigger="click" nzPopoverPlacement="bottomLeft"
                                     nzPopoverOverlayClassName="nz-popover-no-padding">
                                     {{ taskForm().icon }}
-                                </div>
+                                </button>
                                 <ng-template #emojiPickerTpl>
                                     <app-emoji-picker (emojiSelect)="updateForm('icon', $event)"></app-emoji-picker>
                                 </ng-template>
