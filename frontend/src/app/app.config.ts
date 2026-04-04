@@ -44,6 +44,8 @@ import {
     SmileOutline,
     FullscreenOutline,
     FullscreenExitOutline,
+    UndoOutline,
+    RedoOutline,
 } from '@ant-design/icons-angular/icons';
 
 registerLocaleData(en);
@@ -83,6 +85,8 @@ const icons: IconDefinition[] = [
     SmileOutline,
     FullscreenOutline,
     FullscreenExitOutline,
+    UndoOutline,
+    RedoOutline,
 ];
 
 export const appConfig: ApplicationConfig = {

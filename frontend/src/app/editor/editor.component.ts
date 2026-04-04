@@ -9,7 +9,7 @@ import { AutoArrangePlugin, Presets as ArrangePresets } from 'rete-auto-arrange-
 import { AngularPlugin, Presets, AngularArea2D } from 'rete-angular-plugin/18';
 import { CustomNodeComponent } from './custom-node/custom-node.component';
 import { ApiService } from '../api.service';
-import { lastValueFrom, Subscription } from 'rxjs';
+import { lastValueFrom, Subscription, Subject, debounceTime } from 'rxjs';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzContextMenuService, NzDropdownMenuComponent, NzDropdownModule } from 'ng-zorro-antd/dropdown';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
@@ -41,28 +41,28 @@ type AreaExtra = AngularArea2D<Schemes>;
     selector: 'app-editor',
     standalone: true,
     imports: [
-    CommonModule,
-    FormsModule,
-    NzButtonModule,
-    NzDropdownModule,
-    NzMenuModule,
-    NzModalModule,
-    NzFormModule,
-    NzInputModule,
-    NzSelectModule,
-    NzCheckboxModule,
-    ...COMMON_IMPORTS,
-    PropsMetadataReadComponent,
-    PropsConvertComponent,
-    PropsCodeEvalComponent,
-    PropsConditionComponent,
-    PropsFileOperationComponent,
-    PropsMetadataWriteComponent,
-    PropsFFmpegActionComponent,
-    PropsFinishComponent,
-    FileDialogComponent,
-    NzDividerComponent
-],
+        CommonModule,
+        FormsModule,
+        NzButtonModule,
+        NzDropdownModule,
+        NzMenuModule,
+        NzModalModule,
+        NzFormModule,
+        NzInputModule,
+        NzSelectModule,
+        NzCheckboxModule,
+        ...COMMON_IMPORTS,
+        PropsMetadataReadComponent,
+        PropsConvertComponent,
+        PropsCodeEvalComponent,
+        PropsConditionComponent,
+        PropsFileOperationComponent,
+        PropsMetadataWriteComponent,
+        PropsFFmpegActionComponent,
+        PropsFinishComponent,
+        FileDialogComponent,
+        NzDividerComponent
+    ],
     providers: [EditorService],
     templateUrl: './editor.component.html',
     styleUrls: ['./editor.component.scss'],
@@ -74,6 +74,9 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     logs = signal<string[]>([]);
     private logSubscription: Subscription | undefined;
     private routeSub: Subscription | undefined;
+    private changeSub: Subscription | undefined;
+    private movementSubject = new Subject<void>();
+    private movementSub: Subscription | undefined;
 
     editor = new NodeEditor<Schemes>();
     area!: AreaPlugin<Schemes, AreaExtra>;
@@ -108,7 +111,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         private modal: NzModalService,
         private nzContextMenuService: NzContextMenuService,
         public editorService: EditorService,
-    ) {}
+    ) { }
 
     ngOnInit() {
         this.apiService.connectLogsWebSocket();
@@ -123,14 +126,26 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.loadTask();
             }
         });
-    }
+
+        // Snapshots on config changes and movement (debounced)
+        this.changeSub = this.editorService.change$.pipe(debounceTime(400)).subscribe(() => {
+            this.editorService.takeSnapshot();
+        });
+
+        // Debounce movement snapshots (using same stream or separate)
+        this.movementSub = this.movementSubject.pipe(debounceTime(400)).subscribe(() => {
+            this.editorService.takeSnapshot();
+        });
+        }
+
 
     loadTask() {
         const tid = this.taskId();
         if (!tid) return;
         this.apiService.getTask(tid).subscribe((task) => {
             this.task = task;
-            this.loadDag(task);
+            this.editorService.loadDag(task, true);
+            this.selectedNode.set(null);
         });
     }
 
@@ -140,6 +155,12 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         if (this.routeSub) {
             this.routeSub.unsubscribe();
+        }
+        if (this.movementSub) {
+            this.movementSub.unsubscribe();
+        }
+        if (this.changeSub) {
+            this.changeSub.unsubscribe();
         }
         document.removeEventListener('keydown', this.keydownListener);
     }
@@ -163,7 +184,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
                 if (node) {
                     this.selectedNode.set(node);
                     console.debug('selected node', node);
-                    
+
                     this.isPropertyPanelVisible.set(true);
                     if (!this.editorService.nodeConfigs()[node.id]) {
                         this.editorService.nodeConfigs.update((configs) => ({
@@ -234,6 +255,21 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
             return context;
         });
 
+        // History handling
+        this.editor.addPipe((context) => {
+            if (['nodecreated', 'noderemoved', 'connectioncreated', 'connectionremoved'].includes(context.type)) {
+                this.editorService.takeSnapshot();
+            }
+            return context;
+        });
+
+        this.area.addPipe((context) => {
+            if (context.type === 'translated') {
+                this.movementSubject.next();
+            }
+            return context;
+        });
+
         AreaExtensions.simpleNodesOrder(this.area);
 
         document.addEventListener('keydown', this.keydownListener);
@@ -260,6 +296,8 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     async autoArrange() {
         await this.arrange.layout();
         this.zoomFit();
+        // snapshot taken via translated events or manually if layout doesn't trigger them
+        this.editorService.takeSnapshot();
     }
 
     handleKeyDown(e: KeyboardEvent) {
@@ -269,6 +307,16 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
                 return;
             }
             this.deleteSelectedNode();
+        }
+
+        if (e.ctrlKey || e.metaKey) {
+            if (e.key === 'z') {
+                e.preventDefault();
+                this.editorService.undo();
+            } else if (e.key === 'y' || (e.key === 'Z' && e.shiftKey)) {
+                e.preventDefault();
+                this.editorService.redo();
+            }
         }
     }
 
@@ -291,6 +339,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         if (view) {
             await this.area.translate(newNode.id, { x: view.position.x + 50, y: view.position.y + 50 });
         }
+        // Snapshots are taken automatically via Rete and Service events
     }
 
     async deleteSelectedNode() {
@@ -356,16 +405,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
 
 
     updateNodeName(nodeId: string, name: string) {
-        this.editorService.nodeConfigs.update((configs) => ({
-            ...configs,
-            [nodeId]: { ...configs[nodeId], name },
-        }));
-
-        const node = this.editor.getNode(nodeId);
-        if (node) {
-            this.editorService.patchNodeData(node, name, this.editorService.nodeConfigs()[nodeId].config);
-            this.area.update('node', nodeId);
-        }
+        this.editorService.updateNodeName(nodeId, name);
     }
 
     showExecuteModal() {
@@ -386,7 +426,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     executeDag() {
-        const dag = this.serializeDag();
+        const dag = this.editorService.serializeDag();
         this.logs.set([]);
         this.isLogsModalVisible.set(true);
 
@@ -403,40 +443,6 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         this.isLogsModalVisible.set(false);
     }
 
-    serializeDag() {
-        const nodes = this.editor.getNodes();
-        const connections = this.editor.getConnections();
-        const currentConfigs = this.editorService.nodeConfigs();
-
-        const dagJson: any = { nodes: {}, edges: [], start_node: null };
-
-        const startNodes = nodes.filter((n) => n.type === 'StartNode');
-        if (startNodes.length > 0) {
-            dagJson.start_node = startNodes[0].id;
-        }
-
-        nodes.forEach((node) => {
-            const config = currentConfigs[node.id];
-            const position = this.area.nodeViews.get(node.id)?.position || { x: 0, y: 0 };
-            dagJson.nodes[node.id] = {
-                type: node.type,
-                name: node.label,
-                config: config?.config || {},
-                position: position,
-            };
-        });
-
-        connections.forEach((conn) => {
-            dagJson.edges.push({
-                source: conn.source,
-                target: conn.target,
-                branch: conn.sourceOutput || 'default',
-            });
-        });
-
-        return dagJson;
-    }
-
     async saveDag() {
         const taskId = this.taskId();
         if (!taskId) {
@@ -444,59 +450,13 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
             return;
         }
 
-        const dagJson = this.serializeDag();
+        const dagJson = this.editorService.serializeDag();
         try {
             await lastValueFrom(this.apiService.updateTask(taskId, { json_data: dagJson }))
             this.message.success('Task saved successfully');
         } catch (e: any) {
             this.message.error(e.error.detail);
         }
-    }
-
-    async loadDag(taskDef: any) {
-        await this.editor.clear();
-        this.editorService.nodeConfigs.set({});
-        this.selectedNode.set(null);
-
-        const dagJson = taskDef.json_data;
-        if (!dagJson || !dagJson.nodes) return;
-
-        if (Object.keys(dagJson.nodes).length === 0) {
-            // Empty DAG, create default Start node
-            await this.editorService.addNode('StartNode');
-            return;
-        }
-
-        const nodeMap = new Map<string, any>();
-        for (const [id, nodeData] of Object.entries<any>(dagJson.nodes)) {
-            const node = new TaskNode(nodeData.type, nodeData.name);
-            node.id = id;
-            this.editorService.addNodeToConfig(node, nodeData.name, nodeData.config || {});
-            nodeMap.set(id, node);
-            await this.editor.addNode(node);
-        }
-
-        for (const edge of dagJson.edges) {
-            const sourceNode = nodeMap.get(edge.source);
-            const targetNode = nodeMap.get(edge.target);
-            if (sourceNode && targetNode) {
-                const conn = new TaskConnection(sourceNode, edge.branch, targetNode, 'input');
-                await this.editor.addConnection(conn);
-            }
-        }
-
-        let x = 0;
-        for (const node of Array.from(nodeMap.values())) {
-            const nodeData = dagJson.nodes[node.id];
-            if (nodeData?.position) {
-                await this.area.translate(node.id, nodeData.position);
-            } else {
-                await this.area.translate(node.id, { x: x, y: 0 });
-                x += 260;
-            }
-        }
-
-        AreaExtensions.zoomAt(this.area, this.editor.getNodes());
     }
 
     openFileDialog() {

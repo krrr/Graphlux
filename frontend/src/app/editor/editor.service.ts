@@ -1,7 +1,8 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { ClassicPreset, NodeEditor } from 'rete';
-import { AreaPlugin } from 'rete-area-plugin';
+import { AreaExtensions, AreaPlugin } from 'rete-area-plugin';
+import { Subject, Subscription } from 'rxjs';
 
 
 export interface VariableInfo {
@@ -17,6 +18,102 @@ export class EditorService {
     area!: AreaPlugin<any, any>;
     nodeConfigs = signal<{ [id: string]: any }>({});
     message = inject(NzMessageService);
+    change$ = new Subject<void>();
+
+    // History state
+    undoStack = signal<string[]>([]);
+    redoStack = signal<string[]>([]);
+    private isApplyingSnapshot = false;
+
+    constructor() {
+
+    }
+
+    async loadDag(taskDef: any, init = false) {
+        await this.editor.clear();
+        this.nodeConfigs.set({});
+
+        const dagJson = taskDef.json_data;
+        if (!dagJson || !dagJson.nodes) return;
+
+        if (Object.keys(dagJson.nodes).length === 0) {
+            // Empty DAG, create default Start node
+            await this.addNode('StartNode');
+            if (init) {
+                this.clearUndoHistory();
+            }
+            return;
+        }
+
+        const nodeMap = new Map<string, any>();
+        for (const [id, nodeData] of Object.entries<any>(dagJson.nodes)) {
+            const node = new TaskNode(nodeData.type, nodeData.name);
+            node.id = id;
+            this.addNodeToConfig(node, nodeData.name, nodeData.config || {});
+            nodeMap.set(id, node);
+            await this.editor.addNode(node);
+        }
+
+        for (const edge of dagJson.edges) {
+            const sourceNode = nodeMap.get(edge.source);
+            const targetNode = nodeMap.get(edge.target);
+            if (sourceNode && targetNode) {
+                const conn = new TaskConnection(sourceNode, edge.branch, targetNode, 'input');
+                await this.editor.addConnection(conn);
+            }
+        }
+
+        for (const node of Array.from(nodeMap.values())) {
+            const nodeData = dagJson.nodes[node.id];
+            if (nodeData?.position) {
+                await this.area.translate(node.id, nodeData.position);
+            }
+        }
+
+        if (init) {
+            AreaExtensions.zoomAt(this.area, this.editor.getNodes());
+            this.clearUndoHistory();
+        }
+    }
+
+    private clearUndoHistory() {
+        this.undoStack.set([JSON.stringify(this.serializeDag())]);
+        this.redoStack.set([]);
+    }
+
+    serializeDag() {
+        const nodes = this.editor.getNodes();
+        const connections = this.editor.getConnections();
+        const currentConfigs = this.nodeConfigs();
+
+        const dagJson: any = { nodes: {}, edges: [], start_node: null };
+
+        const startNodes = nodes.filter((n) => n.type === 'StartNode');
+        if (startNodes.length > 0) {
+            dagJson.start_node = startNodes[0].id;
+        }
+
+        nodes.forEach((node) => {
+            const config = currentConfigs[node.id];
+            const position = this.area.nodeViews.get(node.id)?.position || { x: 0, y: 0 };
+            dagJson.nodes[node.id] = {
+                type: node.type,
+                name: node.label,
+                config: config?.config || {},
+                position: position,
+            };
+        });
+
+        connections.forEach((conn) => {
+            dagJson.edges.push({
+                source: conn.source,
+                target: conn.target,
+                branch: conn.sourceOutput || 'default',
+            });
+        });
+
+        return dagJson;
+    }
 
     patchNodeData(node: any, name: string, config: any) {
         node.label = name;
@@ -41,6 +138,21 @@ export class EditorService {
             this.patchNodeData(node, this.nodeConfigs()[nodeId].name, this.nodeConfigs()[nodeId].config);
             this.area.update('node', nodeId);
         }
+        this.change$.next();
+    }
+
+    updateNodeName(nodeId: string, name: string) {
+        this.nodeConfigs.update((configs) => ({
+            ...configs,
+            [nodeId]: { ...configs[nodeId], name },
+        }));
+
+        const node = this.editor.getNode(nodeId);
+        if (node) {
+            this.patchNodeData(node, name, this.nodeConfigs()[nodeId].config);
+            this.area.update('node', nodeId);
+        }
+        this.change$.next();
     }
 
     getAvailableVariables(nodeId: string): VariableInfo[] {
@@ -116,6 +228,7 @@ export class EditorService {
             [node.id]: { name, config },
         }));
         this.patchNodeData(node, name, config);
+        this.change$.next();
     }
 
     async addNode(nodeType: string) {
@@ -130,6 +243,46 @@ export class EditorService {
 
         const center = this.area.area.pointer;
         await this.area.translate(node.id, { x: center.x, y: center.y });
+        this.change$.next();
+    }
+
+    takeSnapshot() {
+        if (this.isApplyingSnapshot) return;
+        const snapshot = JSON.stringify(this.serializeDag());
+        const currentStack = this.undoStack();
+        // Avoid duplicate snapshots
+        if (currentStack.length > 0 && currentStack[currentStack.length - 1] === snapshot) return;
+
+        this.undoStack.update(stack => [...stack, snapshot]);
+        this.redoStack.set([]); // Clear redo stack on new action
+    }
+
+    async undo() {
+        const stack = this.undoStack();
+        if (stack.length <= 1) return; // Need at least 2 states to undo (initial + current)
+
+        this.isApplyingSnapshot = true;
+        const current = stack.pop()!;
+        const previous = stack[stack.length - 1];
+
+        this.undoStack.set([...stack]);
+        this.redoStack.update(rs => [...rs, current]);
+
+        await this.loadDag({ json_data: JSON.parse(previous) }, false);
+        this.isApplyingSnapshot = false;
+    }
+
+    async redo() {
+        const stack = this.redoStack();
+        if (stack.length === 0) return;
+
+        this.isApplyingSnapshot = true;
+        const next = stack.pop()!;
+        this.redoStack.set([...stack]);
+        this.undoStack.update(us => [...us, next]);
+
+        await this.loadDag({ json_data: JSON.parse(next) }, false);
+        this.isApplyingSnapshot = false;
     }
 }
 
