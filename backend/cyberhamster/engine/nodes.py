@@ -1,14 +1,16 @@
 import os
 import shutil
 import tempfile
-import shlex
 import ast
 from typing import Any, Dict, Optional, Tuple, TypedDict
+from sqlmodel import Session
 from .context import FileContext
 from ..tools.ffmpeg_wrapper import FFmpegWrapper
 from ..tools.pyexiv2_wrapper import Pyexiv2Wrapper
 from ..tools.imagemagick_wrapper import ImageMagickWrapper
 from ..logger import logger
+from ..db import engine
+from ..models import Task
 
 class FileObject(TypedDict, total=False):
     """Encapsulates a file being processed."""
@@ -19,10 +21,11 @@ class FileObject(TypedDict, total=False):
 
 class DAGNode:
     """Base class for a node in the execution DAG."""
-    def __init__(self, node_id: str, name: str, config: Dict[str, Any] = None):
+    def __init__(self, node_id: str, name: str, config: Dict[str, Any] = None, task_cache: Dict[int, Dict[str, Any]] = None):
         self.node_id = node_id
         self.name = name
         self.config = config or {}
+        self.task_cache = task_cache
     
     def get_input_file(self, inputs: Dict[str, Any]) -> Optional[FileObject]:
         """Helper to get the input file object based on config or default."""
@@ -348,47 +351,51 @@ class CodeEvalNode(DAGNode):
             return False, None, {}
 
 
-class FFmpegActionNode(DAGNode):
-    """Executes FFmpeg with specific parameters."""
+class CallTaskNode(DAGNode):
+    """Executes another task as a sub-DAG."""
     def execute(self, inputs: Dict[str, Any], context: FileContext) -> Tuple[bool, Optional[str], Dict[str, Any]]:
+        task_id = self.config.get("task_id")
+        if not task_id:
+            logger.error(f"[{self.name}] No task_id configured.")
+            return False, None, {}
+
+        # 1. Try to get from cache
+        if self.task_cache is not None and task_id in self.task_cache:
+            dag_json = self.task_cache[task_id]
+            task_name = f"Task {task_id}" # Fallback name
+        else:
+            # 2. Fallback to database
+            with Session(engine) as session:
+                task = session.get(Task, task_id)
+                if not task:
+                    logger.error(f"[{self.name}] Task {task_id} not found.")
+                    return False, None, {}
+                dag_json = task.json_data
+                task_name = task.name
+                # Update cache if available
+                if self.task_cache is not None:
+                    self.task_cache[task_id] = dag_json
+
+        from .executor import TaskExecutor
+        executor = TaskExecutor(dag_json, task_cache=self.task_cache)
+
+        # Determine the primary file path
         file_obj = self.get_input_file(inputs)
-        if not file_obj or "path" not in file_obj:
-            logger.error(f"[{self.name}] No valid input file object provided.")
-            return False, None, {}
+        file_path = file_obj.get("path", "") if file_obj else ""
 
-        input_file = file_obj["path"]
-        if not os.path.exists(input_file):
-            logger.error(f"[{self.name}] Input file not found: {input_file}")
-            return False, None, {}
+        logger.info(f"[{self.name}] Calling subtask {task_id} ('{task_name}') for file: {file_path}")
+        success, next_branch, output_data = executor.execute_with_output(file_path, initial_inputs=inputs, context=context)
 
-        # Example format: "-map 0:v -map 0:a:0 -c:v copy -c:a aac -b:a 128k"
-        args_str = self.config.get("args", "")
-        args = shlex.split(args_str)
-        
-        ext = self.config.get("extension", ".mp4")
-        try:
-            temp_fd, temp_path = tempfile.mkstemp(suffix=ext)
-            os.close(temp_fd)
-            context.add_temp_file(temp_path)
-        except OSError as e:
-            logger.error(f"[{self.name}] Failed to create temporary file: {e}")
-            return False, None, {}
-        
-        logger.info(f"[{self.name}] Executing FFmpeg on {input_file} -> {temp_path} with args: {args_str}")
-        success = FFmpegWrapper.run(input_file, temp_path, args)
         if success:
-            logger.info(f"[{self.name}] FFmpeg successful: {temp_path}")
-            new_file_obj = dict(file_obj)
-            new_file_obj["path"] = temp_path
-            new_file_obj["size"] = os.path.getsize(temp_path)
-            return True, "default", {"file": new_file_obj}
-        
-        logger.error(f"[{self.name}] FFmpeg execution failed for {input_file}")
-        return False, None, {}
+            logger.info(f"[{self.name}] Subtask {task_id} completed successfully.")
+            return True, "default", output_data
+        else:
+            logger.error(f"[{self.name}] Subtask {task_id} failed.")
+            return False, None, {}
 
 
 # A registry to instantiate nodes by type
 NODE_TYPES = { i.__name__: i for i in (
     StartNode, FinishNode, MetadataReadNode, ConvertNode, CodeEvalNode, ConditionNode, FileOperationNode,
-    MetadataWriteNode, FFmpegActionNode)
+    MetadataWriteNode, CallTaskNode)
 }

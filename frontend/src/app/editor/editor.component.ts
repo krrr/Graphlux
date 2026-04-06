@@ -28,14 +28,16 @@ import { PropsCodeEvalComponent } from './properties/props-code-eval.component';
 import { PropsConditionComponent } from './properties/props-condition.component';
 import { PropsFileOperationComponent } from './properties/props-file-operation.component';
 import { PropsMetadataWriteComponent } from './properties/props-metadata-write.component';
-import { PropsFFmpegActionComponent } from './properties/props-ffmpeg-action.component';
 import { EditorService, NODE_INFO, TaskConnection, TaskNode } from './editor.service';
 import { FileDialogComponent } from '../components/file-dialog/file-dialog.component';
 import { PropsFinishComponent } from './properties/props-finish.component';
 import { NzDividerComponent } from "ng-zorro-antd/divider";
+import { PropsCallTaskComponent } from './properties/props-call-task.component';
+
 
 type Schemes = GetSchemes<TaskNode, TaskConnection<TaskNode>>;
 type AreaExtra = AngularArea2D<Schemes>;
+
 
 @Component({
     selector: 'app-editor',
@@ -58,7 +60,7 @@ type AreaExtra = AngularArea2D<Schemes>;
     PropsConditionComponent,
     PropsFileOperationComponent,
     PropsMetadataWriteComponent,
-    PropsFFmpegActionComponent,
+    PropsCallTaskComponent,
     PropsFinishComponent,
     FileDialogComponent,
     NzDividerComponent,
@@ -96,7 +98,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     private readonly keydownListener = this.handleKeyDown.bind(this);
 
     availableNodes = ['FinishNode', 'MetadataReadNode', 'ConvertNode', 'CodeEvalNode', 'ConditionNode', 'FileOperationNode',
-        'MetadataWriteNode', 'FFmpegActionNode'];
+        'MetadataWriteNode', 'CallTaskNode'];
     NODE_INFO = NODE_INFO;
 
     getNodeIcon(type: string | undefined): string {

@@ -187,7 +187,7 @@ export class EditorService {
                     addVar(sourceConfig?.config?.output_var || 'eval_result');
                 } else if (sourceNode?.type === 'MetadataReadNode') {
                     addVar('metadata');
-                } else if (sourceNode?.type === 'ConvertNode' || sourceNode?.type === 'FFmpegActionNode' || sourceNode?.type === 'FileOperationNode' || sourceNode?.type === 'MetadataWriteNode') {
+                } else if (sourceNode?.type === 'ConvertNode' || sourceNode?.type === 'FileOperationNode' || sourceNode?.type === 'MetadataWriteNode') {
                     addVar('file');
                 } else {
                     if (sourceConfig?.config?.output_var) {
@@ -207,7 +207,7 @@ export class EditorService {
         const sourceNode = this.editor.getNode(sourceId) as any;
 
         // If target node is a node that usually takes a file input
-        const fileInputNodes = ['ConvertNode', 'FFmpegActionNode', 'MetadataReadNode', 'FileOperationNode'];
+        const fileInputNodes = ['ConvertNode', 'CallTaskNode', 'MetadataReadNode', 'FileOperationNode'];
         const targetConfig = this.nodeConfigs()[targetId]?.config;
 
         if (fileInputNodes.includes(targetNode?.type)) {
@@ -334,10 +334,10 @@ export const NODE_INFO: Record<string, NodeInfo> = {
         footerKeys: ['target_file_var'],
         outputVar: 'file'
     },
-    FFmpegActionNode: {
-        icon: 'video-camera', color: '#c2dd2f', label: 'FFmpeg Action',
-        footerKeys: ['extension'],
-        outputVar: 'file'
+    CallTaskNode: {
+        icon: 'function', color: '#c2dd2f', label: 'Call Task',
+        footerKeys: ['task_id'],
+        outputVar: 'result'
     },
 };
 

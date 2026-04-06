@@ -3,13 +3,10 @@ from typing import Dict, Any, List
 from ..logger import logger
 
 class FileContext:
-    def __init__(self, original_file_path: str):
+    def __init__(self):
         """
         Initialize the context for processing a single file.
-        
-        :param original_file_path: The absolute or relative path to the original file.
         """
-        self.original_file_path: str = original_file_path
         self.temp_files: List[str] = []
         self.outputs: Dict[str, Dict[str, Any]] = {}
 

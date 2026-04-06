@@ -19,6 +19,8 @@ class FolderEventHandler(FileSystemEventHandler):
         self.executor_pool = executor_pool
         # Simple debounce to prevent multiple triggers for the same file rapidly
         self.recently_processed: Dict[str, float] = {}
+        # Cache for tasks used by this folder (including sub-tasks)
+        self.task_cache: Dict[int, Dict[str, Any]] = {}
 
     def _handle_event(self, file_path: str):
         # Ignore directories and hidden files
@@ -51,14 +53,18 @@ class FolderEventHandler(FileSystemEventHandler):
                 return
             
             task_jsons = [t.json_data for t in tasks]
+            
+            # Pre-populate cache recursively for all tasks in this folder
+            for tj in task_jsons:
+                TaskExecutor.preload_tasks_recursive(tj, self.task_cache, session=session)
 
         for i in task_jsons:
-            executor = TaskExecutor(i)
+            executor = TaskExecutor(i, task_cache=self.task_cache)
 
             # Fire and forget execution to avoid blocking watchdog thread
             def run_executor(exec_obj, path):
                 try:
-                    exec_obj.execute(path)
+                    exec_obj.execute_with_file(path)
                 except Exception as e:
                     logger.error(f"Executor failed for {path}: {e}")
 

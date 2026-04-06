@@ -84,7 +84,7 @@
                     <app-condition-props *ngSwitchCase="'ConditionNode'" [nodeId]="selectedNode().id" />
                     <app-file-operation-props *ngSwitchCase="'FileOperationNode'" [nodeId]="selectedNode().id" />
                     <app-metadata-write-props *ngSwitchCase="'MetadataWriteNode'" [nodeId]="selectedNode().id" />
-                    <app-ffmpeg-action-props *ngSwitchCase="'FFmpegActionNode'" [nodeId]="selectedNode().id" />
+                    <app-props-call-task *ngSwitchCase="'CallTaskNode'" [nodeId]="selectedNode().id" />
                     <app-finish-props *ngSwitchCase="'FinishNode'" [nodeId]="selectedNode().id" />
                     <div *ngSwitchDefault>
                         <i style="color: #6e6e6e">no properties.</i>

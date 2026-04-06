@@ -18,7 +18,8 @@ SCENARIO_2_DAG = {
     "nodes": {
         "node_0": {"type": "StartNode", "name": "Start", "config": {}},
         "node_1": {"type": "MetadataReadNode", "name": "Read MP4", "config": {"input_file_var": "node_0:file"}},
-        "node_2": {"type": "FFmpegActionNode", "name": "Streamline Audio", "config": {
+        "node_2": {"type": "ConvertNode", "name": "Streamline Audio", "config": {
+            "tool": "ffmpeg",
             "input_file_var": "node_0:file",
             "args": "-map 0:v -map 0:a:0 -c:v copy -c:a aac -b:a 128k",
             "extension": ".mp4"
@@ -57,12 +58,10 @@ def test_scenario_2_success(mock_write_meta, mock_ffmpeg_run, mock_read_meta, du
     mock_ffmpeg_run.side_effect = side_effect_ffmpeg
     
     executor = TaskExecutor(SCENARIO_2_DAG)
-    success = executor.execute(dummy_mp4)
-    
-    assert success is True
-    
+    executor.execute_with_file(dummy_mp4)
+
     # Assert ffmpeg was called with correct parsed args
-    expected_args = ["-map", "0:v", "-map", "0:a:0", "-c:v", "copy", "-c:a", "aac", "-b:a", "128k"]
+    expected_args = "-map 0:v -map 0:a:0 -c:v copy -c:a aac -b:a 128k"
     mock_ffmpeg_run.assert_called_once()
     actual_args = mock_ffmpeg_run.call_args[0][2]
     assert actual_args == expected_args

@@ -89,7 +89,7 @@ async def execute_task_endpoint(request: ExecutionRequest):
 
     # Run in threadpool to not block the asyncio loop
     loop = asyncio.get_event_loop()
-    success = await loop.run_in_executor(None, executor.execute, request.file_path)
+    success = await loop.run_in_executor(None, executor.execute_with_file, request.file_path)
 
     if success:
         await manager.broadcast(f"Successfully finished execution for: {request.file_path}")
