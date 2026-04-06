@@ -1,5 +1,5 @@
 import subprocess
-import shlex
+from typing import List
 from sqlmodel import Session
 from ..logger import logger
 from ..db import engine
@@ -8,7 +8,7 @@ from ..models import SystemSettings
 
 class FFmpegWrapper:
     @staticmethod
-    def run(input_file: str, output_file: str, args: str) -> bool:
+    def run(input_file: str, output_file: str, args: List[str]) -> bool:
         ffmpeg_cmd = "ffmpeg"
         try:
             with Session(engine) as session:
@@ -27,7 +27,7 @@ class FFmpegWrapper:
         :return: True if successful, False otherwise.
         """
         # Command syntax: ffmpeg -y -i input_file [args] output_file
-        command = [ffmpeg_cmd, "-y", "-i", input_file] + shlex.split(args) + [output_file]
+        command = [ffmpeg_cmd, "-y", "-i", input_file] + args + [output_file]
         try:
             result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
             return True

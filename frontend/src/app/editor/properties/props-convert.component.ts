@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, signal } from '@angular/core';
+import { Component, Input, OnChanges, signal, SimpleChanges } from '@angular/core';
 import { inject } from '@angular/core';
 import { EditorService, VariableInfo } from '../editor.service';
 import { CommonModule } from '@angular/common';
@@ -137,14 +137,14 @@ import { PropsBase } from './props-base';
                 </nz-form-control>
             </nz-form-item>
             <nz-form-item>
-                <nz-form-label>Arguments (JSON Array string)</nz-form-label>
+                <nz-form-label>Arguments</nz-form-label>
                 <nz-form-control>
                     <input
                         nz-input
-                        [ngModel]="config().args | json"
-                        (ngModelChange)="updateArgs($event)"
+                        [(ngModel)]="localArgsString"
+                        (ngModelChange)="onArgsChange($event)"
                         name="args"
-                        placeholder='["-quality", "85"]'
+                        placeholder='-quality 85'
                     />
                 </nz-form-control>
             </nz-form-item>
@@ -152,17 +152,43 @@ import { PropsBase } from './props-base';
     `,
 })
 export class PropsConvertComponent extends PropsBase implements OnChanges {
+    localArgsString = '';
+
     get availableVariables(): VariableInfo[] {
         return this.editorService.getAvailableVariables(this.nodeId).filter((v) => v.value.endsWith(':file'));
     }
 
-    updateArgs(jsonString: string) {
-        try {
-            const args = JSON.parse(jsonString);
-            this.updateConfig('args', args);
-        } catch (e) {
-            // Ignore invalid JSON during typing
+    override ngOnChanges(changes: SimpleChanges): void {
+        super.ngOnChanges(changes);
+        this.syncLocalArgs();
+    }
+
+    onArgsChange(value: string) {
+        const args = this.parseArgs(value);
+        this.updateConfig('args', args);
+    }
+
+    private parseArgs(value: string): string[] {
+        const regex = /[^\s"']+|"([^"]*)"|'([^']*)'/g;
+        const args = [];
+        let match;
+        while ((match = regex.exec(value)) !== null) {
+            args.push(match[1] || match[2] || match[0]);
         }
+        return args;
+    }
+
+    private joinArgs(args: string[]): string {
+        return (args || []).map(arg => {
+            if (arg.includes(' ') && !arg.startsWith('"') && !arg.startsWith("'")) {
+                return `"${arg}"`;
+            }
+            return arg;
+        }).join(' ');
+    }
+
+    private syncLocalArgs() {
+        this.localArgsString = this.joinArgs(this.config().args || []);
     }
 
     onFormatChange(format: string) {
@@ -203,5 +229,6 @@ export class PropsConvertComponent extends PropsBase implements OnChanges {
             args.push('-quality', String(q));
         }
         this.updateConfig('args', args);
+        this.syncLocalArgs();
     }
 }

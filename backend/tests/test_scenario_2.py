@@ -21,7 +21,7 @@ SCENARIO_2_DAG = {
         "node_2": {"type": "ConvertNode", "name": "Streamline Audio", "config": {
             "tool": "ffmpeg",
             "input_file_var": "node_0:file",
-            "args": "-map 0:v -map 0:a:0 -c:v copy -c:a aac -b:a 128k",
+            "args": ["-map", "0:v", "-map", "0:a:0", "-c:v", "copy", "-c:a", "aac", "-b:a", "128k"],
             "extension": ".mp4"
         }},
         "node_3": {"type": "FileOperationNode", "name": "Replace", "config": {
@@ -61,7 +61,7 @@ def test_scenario_2_success(mock_write_meta, mock_ffmpeg_run, mock_read_meta, du
     executor.execute_with_file(dummy_mp4)
 
     # Assert ffmpeg was called with correct parsed args
-    expected_args = "-map 0:v -map 0:a:0 -c:v copy -c:a aac -b:a 128k"
+    expected_args = ["-map", "0:v", "-map", "0:a:0", "-c:v", "copy", "-c:a", "aac", "-b:a", "128k"]
     mock_ffmpeg_run.assert_called_once()
     actual_args = mock_ffmpeg_run.call_args[0][2]
     assert actual_args == expected_args

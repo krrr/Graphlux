@@ -139,7 +139,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         this.movementSub = this.movementSubject.pipe(debounceTime(400)).subscribe(() => {
             this.editorService.takeSnapshot();
         });
-        }
+    }
 
 
     loadTask() {
