@@ -26,6 +26,8 @@ describe('EditorComponent', () => {
             getTask: vi.fn().mockReturnValue(of({ name: 'Task', description: 'Desc' })),
             updateTask: vi.fn().mockReturnValue(of({})),
             executeTask: vi.fn().mockReturnValue(of({})),
+            connectLogsWebSocket: vi.fn(),
+            disconnectLogsWebSocket: vi.fn(),
         };
         messageServiceSpy = {
             success: vi.fn(),

@@ -46,52 +46,54 @@
             </div>
         </div>
 
-        <div class="property-editor" *ngIf="selectedNode() && isPropertyPanelVisible()">
-            <div class="title-area">
-                <div class="title">Node Properties</div>
-                <button nz-button nzType="text" (click)="isPropertyPanelVisible.set(false)" class="close-btn"
-                    aria-label="Close Properties Panel" title="Close Properties Panel">
-                    <span nz-icon nzType="close"></span>
-                </button>
-            </div>
-
-            <div class="props-area">
-                <div class="ant-form">
-                    <nz-form-item>
-                        <nz-form-label [nzSpan]="4" nzLabelAlign="left" >Type</nz-form-label>
-                        <nz-form-control>
-                            {{ selectedNode().type }}
-                            <span nz-icon [nzType]="getNodeIcon(selectedNode().type)"></span>
-                        </nz-form-control>
-                    </nz-form-item>
-                    <nz-form-item>
-                        <nz-form-label [nzSpan]="4" nzLabelAlign="left" >Name</nz-form-label>
-                        <nz-form-control>
-                            <input nz-input [ngModel]="selectedNode().label"
-                                (ngModelChange)="updateNodeName(selectedNode().id, $event)" name="nodeName"
-                                placeholder="Node Name" />
-                        </nz-form-control>
-                    </nz-form-item>
+        @if (selectedNode() && isPropertyPanelVisible()) {
+            <div class="property-editor" [animate.enter]="'panel-enter'" [animate.leave]="'panel-leave'">
+                <div class="title-area">
+                    <div class="title">Node Properties</div>
+                    <button nz-button nzType="text" (click)="isPropertyPanelVisible.set(false)" class="close-btn"
+                        aria-label="Close Properties Panel" title="Close Properties Panel">
+                        <span nz-icon nzType="close"></span>
+                    </button>
                 </div>
 
-                <nz-divider [style.margin]="'12px 0'"/>
+                <div class="props-area">
+                    <div class="ant-form">
+                        <nz-form-item>
+                            <nz-form-label [nzSpan]="4" nzLabelAlign="left" >Type</nz-form-label>
+                            <nz-form-control>
+                                {{ selectedNode().type }}
+                                <span nz-icon [nzType]="getNodeIcon(selectedNode().type)"></span>
+                            </nz-form-control>
+                        </nz-form-item>
+                        <nz-form-item>
+                            <nz-form-label [nzSpan]="4" nzLabelAlign="left" >Name</nz-form-label>
+                            <nz-form-control>
+                                <input nz-input [ngModel]="selectedNode().label"
+                                    (ngModelChange)="updateNodeName(selectedNode().id, $event)" name="nodeName"
+                                    placeholder="Node Name" />
+                            </nz-form-control>
+                        </nz-form-item>
+                    </div>
 
-                <div class="divider-title">Configuration</div>
-                <div [ngSwitch]="selectedNode().type" class="ant-form">
-                    <app-read-input-props *ngSwitchCase="'MetadataReadNode'" [nodeId]="selectedNode().id" />
-                    <app-convert-props *ngSwitchCase="'ConvertNode'" [nodeId]="selectedNode().id" />
-                    <app-code-eval-props *ngSwitchCase="'CodeEvalNode'" [nodeId]="selectedNode().id" />
-                    <app-condition-props *ngSwitchCase="'ConditionNode'" [nodeId]="selectedNode().id" />
-                    <app-file-operation-props *ngSwitchCase="'FileOperationNode'" [nodeId]="selectedNode().id" />
-                    <app-metadata-write-props *ngSwitchCase="'MetadataWriteNode'" [nodeId]="selectedNode().id" />
-                    <app-props-call-task *ngSwitchCase="'CallTaskNode'" [nodeId]="selectedNode().id" />
-                    <app-finish-props *ngSwitchCase="'FinishNode'" [nodeId]="selectedNode().id" />
-                    <div *ngSwitchDefault>
-                        <i style="color: #6e6e6e">no properties.</i>
+                    <nz-divider [style.margin]="'12px 0'"/>
+
+                    <div class="divider-title">Configuration</div>
+                    <div [ngSwitch]="selectedNode().type" class="ant-form">
+                        <app-read-input-props *ngSwitchCase="'MetadataReadNode'" [nodeId]="selectedNode().id" />
+                        <app-convert-props *ngSwitchCase="'ConvertNode'" [nodeId]="selectedNode().id" />
+                        <app-code-eval-props *ngSwitchCase="'CodeEvalNode'" [nodeId]="selectedNode().id" />
+                        <app-condition-props *ngSwitchCase="'ConditionNode'" [nodeId]="selectedNode().id" />
+                        <app-file-operation-props *ngSwitchCase="'FileOperationNode'" [nodeId]="selectedNode().id" />
+                        <app-metadata-write-props *ngSwitchCase="'MetadataWriteNode'" [nodeId]="selectedNode().id" />
+                        <app-props-call-task *ngSwitchCase="'CallTaskNode'" [nodeId]="selectedNode().id" />
+                        <app-finish-props *ngSwitchCase="'FinishNode'" [nodeId]="selectedNode().id" />
+                        <div *ngSwitchDefault>
+                            <i style="color: #6e6e6e">no properties.</i>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        }
     </div>
 
     <nz-modal [nzVisible]="isExecuteModalVisible()" (nzVisibleChange)="isExecuteModalVisible.set($event)"
