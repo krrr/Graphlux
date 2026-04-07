@@ -84,7 +84,8 @@ export class ApiService {
         if (this.socket) {
             this.socket.close();
         }
-        const wsUrl = `ws://${window.location.host}/api/logs`;
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${wsProtocol}//${window.location.host}/api/logs`;
         this.socket = new WebSocket(wsUrl);
 
         this.socket.onmessage = (event) => {
@@ -98,5 +99,12 @@ export class ApiService {
         this.socket.onclose = () => {
             console.log('WebSocket connection closed.');
         };
+    }
+
+    disconnectLogsWebSocket(): void {
+        if (this.socket) {
+            this.socket.close();
+            this.socket = null;
+        }
     }
 }

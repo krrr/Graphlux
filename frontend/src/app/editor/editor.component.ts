@@ -117,7 +117,6 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     ) { }
 
     ngOnInit() {
-        this.apiService.connectLogsWebSocket();
         this.logSubscription = this.apiService.logs$.subscribe((log) => {
             this.logs.update((l) => [...l, log]);
         });
@@ -165,6 +164,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         if (this.changeSub) {
             this.changeSub.unsubscribe();
         }
+        this.apiService.disconnectLogsWebSocket();
         document.removeEventListener('keydown', this.keydownListener);
     }
 
@@ -432,6 +432,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         const dag = this.editorService.serializeDag();
         this.logs.set([]);
         this.isLogsModalVisible.set(true);
+        this.apiService.connectLogsWebSocket();
 
         this.apiService.executeTask(dag, this.executeFilePath(), this.taskId).subscribe({
             next: (res) => console.log('Execution response:', res),
@@ -444,6 +445,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
 
     handleLogsClose() {
         this.isLogsModalVisible.set(false);
+        this.apiService.disconnectLogsWebSocket();
     }
 
     async saveDag() {
