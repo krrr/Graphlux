@@ -2,6 +2,7 @@ import os
 import shutil
 import tempfile
 import ast
+import send2trash
 from typing import Any, Dict, Optional, Tuple, TypedDict
 from sqlmodel import Session
 from .context import FileContext
@@ -258,8 +259,8 @@ class FileOperationNode(DAGNode):
                         shutil.move(current, new_dest)
                         # If destination path actually changed, remove the old one
                         if new_dest != dest_path and os.path.exists(dest_path):
-                            logger.info(f"[{self.name}] Removing old target file: {dest_path}")
-                            os.remove(dest_path)
+                            logger.info(f"[{self.name}] Moving old target file to recycle bin: {dest_path}")
+                            send2trash.send2trash(dest_path)
                         
                         # Update the path in the input object for downstream nodes
                         file_obj["path"] = new_dest
@@ -269,6 +270,9 @@ class FileOperationNode(DAGNode):
                 else:
                     logger.info(f"[{self.name}] Overwriting {dest_path} with {current}")
                     try:
+                        if os.path.exists(dest_path):
+                            logger.info(f"[{self.name}] Moving existing target file to recycle bin: {dest_path}")
+                            send2trash.send2trash(dest_path)
                         shutil.move(current, dest_path)
                         file_obj["path"] = dest_path
                     except OSError as e:
