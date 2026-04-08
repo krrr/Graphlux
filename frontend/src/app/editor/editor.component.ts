@@ -1,5 +1,4 @@
 import { Component, AfterViewInit, ViewChild, ElementRef, OnInit, Injector, OnDestroy, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { NodeEditor, GetSchemes, ClassicPreset } from 'rete';
@@ -10,29 +9,19 @@ import { AngularPlugin, Presets, AngularArea2D } from 'rete-angular-plugin/18';
 import { CustomNodeComponent } from './custom-node/custom-node.component';
 import { ApiService } from '../api.service';
 import { lastValueFrom, Subscription, Subject, debounceTime } from 'rxjs';
-import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzContextMenuService, NzDropdownMenuComponent, NzDropdownModule } from 'ng-zorro-antd/dropdown';
-import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { NzFormModule } from 'ng-zorro-antd/form';
-import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { COMMON_IMPORTS } from '../shared-imports';
 import { CustomSocketComponent } from './custom-node/custom-socket.component';
 import { CustomConnComponent } from './custom-node/custom-conn.component';
-import { PropsMetadataReadComponent } from './properties/props-metadata-read.component';
-import { PropsConvertComponent } from './properties/props-convert.component';
-import { PropsCodeEvalComponent } from './properties/props-code-eval.component';
-import { PropsConditionComponent } from './properties/props-condition.component';
-import { PropsFileOperationComponent } from './properties/props-file-operation.component';
-import { PropsMetadataWriteComponent } from './properties/props-metadata-write.component';
 import { EditorService, NODE_INFO, TaskConnection, TaskNode } from './editor.service';
 import { FileDialogComponent } from '../components/file-dialog/file-dialog.component';
-import { PropsFinishComponent } from './properties/props-finish.component';
-import { NzDividerComponent } from "ng-zorro-antd/divider";
-import { PropsCallTaskComponent } from './properties/props-call-task.component';
+import { NodePropertiesComponent } from './properties/node-properties.component';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
 
 
 type Schemes = GetSchemes<TaskNode, TaskConnection<TaskNode>>;
@@ -43,29 +32,18 @@ type AreaExtra = AngularArea2D<Schemes>;
     selector: 'app-editor',
     standalone: true,
     imports: [
-    CommonModule,
-    FormsModule,
-    NzButtonModule,
-    NzDropdownModule,
-    NzMenuModule,
-    NzModalModule,
-    NzFormModule,
-    NzInputModule,
-    NzSelectModule,
-    NzCheckboxModule,
-    ...COMMON_IMPORTS,
-    PropsMetadataReadComponent,
-    PropsConvertComponent,
-    PropsCodeEvalComponent,
-    PropsConditionComponent,
-    PropsFileOperationComponent,
-    PropsMetadataWriteComponent,
-    PropsCallTaskComponent,
-    PropsFinishComponent,
-    FileDialogComponent,
-    NzDividerComponent,
-    RouterLink
-],
+        ...COMMON_IMPORTS,
+        FormsModule,
+        NzDropdownModule,
+        NzModalModule,
+        NzFormModule,
+        NzSelectModule,
+        NzCheckboxModule,
+        NzDividerModule,
+        FileDialogComponent,
+        RouterLink,
+        NodePropertiesComponent
+    ],
     providers: [EditorService],
     templateUrl: './editor.component.html',
     styleUrls: ['./editor.component.scss'],
@@ -100,11 +78,6 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     availableNodes = ['FinishNode', 'MetadataReadNode', 'ConvertNode', 'CodeEvalNode', 'ConditionNode', 'FileOperationNode',
         'MetadataWriteNode', 'CallTaskNode'];
     NODE_INFO = NODE_INFO;
-
-    getNodeIcon(type: string | undefined): string {
-        if (!type) return 'question-circle';
-        return NODE_INFO[type]?.icon || 'setting';
-    }
 
     constructor(
         private apiService: ApiService,
@@ -406,10 +379,6 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         this.isPropertyPanelVisible.set(true);
     }
 
-
-    updateNodeName(nodeId: string, name: string) {
-        this.editorService.updateNodeName(nodeId, name);
-    }
 
     showExecuteModal() {
         this.isExecuteModalVisible.set(true);
