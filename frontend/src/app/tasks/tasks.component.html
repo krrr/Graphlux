@@ -5,7 +5,14 @@
     </div>
 
     <div class="task-list" *ngIf="tasks().length > 0">
-        <nz-card *ngFor="let task of tasks()" nzHoverable (click)="openEditor(task.id)" class="task-card">
+        <nz-card *ngFor="let task of tasks()" nzHoverable
+            (click)="openEditor(task.id)"
+            class="task-card"
+            tabindex="0"
+            role="button"
+            [attr.aria-label]="'Open task ' + task.name"
+            (keydown.enter)="$event.preventDefault(); openEditor(task.id)"
+            (keydown.space)="$event.preventDefault(); openEditor(task.id)">
             <div class="card-header">
                 <div style="display: flex; align-items: center; gap: 12px">
                     <div class="task-icon">{{ task.icon || '🐹' }}</div>
@@ -25,11 +32,11 @@
                 </nz-dropdown-menu>
             </div>
 
-            <p style="color: #595959; margin-bottom: 16px; min-height: 40px" (click)="openEditor(task.id)">
+            <p style="color: #595959; margin-bottom: 16px; min-height: 40px">
                 {{ task.description || 'No description.' }}
             </p>
 
-            <div class="folder-list" (click)="openEditor(task.id)">
+            <div class="folder-list">
                 <span nz-icon nzType="folder"></span>
                 <div style="margin-left: 10px; color: #595959">
                     <nz-tag *ngFor="let f of task.folders" [title]="f.watch_folder">{{ f.name }}</nz-tag>
