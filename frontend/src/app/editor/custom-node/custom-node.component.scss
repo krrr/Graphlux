@@ -1,5 +1,6 @@
 :host {
     display: block;
+    user-select: none;  // prevent text selection during dragging
 }
 
 .node-wrapper {

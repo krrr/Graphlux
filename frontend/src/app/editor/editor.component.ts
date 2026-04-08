@@ -333,7 +333,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         }
 
         await this.editor.removeNode(node.id);
-        this.selectedNode.set(null);
+        setTimeout(() => this.selectedNode.set(null), 250);  // wait context menu animation
     }
 
     async changeSelectedNodeType(newType: string) {
