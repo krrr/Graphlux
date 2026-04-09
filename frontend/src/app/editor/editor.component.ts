@@ -22,6 +22,7 @@ import { EditorService, NODE_INFO, TaskConnection, TaskNode } from './editor.ser
 import { FileDialogComponent } from '../components/file-dialog/file-dialog.component';
 import { NodePropertiesComponent } from './properties/node-properties.component';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzSpaceModule } from 'ng-zorro-antd/space';
 
 
 type Schemes = GetSchemes<TaskNode, TaskConnection<TaskNode>>;
@@ -42,7 +43,8 @@ type AreaExtra = AngularArea2D<Schemes>;
         NzDividerModule,
         FileDialogComponent,
         RouterLink,
-        NodePropertiesComponent
+        NodePropertiesComponent,
+        NzSpaceModule,
     ],
     providers: [EditorService],
     templateUrl: './editor.component.html',
@@ -270,7 +272,16 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     async autoArrange() {
+        // auto arrange requires fixed size
+        for (let i of this.editor.getNodes()) {
+            (i as any).width = 220;  // fixed for simplicity
+            (i as any).height = 140;
+        }
         await this.arrange.layout();
+        for (let i of this.editor.getNodes()) {
+            delete (i as any).width;
+            delete (i as any).height;
+        }
         this.zoomFit();
         // snapshot taken via translated events or manually if layout doesn't trigger them
         this.editorService.takeSnapshot();

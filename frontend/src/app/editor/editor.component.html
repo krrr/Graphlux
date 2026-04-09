@@ -3,16 +3,19 @@
         <span style="font-size: 16px">{{ task()?.name }}</span>
         <div style="flex-grow: 1"></div>
         <button nz-button nzType="primary" (click)="saveDag()"><span nz-icon nzType="save"></span>Save</button>
-        <button nz-button nzType="default" (click)="showExecuteModal()">Execute DAG</button>
+        <button nz-button nzType="default" (click)="showExecuteModal()"><nz-icon nzType="bug"/> Run</button>
         <nz-divider nzType="vertical"/>
-        <button nz-button nz-dropdown [nzDropdownMenu]="menu" nzTrigger="click">Add Node</button>
-        <nz-dropdown-menu #menu="nzDropdownMenu">
-            <ul nz-menu>
-                <li nz-menu-item *ngFor="let t of availableNodes" (click)="editorService.addNode(t)">{{
-                    NODE_INFO[t].label }}</li>
-            </ul>
-        </nz-dropdown-menu>
-        <button nz-button nzType="default" (click)="autoArrange()">Auto Arrange</button>
+        <nz-space-compact>
+            <button nz-button nz-dropdown [nzDropdownMenu]="menu" nzTrigger="click" title="Add Node"><nz-icon nzType="plus" /></button>
+            <nz-dropdown-menu #menu="nzDropdownMenu">
+                <ul nz-menu>
+                    <li nz-menu-item *ngFor="let t of availableNodes" (click)="editorService.addNode(t)">{{
+                        NODE_INFO[t].label }}</li>
+                </ul>
+            </nz-dropdown-menu>
+            <button nz-button nzType="default" (click)="autoArrange()" title="Auto Arrange"><nz-icon nzType="layout" /></button>
+        </nz-space-compact>
+                
         <nz-divider nzType="vertical"/>
         <button nz-button routerLink="/tasks/"><nz-icon nzType="icon:back"/></button>
     </div>
@@ -31,11 +34,11 @@
 
             <div class="toolbar-group">
                 <button nz-button nzType="text" (click)="zoomOut()" nzSize="small" title="Zoom Out">
-                    <span nz-icon nzType="minus"></span>
+                    <span nz-icon nzType="zoom-out"></span>
                 </button>
                 <span class="zoom-indicator">{{ zoomLevel() }}%</span>
                 <button nz-button nzType="text" (click)="zoomIn()" nzSize="small" title="Zoom In">
-                    <span nz-icon nzType="plus"></span>
+                    <span nz-icon nzType="zoom-in"></span>
                 </button>
             </div>
 
@@ -104,7 +107,7 @@
             </li>
             <li nz-menu-divider></li>
             <li nz-menu-item (click)="autoArrange()">
-                <span nz-icon nzType="layout" nzTheme="outline"></span>
+                <nz-icon nzType="layout"/>
                 <span>Auto Arrange</span>
             </li>
         </ul>

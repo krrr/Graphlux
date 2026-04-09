@@ -47,6 +47,9 @@ import {
     UndoOutline,
     RedoOutline,
     FunctionOutline,
+    BugOutline,
+    ZoomInOutline,
+    ZoomOutOutline,
 } from '@ant-design/icons-angular/icons';
 
 registerLocaleData(en);
@@ -89,6 +92,9 @@ const icons: IconDefinition[] = [
     UndoOutline,
     RedoOutline,
     FunctionOutline,
+    BugOutline,
+    ZoomInOutline,
+    ZoomOutOutline,
 ];
 
 export const appConfig: ApplicationConfig = {
