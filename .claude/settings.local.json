@@ -3,7 +3,9 @@
     "allow": [
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(npx ng:*)"
+      "Bash(npx ng:*)",
+      "Bash(pnpm run:*)",
+      "Bash(npx vitest:*)"
     ]
   }
 }

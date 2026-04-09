@@ -7,7 +7,7 @@ import { vi } from 'vitest';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
 import { SettingsComponent } from './settings.component';
-import { ApiService } from '../api.service';
+import { ApiService } from '../../api.service';
 
 describe('Settings', () => {
     let component: SettingsComponent;

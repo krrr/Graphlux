@@ -8,8 +8,8 @@ import { vi } from 'vitest';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
 import { FoldersComponent } from './folders.component';
-import { ApiService } from '../api.service';
-import { createDefaultFolderForm, Folder, FolderForm } from '../interfaces/folder.interface';
+import { ApiService } from '../../api.service';
+import { createDefaultFolderForm, Folder, FolderForm } from '../../interfaces/folder.interface';
 
 describe('Folders', () => {
     let component: FoldersComponent;

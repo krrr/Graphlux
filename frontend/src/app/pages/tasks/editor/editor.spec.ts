@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { ApiService } from '../api.service';
+import { ApiService } from '../../../api.service';
 import { EditorService } from './editor.service';
 import { vi } from 'vitest';
 
