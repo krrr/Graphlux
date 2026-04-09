@@ -67,15 +67,11 @@ export class TasksComponent implements OnInit {
         if (task) {
             this.isEditing.set(true);
             this.editingTaskId.set(task.id);
-            this.taskForm.set({
-                name: task.name,
-                description: task.description || '',
-                icon: task.icon || '📁',
-            });
+            this.taskForm.set({...task});
         } else {
             this.isEditing.set(false);
             this.editingTaskId.set(null);
-            this.taskForm.set({ name: '', description: '', icon: '📁' });
+            this.taskForm.set({ name: '', description: '', icon: '🪄' });
         }
         this.isModalVisible.set(true);
     }

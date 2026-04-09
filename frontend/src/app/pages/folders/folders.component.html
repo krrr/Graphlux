@@ -32,16 +32,18 @@
                     </nz-tag>
                 </td>
                 <td>
-                    <button nz-button nzType="link" (click)="showModal(folder)">Edit Folder</button>
-                    <nz-divider nzType="vertical"></nz-divider>
-                    <button nz-button nzType="link" (click)="toggleFolderStatus(folder)">
-                        {{ folder.status === 'active' ? 'Pause' : 'Resume' }}
+                    <button nz-button nzType="text" title="Edit Folder" (click)="showModal(folder)">
+                        <nz-icon nzType="edit"/>
                     </button>
                     <nz-divider nzType="vertical"></nz-divider>
-                    <button nz-button nzType="link" nzDanger nz-popconfirm
+                    <button nz-button nzType="text" [title]="folder.status === 'active' ? 'Pause' : 'Resume'" (click)="toggleFolderStatus(folder)">
+                        <nz-icon [nzType]="folder.status === 'active' ? 'pause-circle' : 'play-circle'"/>
+                    </button>
+                    <nz-divider nzType="vertical"></nz-divider>
+                    <button nz-button nzType="text" nzDanger nz-popconfirm title="Delete"
                         nzPopconfirmTitle="Are you sure you want to delete this folder?"
                         (nzOnConfirm)="deleteFolder(folder.id!)">
-                        Delete
+                        <nz-icon nzType="delete"/>
                     </button>
                 </td>
             </tr>

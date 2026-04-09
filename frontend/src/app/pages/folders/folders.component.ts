@@ -108,16 +108,11 @@ export class FoldersComponent implements OnInit {
         }
 
         const payload = {
-            folder: {
-                name: currentForm.name,
-                watch_folder: currentForm.watch_folder,
-                status: currentForm.status,
-                scan_interval: currentForm.scan_interval,
-                real_time_watch: currentForm.real_time_watch,
-                filename_regex: currentForm.filename_regex,
-            },
+            folder: { ...currentForm, task_ids: undefined },
             task_ids: currentForm.task_ids
         };
+        console.debug('update folder', payload.folder);
+        
 
         if (this.isEditing() && this.editingFolderId()) {
             this.apiService.updateFolder(this.editingFolderId()!, payload).subscribe(() => {
@@ -144,9 +139,11 @@ export class FoldersComponent implements OnInit {
     toggleFolderStatus(folder: Folder) {
         const newStatus = folder.status === 'active' ? 'paused' : 'active';
         const payload = {
-            folder: { ...folder, status: newStatus, },
+            folder: { ...folder, tasks: undefined, status: newStatus},
             task_ids: folder.tasks ? folder.tasks.map(t => t.id) : []
         };
+        console.log(payload);
+        
         this.apiService.updateFolder(folder.id!, payload).subscribe(() => {
             this.message.success(`Folder ${newStatus === 'active' ? 'resumed' : 'paused'}`);
             this.refreshFolders$.next();
