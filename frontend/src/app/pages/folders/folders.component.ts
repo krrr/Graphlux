@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop'
 import { FormsModule } from '@angular/forms';
-import { ApiService } from '../api.service';
+import { ApiService } from '../../api.service';
 import { Router } from '@angular/router';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzModalModule } from 'ng-zorro-antd/modal';
@@ -15,10 +15,10 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
-import { COMMON_IMPORTS } from '../shared-imports';
-import { FileDialogComponent } from '../components/file-dialog/file-dialog.component';
-import { Folder, FolderForm, createDefaultFolderForm } from '../interfaces/folder.interface';
-import { Task } from '../interfaces/task.interface';
+import { COMMON_IMPORTS } from '../../shared-imports';
+import { FileDialogComponent } from '../../components/file-dialog/file-dialog.component';
+import { Folder, FolderForm, createDefaultFolderForm } from '../../interfaces/folder.interface';
+import { Task } from '../../interfaces/task.interface';
 import { BehaviorSubject, switchMap } from 'rxjs';
 
 @Component({

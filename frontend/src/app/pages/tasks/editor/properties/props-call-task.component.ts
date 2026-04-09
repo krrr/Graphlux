@@ -5,7 +5,7 @@ import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { PropsBase } from './props-base';
-import { ApiService } from '../../api.service';
+import { ApiService } from '../../../../api.service';
 
 @Component({
     selector: 'app-props-call-task',

@@ -1,5 +1,4 @@
 import { Component, Input, OnChanges, signal } from '@angular/core';
-import { inject } from '@angular/core';
 import { EditorService, VariableInfo } from '../editor.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';

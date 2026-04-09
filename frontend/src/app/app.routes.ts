@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
-import { EditorComponent } from './editor/editor.component';
-import { TasksComponent } from './tasks/tasks.component';
-import { FoldersComponent } from './folders/folders.component';
-import { SettingsComponent } from './settings/settings.component';
+import { EditorComponent } from './pages/tasks/editor/editor.component';
+import { TasksComponent } from './pages/tasks/tasks.component';
+import { FoldersComponent } from './pages/folders/folders.component';
+import { SettingsComponent } from './pages/settings/settings.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/tasks', pathMatch: 'full' },

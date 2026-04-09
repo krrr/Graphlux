@@ -4,7 +4,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzCodeEditorModule } from 'ng-zorro-antd/code-editor';
 import { PropsBase } from './props-base';
 import { VariableInfo } from '../editor.service';
-import { COMMON_IMPORTS } from '../../shared-imports';
+import { COMMON_IMPORTS } from '../../../../shared-imports';
 import type { editor } from 'monaco-editor';
 
 @Component({

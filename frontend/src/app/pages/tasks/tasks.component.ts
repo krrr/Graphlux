@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ApiService } from '../api.service';
+import { ApiService } from '../../api.service';
 import { Router } from '@angular/router';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
@@ -10,9 +10,9 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzDropdownModule } from 'ng-zorro-antd/dropdown';
-import { COMMON_IMPORTS } from '../shared-imports';
+import { COMMON_IMPORTS } from '../../shared-imports';
 import { NzTagComponent } from 'ng-zorro-antd/tag';
-import { EmojiPickerComponent } from '../components/emoji-picker/emoji-picker.component';
+import { EmojiPickerComponent } from '../../components/emoji-picker/emoji-picker.component';
 import { NzPopoverModule } from 'ng-zorro-antd/popover';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
 

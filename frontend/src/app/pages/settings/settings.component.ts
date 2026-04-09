@@ -1,11 +1,11 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ApiService } from '../api.service';
+import { ApiService } from '../../api.service';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { COMMON_IMPORTS } from '../shared-imports';
+import { COMMON_IMPORTS } from '../../shared-imports';
 
 @Component({
     selector: 'app-settings',
