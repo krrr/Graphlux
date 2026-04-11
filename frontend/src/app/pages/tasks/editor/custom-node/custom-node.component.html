@@ -13,20 +13,26 @@
                 <div class="socket-point" refComponent
                     [data]="{ type: 'socket', side: 'input', key: item.key, nodeId: data.id, payload: item.input.socket, seed: seed }"
                     [emit]="emit" [attr.data-testid]="'input-' + item.key"></div>
-                <div class="socket-label" *ngIf="item.key !== 'input'">{{ item.key }}</div>
+                @if (item.key !== 'input') {
+                    <div class="socket-label">{{ item.key }}</div>
+                }
             </div>
             }
         </div>
 
         <div class="sockets output-sockets">
             <!-- Special for FinishNode which has no Rete outputs but we want to show result -->
-            <div class="socket-wrapper" *ngIf="data.type === 'FinishNode'">
+            @if (data.type === 'FinishNode') {
+            <div class="socket-wrapper">
                 <div class="socket-label finish-node">{{ getOutputLabel('default') }}</div>
             </div>
+            }
 
             @for (item of outputs; track item.key) {
             <div class="socket-wrapper">
-                <div class="socket-label" *ngIf="getOutputLabel(item.key)">{{ getOutputLabel(item.key) }}</div>
+                @if (getOutputLabel(item.key)) {
+                    <div class="socket-label">{{ getOutputLabel(item.key) }}</div>
+                }
                 <div class="socket-point" refComponent
                     [data]="{ type: 'socket', side: 'output', key: item.key, nodeId: data.id, payload: item.output.socket, seed: seed }"
                     [emit]="emit" [attr.data-testid]="'output-' + item.key"></div>
@@ -35,12 +41,14 @@
         </div>
     </div>
 
-    <div class="node-footer" *ngIf="configDisplayKeys.length > 0">
-        @for (key of configDisplayKeys; track key) {
-        <div class="config-row">
-            <span class="config-key">{{ getConfigKeyLabel(key) }}:</span>
-            <span class="config-value" [title]="getConfigValue(key)">{{ getConfigValue(key) }}</span>
+    @if (configDisplayKeys.length > 0) {
+        <div class="node-footer">
+            @for (key of configDisplayKeys; track key) {
+                <div class="config-row">
+                    <span class="config-key">{{ getConfigKeyLabel(key) }}:</span>
+                    <span class="config-value" [title]="getConfigValue(key)">{{ getConfigValue(key) }}</span>
+                </div>
+            }
         </div>
-        }
-    </div>
+    }
 </div>

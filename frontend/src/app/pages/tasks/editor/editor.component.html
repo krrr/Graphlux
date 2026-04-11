@@ -79,7 +79,9 @@
                     @for (log of logs(); track $index) {
                         <div>{{ log }}</div>
                     }
-                    <div *ngIf="logs().length === 0" style="color: #666">Waiting for logs...</div>
+                    @if (logs().length === 0) {
+                        <div style="color: #666">Waiting for logs...</div>
+                    }
                 </div>
             </div>
         </ng-container>
@@ -87,36 +89,38 @@
 
     <!-- Context Menus -->
     <nz-dropdown-menu #contextMenu="nzDropdownMenu">
-        <ul nz-menu *ngIf="!!selectedNode()">
-            <li nz-menu-item (click)="cloneSelectedNode()"><span nz-icon nzType="copy" nzTheme="outline"></span>Clone
-            </li>
-            <li nz-menu-item (click)="deleteSelectedNode()"><span nz-icon nzType="delete"
-                    nzTheme="outline"></span>Delete</li>
-            <li nz-menu-divider></li>
-            <li nz-submenu nzTitle="Change Type" nzIcon="swap">
-                <ul>
-                    @for (t of availableNodes; track t) {
-                        <li nz-menu-item (click)="changeSelectedNodeType(t)">{{
-                        NODE_INFO[t].label }}</li>
-                    }
-                </ul>
-            </li>
-        </ul>
-
-        <ul nz-menu *ngIf="!selectedNode()">
-            <li nz-submenu nzTitle="Add Node" nzIcon="plus">
-                <ul>
-                    @for (t of availableNodes; track t) {
-                        <li nz-menu-item (click)="editorService.addNode(t)">{{ NODE_INFO[t].label }}</li>
-                    }
-                </ul>
-            </li>
-            <li nz-menu-divider></li>
-            <li nz-menu-item (click)="autoArrange()">
-                <nz-icon nzType="layout"/>
-                <span>Auto Arrange</span>
-            </li>
-        </ul>
+        @if (!!selectedNode()) {
+            <ul nz-menu>
+                <li nz-menu-item (click)="cloneSelectedNode()"><span nz-icon nzType="copy" nzTheme="outline"></span>Clone
+                </li>
+                <li nz-menu-item (click)="deleteSelectedNode()"><span nz-icon nzType="delete"
+                        nzTheme="outline"></span>Delete</li>
+                <li nz-menu-divider></li>
+                <li nz-submenu nzTitle="Change Type" nzIcon="swap">
+                    <ul>
+                        @for (t of availableNodes; track t) {
+                            <li nz-menu-item (click)="changeSelectedNodeType(t)">{{
+                            NODE_INFO[t].label }}</li>
+                        }
+                    </ul>
+                </li>
+            </ul>
+        } @else {
+            <ul nz-menu>
+                <li nz-submenu nzTitle="Add Node" nzIcon="plus">
+                    <ul>
+                        @for (t of availableNodes; track t) {
+                            <li nz-menu-item (click)="editorService.addNode(t)">{{ NODE_INFO[t].label }}</li>
+                        }
+                    </ul>
+                </li>
+                <li nz-menu-divider></li>
+                <li nz-menu-item (click)="autoArrange()">
+                    <nz-icon nzType="layout"/>
+                    <span>Auto Arrange</span>
+                </li>
+            </ul>
+        }
     </nz-dropdown-menu>
 </div>
 

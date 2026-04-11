@@ -56,7 +56,7 @@ import { PropsBase } from './props-base';
         </nz-form-item>
 
         <!-- Preset Configuration -->
-        <ng-container *ngIf="(config().format || 'custom') !== 'custom'">
+        @if ((config().format || 'custom') !== 'custom') {
             <nz-form-item>
                 <nz-form-label nzTooltipTitle="Controls quantization loss (0-100)">
                     Quality
@@ -72,7 +72,7 @@ import { PropsBase } from './props-base';
                 </nz-form-control>
             </nz-form-item>
 
-            <ng-container *ngIf="config().format === 'avif'">
+            @if (config().format === 'avif') {
                 <nz-form-item>
                     <nz-form-label nzTooltipTitle="Encoding effort (0-9). 6 or 7 recommended for balanced speed/size.">
                         Speed (Effort)
@@ -112,11 +112,11 @@ import { PropsBase } from './props-base';
                         ></nz-switch>
                     </nz-form-control>
                 </nz-form-item>
-            </ng-container>
-        </ng-container>
+            }
+        }
 
         <!-- Custom Configuration -->
-        <ng-container *ngIf="(config().format || 'custom') === 'custom'">
+        @if ((config().format || 'custom') === 'custom') {
             <nz-form-item>
                 <nz-form-label>Tool</nz-form-label>
                 <nz-form-control>
@@ -150,7 +150,7 @@ import { PropsBase } from './props-base';
                     />
                 </nz-form-control>
             </nz-form-item>
-        </ng-container>
+        }
     `,
 })
 export class PropsConvertComponent extends PropsBase implements OnChanges {

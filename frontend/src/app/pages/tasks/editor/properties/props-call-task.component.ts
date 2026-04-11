@@ -12,7 +12,7 @@ import { ApiService } from '../../../../api.service';
     standalone: true,
     imports: [CommonModule, FormsModule, NzFormModule, NzInputModule, NzSelectModule],
     template: `
-    <div *ngIf="config()">
+    @if (config()) {
       <nz-form-item>
         <nz-form-label>Task</nz-form-label>
         <nz-form-control>
@@ -23,7 +23,7 @@ import { ApiService } from '../../../../api.service';
           </nz-select>
         </nz-form-control>
       </nz-form-item>
-    </div>
+    }
   `,
     styles: [],
 })

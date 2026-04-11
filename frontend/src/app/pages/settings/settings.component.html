@@ -26,13 +26,15 @@
             </nz-form-control>
         </nz-form-item>
 
-        <nz-form-item *ngIf="apiService.appInfo()?.is_packaged">
-            <nz-form-label>Start on Boot (Windows)</nz-form-label>
-            <nz-form-control>
-                <input type="checkbox" [ngModel]="settings().auto_start" (ngModelChange)="updateField('auto_start', $event)" name="auto_start" />
-                <span style="margin-left: 8px;">Enable</span>
-            </nz-form-control>
-        </nz-form-item>
+        @if (apiService.appInfo()?.is_packaged) {
+            <nz-form-item>
+                <nz-form-label>Start on Boot (Windows)</nz-form-label>
+                <nz-form-control>
+                    <input type="checkbox" [ngModel]="settings().auto_start" (ngModelChange)="updateField('auto_start', $event)" name="auto_start" />
+                    <span style="margin-left: 8px;">Enable</span>
+                </nz-form-control>
+            </nz-form-item>
+        }
 
         <button nz-button nzType="primary" (click)="saveSettings()"><nz-icon nzType="save"
                 nzTheme="outline" />Save</button>

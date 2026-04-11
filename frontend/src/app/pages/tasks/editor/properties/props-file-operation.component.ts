@@ -32,24 +32,26 @@ import { PropsBase } from './props-base';
                 </nz-select>
             </nz-form-control>
         </nz-form-item>
-        <nz-form-item *ngIf="config().action === 'overwrite'">
-            <nz-form-label>Target File to Replace</nz-form-label>
-            <nz-form-control>
-                <nz-select [ngModel]="config().target_file_var" (ngModelChange)="updateConfig('target_file_var', $event)"
-                    nzPlaceHolder="Select file to be replaced" name="target_file_var">
-                    @for (i of availableVariables; track i) {
-                        <nz-option [nzValue]="i.value" [nzLabel]="i.label" />
-                    }
-                </nz-select>
-            </nz-form-control>
-        </nz-form-item>
-        <nz-form-item *ngIf="config().action === 'overwrite'">
-            <nz-form-label>Target Extension (Optional)</nz-form-label>
-            <nz-form-control>
-                <input nz-input [ngModel]="config().target_extension" (ngModelChange)="updateConfig('target_extension', $event)"
-                    name="target_extension_fo" placeholder=".avif" />
-            </nz-form-control>
-        </nz-form-item>
+        @if (config().action === 'overwrite') {
+            <nz-form-item>
+                <nz-form-label>Target File to Replace</nz-form-label>
+                <nz-form-control>
+                    <nz-select [ngModel]="config().target_file_var" (ngModelChange)="updateConfig('target_file_var', $event)"
+                        nzPlaceHolder="Select file to be replaced" name="target_file_var">
+                        @for (i of availableVariables; track i) {
+                            <nz-option [nzValue]="i.value" [nzLabel]="i.label" />
+                        }
+                    </nz-select>
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label>Target Extension (Optional)</nz-form-label>
+                <nz-form-control>
+                    <input nz-input [ngModel]="config().target_extension" (ngModelChange)="updateConfig('target_extension', $event)"
+                        name="target_extension_fo" placeholder=".avif" />
+                </nz-form-control>
+            </nz-form-item>
+        }
     `
 })
 export class PropsFileOperationComponent extends PropsBase implements OnChanges {

@@ -32,13 +32,15 @@ import { PropsBase } from './props-base';
                     (ngModelChange)="updateConfig('enable_single_tag', $event)"></nz-switch>
             </nz-form-control>
         </nz-form-item>
-        <nz-form-item *ngIf="config().enable_single_tag">
-            <nz-form-label>Read single tag</nz-form-label>
-            <nz-form-control>
-                <input nz-input [ngModel]="config().read_single_tag" (ngModelChange)="updateConfig('read_single_tag', $event)"
-                    name="read_single_tag" placeholder="e.g. Xmp.ProcessingStatus" />
-            </nz-form-control>
-        </nz-form-item>
+        @if (config().enable_single_tag) {
+            <nz-form-item>
+                <nz-form-label>Read single tag</nz-form-label>
+                <nz-form-control>
+                    <input nz-input [ngModel]="config().read_single_tag" (ngModelChange)="updateConfig('read_single_tag', $event)"
+                        name="read_single_tag" placeholder="e.g. Xmp.ProcessingStatus" />
+                </nz-form-control>
+            </nz-form-item>
+        }
     `
 })
 export class PropsMetadataReadComponent extends PropsBase implements OnChanges {

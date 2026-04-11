@@ -24,7 +24,9 @@ import type { editor } from 'monaco-editor';
                     <nz-code-editor class="editor" [nzEditorOption]="editorOpt" [ngModel]="config().code"
                         (ngModelChange)="updateConfig('code', $event)" (nzEditorInitialized)="onEditorInit($event)" />
                 </div>
-                <div *ngIf="isExpanded()" class="ant-modal-mask" (click)="toggleExpand()"></div>
+                @if (isExpanded()) {
+                    <div class="ant-modal-mask" (click)="toggleExpand()"></div>
+                }
             </nz-form-control>
         </nz-form-item>
         <nz-form-item>

@@ -28,7 +28,9 @@
           </nz-list-item>
           }
 
-          <nz-list-empty *ngIf="items().length === 0 && !loading()"></nz-list-empty>
+          @if (items().length === 0 && !loading()) {
+              <nz-list-empty></nz-list-empty>
+          }
         </nz-list>
       </div>
     </div>

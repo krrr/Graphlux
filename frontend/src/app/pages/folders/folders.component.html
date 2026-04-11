@@ -4,7 +4,8 @@
         <button nz-button nzType="primary" (click)="showModal()"><nz-icon nzType="plus"/> Folder</button>
     </div>
 
-    <nz-table #basicTable [nzData]="folders()" *ngIf="folders().length > 0">
+    @if (folders().length > 0) {
+    <nz-table #basicTable [nzData]="folders()">
         <thead>
             <tr>
                 <th>Name</th>
@@ -54,14 +55,15 @@
             }
         </tbody>
     </nz-table>
-
-    <nz-empty *ngIf="folders().length === 0" nzNotFoundImage="assets/empty.svg" [nzNotFoundContent]="contentTpl">
+    } @else {
+    <nz-empty nzNotFoundImage="assets/empty.svg" [nzNotFoundContent]="contentTpl">
         <ng-template #contentTpl>
             <span style="color: #8c8c8c; font-size: 16px">No folders configured yet</span>
             <br />
             <span style="color: #bfbfbf">Folders define the directories to watch for processing.</span>
         </ng-template>
     </nz-empty>
+    }
 
     <nz-modal [nzVisible]="isModalVisible()" (nzVisibleChange)="isModalVisible.set($event)"
         [nzTitle]="isEditing() ? 'Edit Folder' : 'Create New Folder'" (nzOnCancel)="handleCancel()"

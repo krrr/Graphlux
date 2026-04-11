@@ -4,7 +4,8 @@
         <button nz-button nzType="primary" (click)="showModal()"><nz-icon nzType="plus"/> Create Task</button>
     </div>
 
-    <div class="task-list" *ngIf="tasks().length > 0">
+    @if (tasks().length > 0) {
+    <div class="task-list">
         @for (task of tasks(); track task.id) {
         <nz-card nzHoverable (click)="openEditor(task.id)" class="task-card">
             <div class="card-header">
@@ -43,14 +44,16 @@
             </div>
         </nz-card>
         }
-
-    <nz-empty *ngIf="tasks().length === 0" nzNotFoundImage="assets/empty.svg" [nzNotFoundContent]="contentTpl">
+    </div>
+    } @else {
+    <nz-empty nzNotFoundImage="assets/empty.svg" [nzNotFoundContent]="contentTpl">
         <ng-template #contentTpl>
             <span style="color: #8c8c8c; font-size: 16px">No tasks created yet</span>
             <br />
             <span style="color: #bfbfbf">Task define the processing pipeline for your files.</span>
         </ng-template>
     </nz-empty>
+    }
 
     <nz-modal [nzVisible]="isModalVisible()" (nzVisibleChange)="isModalVisible.set($event)"
         [nzTitle]="isEditing() ? 'Edit Task' : 'Create Task'" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()">
