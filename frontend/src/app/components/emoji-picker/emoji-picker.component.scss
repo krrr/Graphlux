@@ -40,4 +40,8 @@
   &:hover {
     background: #f0f0f0;
   }
+
+  &.active {
+    background: var(--primary-color-tint);
+  }
 }

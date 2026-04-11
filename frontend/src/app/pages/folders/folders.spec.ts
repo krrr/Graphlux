@@ -144,14 +144,14 @@ describe('Folders', () => {
     it('should toggle folder status', () => {
         component.toggleFolderStatus(mockFolders[0]); // active -> paused
         expect(apiServiceSpy.updateFolder).toHaveBeenCalledWith(1, {
-            folder: { ...mockFolders[0], status: 'paused' },
+            folder: { ...mockFolders[0], status: 'paused', tasks: undefined },
             task_ids: [1]
         });
         expect(messageServiceSpy.success).toHaveBeenCalledWith('Folder paused');
 
         component.toggleFolderStatus(mockFolders[1]); // paused -> active
         expect(apiServiceSpy.updateFolder).toHaveBeenCalledWith(2, {
-            folder: { ...mockFolders[1], status: 'active' },
+            folder: { ...mockFolders[1], status: 'active', tasks: undefined },
             task_ids: [2]
         });
         expect(messageServiceSpy.success).toHaveBeenCalledWith('Folder resumed');

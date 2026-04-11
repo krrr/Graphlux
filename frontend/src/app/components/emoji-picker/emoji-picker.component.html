@@ -1,11 +1,13 @@
 <div class="emoji-picker-container">
-    <nz-tabs nzTabPosition="bottom" [nzAnimated]="false" nzSize="small">
-        <nz-tab *ngFor="let c of categories" [nzTitle]="titleTpl">
+    <nz-tabs nzTabPosition="bottom" [nzAnimated]="false" nzSize="small" 
+             [nzSelectedIndex]="selectedTabIndex()" 
+             (nzSelectedIndexChange)="selectedTabIndex.set($event)">
+        <nz-tab *ngFor="let c of categoriesWithEmojis" [nzTitle]="titleTpl">
             <ng-template #titleTpl>
                 <span nz-icon [nzType]="c.icon"></span>
             </ng-template>
             <div class="emoji-grid">
-                <div *ngFor="let i of getEmojis(c.ranges)" class="emoji-item" (click)="selectEmoji(i)">
+                <div *ngFor="let i of c.emojis" class="emoji-item" [class.active]="value() === i" (click)="selectEmoji(i)">
                     {{ i }}
                 </div>
             </div>

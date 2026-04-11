@@ -1,7 +1,99 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, model, signal, effect, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
+
+// 从 emoji_grouped.json 提取的类别数据
+// category 6: Activities (sports, games, arts)
+// category 7: Objects (technology, tools, household)
+// category 5: Travel & Places (transport, weather, buildings)
+// category 8: Symbols (numbers, arrows, shapes)
+const EMOJI_CATEGORIES = [
+    {
+        name: 'Activities',
+        icon: 'trophy',
+        ranges: [
+            [0x1f380, 0x1f381], [0x1f383, 0x1f384], [0x1f386, 0x1f38b], [0x1f38d, 0x1f391],
+            [0x1f396, 0x1f397], [0x1f399, 0x1f39b], [0x1f39e], [0x1f39f],
+            [0x1f3a3], [0x1f3a8], [0x1f3ab], [0x1f3ad, 0x1f3b4], [0x1f3bd, 0x1f3c0],
+            [0x1f3c5, 0x1f3c6], [0x1f3c8, 0x1f3c9], [0x1f3cf, 0x1f3d3], [0x1f3f8],
+            [0x1f3a0, 0x1f3a2], [0x1f3a4, 0x1f3a5], [0x1f3a7], [0x1f3a9],
+            [0x1f3b5, 0x1f3bc], [0x1f3c2, 0x1f3c4], [0x1f3c7], [0x1f3ca, 0x1f3cc],
+            [0x1f3ee], [0x1f3f7], [0x1f3f9], [0x1f451, 0x1f462], [0x1f484],
+            [0x1f489, 0x1f48a], [0x1f48d, 0x1f48e], [0x1f4a1], [0x1f4a3], [0x1f4a5],
+            [0x1f4b0], [0x1f4b3, 0x1f4b9], [0x1f4bb, 0x1f4da], [0x1f4dc, 0x1f4f2],
+            [0x1f4f7, 0x1f4fd], [0x1f4ff], [0x1f507, 0x1f517], [0x1f526, 0x1f529],
+            [0x1f52b], [0x1f52c, 0x1f52d], [0x1f56f], [0x1f576], [0x1f579], [0x1f587],
+            [0x1f58a, 0x1f58d], [0x1f5a5], [0x1f5a8], [0x1f5bc],
+            [0x1f5c2, 0x1f5c4], [0x1f5d1, 0x1f5d3], [0x1f5dc, 0x1f5de], [0x1f5e1],
+            [0x1f5f3], [0x1f5ff], [0x1f6aa], [0x1f6ac], [0x1f6bd], [0x1f6bf],
+            [0x1f6c1], [0x1f6cb], [0x1f6cd], [0x1f6cf], [0x1f6d2], [0x1f6d7],
+            [0x1f6e0, 0x1f6e1], [0x1f6f7], [0x1f93f], [0x1f941], [0x1f945],
+            [0x1f947, 0x1f94f], [0x1f9af], [0x1f97b, 0x1f97f], [0x1f9e7, 0x1f9e9],
+            [0x1f9f5, 0x1f9f6], [0x1f9f8], [0x1f9f9, 0x1f9ff], [0x1fa80, 0x1fa81],
+            [0x1fa84, 0x1fa86], [0x1faa1, 0x1faa2], [0x1faa9], [0x1fae7]
+        ]
+    },
+    {
+        name: 'Objects',
+        icon: 'bulb',
+        ranges: [
+            [0x1f392, 0x1f393], [0x1f399, 0x1f39b], [0x1f39e], [0x1f3a4, 0x1f3a5],
+            [0x1f3a7], [0x1f3a9], [0x1f3ac], [0x1f3b5, 0x1f3bc], [0x1f3ee],
+            [0x1f3f7], [0x1f3f9], [0x1f451, 0x1f462], [0x1f484], [0x1f489, 0x1f48a],
+            [0x1f48d, 0x1f48e], [0x1f4a1], [0x1f4a3], [0x1f4a5], [0x1f4b0],
+            [0x1f4b3, 0x1f4b9], [0x1f4bb, 0x1f4da], [0x1f4dc, 0x1f4f2], [0x1f4f7, 0x1f4fd],
+            [0x1f4ff], [0x1f507, 0x1f517], [0x1f526, 0x1f529], [0x1f52c, 0x1f52d],
+            [0x1f56f], [0x1f576], [0x1f587], [0x1f58a, 0x1f58d], [0x1f5a5], [0x1f5a8],
+            [0x1f5b1, 0x1f5b2], [0x1f5c2, 0x1f5c4], [0x1f5d1, 0x1f5d3], [0x1f5dc, 0x1f5de],
+            [0x1f5e1], [0x1f5f3], [0x1f5ff], [0x1f6aa], [0x1f6ac], [0x1f6bd], [0x1f6bf],
+            [0x1f6c1], [0x1f6cb], [0x1f6cd], [0x1f6cf], [0x1f6d2], [0x1f6d7],
+            [0x1f6e0, 0x1f6e1], [0x1f941], [0x1f97b, 0x1f97f], [0x1f9af], [0x1f9ba],
+            [0x1f9e2, 0x1f9e6], [0x1f9ea, 0x1f9ec], [0x1f9ee, 0x1f9f0], [0x1f9f2],
+            [0x1f9f4], [0x1f9f7], [0x1f9f9, 0x1f9ff], [0x1fa70, 0x1fa74], [0x1fa78, 0x1fa7c],
+            [0x1fa83], [0x1fa87, 0x1fa8a], [0x1fa8e, 0x1fa8f], [0x1fa91, 0x1faa0],
+            [0x1faa3, 0x1faa7], [0x1faaa, 0x1faae], [0x1fae7]
+        ]
+    },
+    {
+        name: 'Travel',
+        icon: 'car',
+        ranges: [
+            [0x1f300, 0x1f321], [0x1f324, 0x1f32c], [0x1f3a0, 0x1f3a2], [0x1f3aa],
+            [0x1f3cd, 0x1f3ce], [0x1f3d4, 0x1f3e6], [0x1f3e8, 0x1f3ed], [0x1f3ef, 0x1f3f0],
+            [0x1f488], [0x1f492], [0x1f4a7], [0x1f4ba], [0x1f525], [0x1f54b, 0x1f54d],
+            [0x1f550, 0x1f567], [0x1f570], [0x1f5fa, 0x1f5fe], [0x1f680, 0x1f6a2],
+            [0x1f6a4, 0x1f6a8], [0x1f6b2], [0x1f6ce], [0x1f6d1], [0x1f6d5, 0x1f6d6],
+            [0x1f6d8], [0x1f6dd, 0x1f6df], [0x1f6e2, 0x1f6e5], [0x1f6e9], [0x1f6eb, 0x1f6ec],
+            [0x1f6f0], [0x1f6f3, 0x1f6f6], [0x1f6f8, 0x1f6fc], [0x1f9bc, 0x1f9bd],
+            [0x1f9ed], [0x1f9f1], [0x1f9f3], [0x1fa82], [0x1fa90], [0x1faa8], [0x1fab5]
+        ]
+    },
+    {
+        name: 'Symbols',
+        icon: 'info-circle',
+        ranges: [
+            [0x0023], [0x002a], [0x0030, 0x0039], [0x00a9], [0x00ae], [0x203c], [0x2049],
+            [0x20e3], [0x2122], [0x2139], [0x2194, 0x2199], [0x21a9, 0x21aa], [0x23cf],
+            [0x23e9, 0x23ef], [0x23f8, 0x23fa], [0x24c2], [0x25aa, 0x25ab], [0x25b6],
+            [0x25c0], [0x25fb, 0x25fe], [0x2611], [0x2622, 0x2623], [0x2626], [0x262a],
+            [0x262e, 0x262f], [0x2638], [0x2640], [0x2642], [0x2648, 0x2653], [0x267b],
+            [0x267e, 0x267f], [0x2695], [0x269b, 0x269c], [0x26a0], [0x26a7],
+            [0x26aa, 0x26ab], [0x26ce], [0x26d4], [0x2705], [0x2714], [0x2716],
+            [0x271d], [0x2721], [0x2733, 0x2734], [0x2747], [0x274c], [0x274e],
+            [0x2753, 0x2755], [0x2757], [0x2795, 0x2797], [0x27a1], [0x27b0], [0x27bf],
+            [0x2934, 0x2935], [0x2b05, 0x2b07], [0x2b1b, 0x2b1c], [0x2b55], [0x3030],
+            [0x303d], [0x3297], [0x3299], [0x1f170, 0x1f171], [0x1f17e, 0x1f17f],
+            [0x1f18e], [0x1f191, 0x1f19a], [0x1f201, 0x1f202], [0x1f21a], [0x1f22f],
+            [0x1f232, 0x1f23a], [0x1f250, 0x1f251], [0x1f3a6], [0x1f3e7], [0x1f4a0],
+            [0x1f4b1, 0x1f4b2], [0x1f4db], [0x1f4f3, 0x1f4f6], [0x1f500, 0x1f506],
+            [0x1f518, 0x1f524], [0x1f52f, 0x1f53d], [0x1f549], [0x1f54e], [0x1f6ab],
+            [0x1f6ad, 0x1f6b1], [0x1f6b3], [0x1f6b7, 0x1f6bc], [0x1f6be],
+            [0x1f6c2, 0x1f6c5], [0x1f6d0], [0x1f6dc], [0x1f7e0, 0x1f7eb], [0x1f7f0],
+            [0x1faaf], [0x1fadf]
+        ]
+    }
+];
 
 @Component({
     selector: 'app-emoji-picker',
@@ -11,54 +103,44 @@ import { NzTabsModule } from 'ng-zorro-antd/tabs';
     styleUrls: ['./emoji-picker.component.scss'],
 })
 export class EmojiPickerComponent {
-    @Output() emojiSelect = new EventEmitter<string>();
+    value = model<string>('');
+    selectedTabIndex = signal<number>(0);
 
-    // 定义常用 Emoji 的 Unicode 范围
-    categories = [
-        {
-            name: 'Smileys',
-            icon: 'smile',
-            ranges: [[0x1f600, 0x1f64f]] // Emoticons
-        },
-        {
-            name: 'Animals',
-            icon: 'heart',
-            ranges: [[0x1f400, 0x1f43d], [0x1f980, 0x1f9ae]] // Animals & Nature
-        },
-        {
-            name: 'Food',
-            icon: 'coffee',
-            ranges: [[0x1f344, 0x1f37f], [0x1f950, 0x1f96f]] // Food & Drink
-        },
-        {
-            name: 'Activities',
-            icon: 'trophy',
-            ranges: [[0x1f3a0, 0x1f3c4], [0x1f3cf, 0x1f3d3]] // Activities & Sports
-        },
-        {
-            name: 'Travel',
-            icon: 'car',
-            ranges: [[0x1f680, 0x1f6c5], [0x1f300, 0x1f320]] // Travel & Places
-        },
-        {
-            name: 'Objects',
-            icon: 'bulb',
-            ranges: [[0x1f4a0, 0x1f4ff], [0x1f380, 0x1f39f]] // Objects
-        },
-        {
-            name: 'Symbols',
-            icon: 'info-circle',
-            ranges: [[0x2600, 0x26ff], [0x2700, 0x27bf]] // Symbols & Dingbats
-        }
-    ];
+    // 预计算 Emoji 列表以提高查找效率
+    categoriesWithEmojis = EMOJI_CATEGORIES.map(c => ({
+        ...c,
+        emojis: this.getEmojis(c.ranges)
+    }));
+
+    constructor(private el: ElementRef) {
+        // 当外部传入的 value 改变时，自动切换到对应的标签页并滚动到对应位置
+        effect(() => {
+            const currentEmoji = this.value();
+            if (!currentEmoji) return;
+
+            const index = this.categoriesWithEmojis.findIndex(c => 
+                c.emojis.includes(currentEmoji)
+            );
+            
+            if (index !== -1) {
+                this.selectedTabIndex.set(index);
+                // 确保在 Tab 切换渲染完成后执行滚动
+                setTimeout(() => {
+                    this.el.nativeElement.querySelector('.emoji-item.active')?.scrollIntoView({
+                        block: 'center',
+                        inline: 'nearest',
+                        behavior: 'smooth'
+                    });
+                }, 100);
+            }
+        }, { allowSignalWrites: true });
+    }
 
     getEmojis(ranges: number[][]): string[] {
         const emojis: string[] = [];
         for (const [start, end] of ranges) {
             for (let i = start; i <= end; i++) {
                 const emoji = String.fromCodePoint(i);
-                // 简单过滤：某些码点可能在旧系统上无法显示，或不是真正的 Emoji
-                // 这里可以根据需要增加更复杂的正则过滤
                 emojis.push(emoji);
             }
         }
@@ -66,6 +148,6 @@ export class EmojiPickerComponent {
     }
 
     selectEmoji(emoji: string) {
-        this.emojiSelect.emit(emoji);
+        this.value.set(emoji);
     }
 }

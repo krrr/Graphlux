@@ -8,7 +8,7 @@
         <nz-card *ngFor="let task of tasks()" nzHoverable (click)="openEditor(task.id)" class="task-card">
             <div class="card-header">
                 <div style="display: flex; align-items: center; gap: 12px">
-                    <div class="task-icon">{{ task.icon || '🐹' }}</div>
+                    <div class="task-icon">{{ task.icon }}</div>
                     <div>
                         <h3 style="margin: 0">{{ task.name }}</h3>
                     </div>
@@ -58,13 +58,13 @@
                         <nz-form-item>
                             <nz-form-label nzRequired>Icon</nz-form-label>
                             <nz-form-control>
-                                <div class="emoji-trigger" nz-popover [nzPopoverContent]="emojiPickerTpl"
+                                <div class="emoji-trigger" nz-popover #pop="nzPopover" [nzPopoverContent]="emojiPickerTpl"
                                     nzPopoverTrigger="click" nzPopoverPlacement="bottomLeft"
                                     nzPopoverOverlayClassName="nz-popover-no-padding">
                                     {{ taskForm().icon }}
                                 </div>
                                 <ng-template #emojiPickerTpl>
-                                    <app-emoji-picker (emojiSelect)="updateForm('icon', $event)"></app-emoji-picker>
+                                    <app-emoji-picker [value]="taskForm().icon" (valueChange)="updateForm('icon', $event); pop.hide()"/>
                                 </ng-template>
                             </nz-form-control>
                         </nz-form-item>
