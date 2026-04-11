@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop'
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../api.service';
@@ -52,8 +52,9 @@ export class FoldersComponent implements OnInit {
     folders = toSignal(
         this.refreshFolders$.pipe(switchMap(() => this.apiService.getFolders())),
         { initialValue: [] as Folder[] }
-    ); 
-    tasks = signal<any[]>([]);
+    );
+    tasks = toSignal(this.apiService.getTasks(), { initialValue: [] as Task[] });
+    taskMap = computed(() => new Map(this.tasks().map((task) => [task.id, task])));
 
     isModalVisible = signal(false);
     isEditing = signal(false);
@@ -66,13 +67,6 @@ export class FoldersComponent implements OnInit {
     constructor() {}
 
     ngOnInit() {
-        this.loadTasks();
-    }
-
-    loadTasks() {
-        this.apiService.getTasks().subscribe((tasks) => {
-            this.tasks.set(tasks);
-        });
     }
 
     showModal(folder?: Folder) {

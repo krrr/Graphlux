@@ -94,7 +94,7 @@ def main():
         if show_requested.wait(timeout=1):
             show_requested.clear()
             if not window:
-                window = webview.create_window("CyberHamster", "http://127.0.0.1:8000", width=1024, height=768)
+                window = webview.create_window("CyberHamster", "http://127.0.0.1:8000", width=1024, height=768, transparent=True)
                 window.events.closing += on_closing
                 window.events.closed += on_closed
                 webview.start()

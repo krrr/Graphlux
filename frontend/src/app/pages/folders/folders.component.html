@@ -20,10 +20,13 @@
                 <td>{{ folder.watch_folder }}</td>
                 <td>
                     <div style="display: flex; flex-wrap: wrap; gap: 4px">
-                        <nz-tag *ngFor="let task of folder.tasks" nzColor="blue">
-                            <span style="margin-right: 4px">{{ task.icon }}</span>
-                            {{ task.name }}
-                        </nz-tag>
+                        @for (t of folder.tasks; track t.id) {
+                            @let fullTask = taskMap().get(t.id);
+                            <nz-tag nzColor="blue">
+                                <span style="margin-right: 4px">{{ fullTask?.icon }}</span>
+                                {{ fullTask?.name }}
+                            </nz-tag>
+                            }
                     </div>
                 </td>
                 <td>
