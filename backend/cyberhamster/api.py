@@ -2,6 +2,7 @@ import os
 import sys
 import ctypes
 import asyncio
+import datetime
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from sqlalchemy.orm import selectinload, defer
 from sqlmodel import Session, select
@@ -162,8 +163,9 @@ def update_task(task_id: int, task_update: Task, session: Session = Depends(get_
         validate_dag(update_data["json_data"])
 
     for key, value in update_data.items():
-        if key != "id": # Don't update ID
+        if key not in ('id', 'created_at', 'updated_at'): # Don't update ID
             setattr(task, key, value)
+    task.updated_at = datetime.datetime.now()
 
     session.add(task)
     session.commit()

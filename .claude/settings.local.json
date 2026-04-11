@@ -5,7 +5,8 @@
       "Bash(git commit:*)",
       "Bash(npx ng:*)",
       "Bash(pnpm run:*)",
-      "Bash(npx vitest:*)"
+      "Bash(npx vitest:*)",
+      "Bash(python:*)"
     ]
   },
   "outputStyle": "Explanatory"

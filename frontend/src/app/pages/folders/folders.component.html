@@ -21,7 +21,7 @@
                 <td>
                     <div style="display: flex; flex-wrap: wrap; gap: 4px">
                         <nz-tag *ngFor="let task of folder.tasks" nzColor="blue">
-                            <span style="margin-right: 4px">{{ task.icon || '🐹' }}</span>
+                            <span style="margin-right: 4px">{{ task.icon }}</span>
                             {{ task.name }}
                         </nz-tag>
                     </div>
@@ -94,7 +94,7 @@
                                     (ngModelChange)="updateForm('task_ids', $event)" name="task_ids"
                                     nzPlaceHolder="Select tasks">
                                     <nz-option *ngFor="let t of tasks()" [nzValue]="t.id"
-                                        [nzLabel]="(t.icon || '🐹') + ' ' + t.name"></nz-option>
+                                        [nzLabel]="t.icon + ' ' + t.name"></nz-option>
                                 </nz-select>
                             </nz-form-control>
                         </nz-form-item>
