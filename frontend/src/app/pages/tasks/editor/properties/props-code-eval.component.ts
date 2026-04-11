@@ -32,8 +32,9 @@ import type { editor } from 'monaco-editor';
             <nz-form-control>
                 <nz-input-group nzSearch [nzAddOnAfter]="suffixButton">
                     <nz-select [(ngModel)]="selectedVarForInsert" name="quick_var" nzSize="small">
-                        <nz-option *ngFor="let i of availableVariables" [nzValue]="formatVarForCode(i.value)"
-                            [nzLabel]="i.label" />
+                        @for (i of availableVariables; track i) {
+                            <nz-option [nzValue]="formatVarForCode(i.value)" [nzLabel]="i.label" />
+                        }
                     </nz-select>
                 </nz-input-group>
                 <ng-template #suffixButton>

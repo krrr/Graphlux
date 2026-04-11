@@ -17,7 +17,9 @@ import { ApiService } from '../../../../api.service';
         <nz-form-label>Task</nz-form-label>
         <nz-form-control>
           <nz-select [ngModel]="config()?.['task_id']" (ngModelChange)="updateConfig('task_id', $event)">
-            <nz-option *ngFor="let i of availableTasks" [nzValue]="i.id" [nzLabel]="i.name"/>
+            @for (i of availableTasks; track i.id) {
+                <nz-option [nzValue]="i.id" [nzLabel]="i.name"/>
+            }
           </nz-select>
         </nz-form-control>
       </nz-form-item>

@@ -29,7 +29,9 @@ import { PropsBase } from './props-base';
             <nz-form-control>
                 <nz-select [ngModel]="config().target_file_var" (ngModelChange)="updateConfig('target_file_var', $event)"
                     nzPlaceHolder="Select target node" name="target_file_var">
-                    <nz-option *ngFor="let i of availableVariables" [nzValue]="i.value" [nzLabel]="i.label" />
+                    @for (i of availableVariables; track i) {
+                        <nz-option [nzValue]="i.value" [nzLabel]="i.label" />
+                    }
                 </nz-select>
             </nz-form-control>
         </nz-form-item>
@@ -52,7 +54,8 @@ import { PropsBase } from './props-base';
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let data of tagEntries; let i = index">
+                        @for (data of tagEntries; track data) {
+                            <tr>
                             <td class="input-cell">
                                 <input nz-input [(ngModel)]="data.key" (ngModelChange)="syncTags()" placeholder="Tag" />
                             </td>
@@ -60,11 +63,12 @@ import { PropsBase } from './props-base';
                                 <input nz-input [(ngModel)]="data.value" (ngModelChange)="syncTags()" placeholder="Value" />
                             </td>
                             <td class="sm-btn-cell">
-                                <button nz-button nzType="text" (click)="removeTag(i)" type="button" nzSize="small" aria-label="Remove Tag" title="Remove Tag">
+                                <button nz-button nzType="text" (click)="removeTag($index)" type="button" nzSize="small" aria-label="Remove Tag" title="Remove Tag">
                                     <span nz-icon nzType="delete"></span>
                                 </button>
                             </td>
                         </tr>
+                        }
                     </tbody>
                 </nz-table>
             </nz-form-control>

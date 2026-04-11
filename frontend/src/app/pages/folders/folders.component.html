@@ -15,7 +15,8 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let folder of basicTable.data">
+            @for (folder of basicTable.data; track folder.id) {
+            <tr>
                 <td>{{ folder.name }}</td>
                 <td>{{ folder.watch_folder }}</td>
                 <td>
@@ -50,6 +51,7 @@
                     </button>
                 </td>
             </tr>
+            }
         </tbody>
     </nz-table>
 
@@ -96,8 +98,9 @@
                                 <nz-select nzMode="multiple" [ngModel]="folderForm().task_ids"
                                     (ngModelChange)="updateForm('task_ids', $event)" name="task_ids"
                                     nzPlaceHolder="Select tasks">
-                                    <nz-option *ngFor="let t of tasks()" [nzValue]="t.id"
-                                        [nzLabel]="t.icon + ' ' + t.name"></nz-option>
+                                    @for (t of tasks(); track t.id) {
+                                        <nz-option [nzValue]="t.id" [nzLabel]="t.icon + ' ' + t.name"></nz-option>
+                                    }
                                 </nz-select>
                             </nz-form-control>
                         </nz-form-item>

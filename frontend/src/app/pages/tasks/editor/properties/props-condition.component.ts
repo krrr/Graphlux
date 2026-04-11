@@ -28,19 +28,22 @@ import { PropsBase } from './props-base';
           </nz-form-control>
         </nz-form-item>
 
-        <div *ngFor="let cond of config().conditions; let i = index; trackBy: trackByIndex" style="border: 1px solid #d9d9d9; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+        @for (cond of config().conditions; track $index) {
+          <div style="border: 1px solid #d9d9d9; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <strong>Condition {{ i + 1 }}</strong>
-            <button nz-button nzType="text" nzDanger nzSize="small" (click)="removeCondition(i)" aria-label="Remove Condition" title="Remove Condition"><span nz-icon nzType="delete"></span></button>
+            <strong>Condition {{ $index + 1 }}</strong>
+            <button nz-button nzType="text" nzDanger nzSize="small" (click)="removeCondition($index)" aria-label="Remove Condition" title="Remove Condition"><span nz-icon nzType="delete"></span></button>
           </div>
           <nz-form-item style="margin-bottom: 8px;">
             <nz-form-label>Variable</nz-form-label>
             <nz-form-control>
               <nz-select [ngModel]="cond.variable"
-                (ngModelChange)="updateCondition(i, 'variable', $event)"
-                name="cond_var_{{i}}"
+                (ngModelChange)="updateCondition($index, 'variable', $event)"
+                name="cond_var_{{$index}}"
               >
-                <nz-option *ngFor="let i of availableVariables" [nzValue]="i.value" [nzLabel]="i.label"></nz-option>
+                @for (i of availableVariables; track i.value) {
+                    <nz-option [nzValue]="i.value" [nzLabel]="i.label"></nz-option>
+                }
               </nz-select>
             </nz-form-control>
           </nz-form-item>
@@ -49,8 +52,8 @@ import { PropsBase } from './props-base';
             <nz-form-control>
               <nz-select
                 [ngModel]="cond.operator"
-                (ngModelChange)="updateCondition(i, 'operator', $event)"
-                name="cond_op_{{i}}"
+                (ngModelChange)="updateCondition($index, 'operator', $event)"
+                name="cond_op_{{$index}}"
               >
                 <nz-option nzValue="<" nzLabel="<"/>
                 <nz-option nzValue=">" nzLabel=">"/>
@@ -64,12 +67,13 @@ import { PropsBase } from './props-base';
               <input
                 nz-input
                 [ngModel]="cond.target"
-                (ngModelChange)="updateCondition(i, 'target', $event)"
-                name="cond_thresh_{{i}}"
+                (ngModelChange)="updateCondition($index, 'target', $event)"
+                name="cond_thresh_{{$index}}"
               />
             </nz-form-control>
           </nz-form-item>
         </div>
+        }
 
         <button nz-button nzType="dashed" nzBlock (click)="addCondition()" class="add-btn">
           <span nz-icon nzType="plus"></span> Add Condition
@@ -106,9 +110,5 @@ export class PropsConditionComponent extends PropsBase implements OnChanges {
             conditions[index] = { ...conditions[index], [field]: value };
             this.updateConfig('conditions', conditions);
         }
-    }
-
-    trackByIndex(index: number, item: any): number {
-        return index;
     }
 }

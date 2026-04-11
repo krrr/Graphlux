@@ -5,7 +5,8 @@
     </div>
 
     <div class="task-list" *ngIf="tasks().length > 0">
-        <nz-card *ngFor="let task of tasks()" nzHoverable (click)="openEditor(task.id)" class="task-card">
+        @for (task of tasks(); track task.id) {
+        <nz-card nzHoverable (click)="openEditor(task.id)" class="task-card">
             <div class="card-header">
                 <div style="display: flex; align-items: center; gap: 12px">
                     <div class="task-icon">{{ task.icon }}</div>
@@ -32,14 +33,16 @@
             <div class="folder-list" (click)="openEditor(task.id)">
                 <span nz-icon nzType="folder"></span>
                 <div style="margin-left: 10px; color: #595959">
-                    <nz-tag *ngFor="let f of task.folders" [title]="f.watch_folder">{{ f.name }}</nz-tag>
-                    <div *ngIf="task.folders.length === 0">
-                        <i>None</i>
-                    </div>
+                    @for (f of task.folders; track f.id) {
+                        <nz-tag [title]="f.watch_folder">{{ f.name }}</nz-tag>
+                    }
+                    @if (task.folders.length === 0) {
+                        <div><i>None</i></div>
+                    }
                 </div>
             </div>
         </nz-card>
-    </div>
+        }
 
     <nz-empty *ngIf="tasks().length === 0" nzNotFoundImage="assets/empty.svg" [nzNotFoundContent]="contentTpl">
         <ng-template #contentTpl>

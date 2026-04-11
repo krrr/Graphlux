@@ -16,16 +16,17 @@
 
       <div class="file-list" [class.loading]="loading()">
         <nz-list nzBordered nzSize="small">
-          <nz-list-item
-            *ngFor="let item of items()"
-            (click)="onItemClick(item)"
-            (dblclick)="onItemDoubleClick(item)"
-            [class.selected]="selectedPath() === item.path"
-            class="list-item"
-          >
+          @for (item of items(); track item.path) {
+            <nz-list-item
+              (click)="onItemClick(item)"
+              (dblclick)="onItemDoubleClick(item)"
+              [class.selected]="selectedPath() === item.path"
+              class="list-item"
+            >
             <i nz-icon [nzType]="item.is_dir ? 'folder' : 'file'" class="item-icon" [style.color]="item.is_dir ? '#faad14' : '#1890ff'"></i>
             <span class="item-name">{{ item.name }}</span>
           </nz-list-item>
+          }
 
           <nz-list-empty *ngIf="items().length === 0 && !loading()"></nz-list-empty>
         </nz-list>

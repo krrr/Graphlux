@@ -36,7 +36,9 @@ import { PropsBase } from './props-base';
                     nzPlaceHolder="Select source node"
                     name="input_file_var"
                 >
-                    <nz-option *ngFor="let i of availableVariables" [nzValue]="i.value" [nzLabel]="i.label"></nz-option>
+                    @for (i of availableVariables; track i) {
+                        <nz-option [nzValue]="i.value" [nzLabel]="i.label"></nz-option>
+                    }
                 </nz-select>
             </nz-form-control>
         </nz-form-item>
