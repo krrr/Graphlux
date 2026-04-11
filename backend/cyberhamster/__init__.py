@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from contextlib import asynccontextmanager
 import asyncio
 import os
 
@@ -8,19 +9,17 @@ from cyberhamster.db import init_db, get_session
 from cyberhamster.task_manager import task_manager
 from cyberhamster.tools.imagemagick_wrapper import magick_pool_reaper
 
-app = FastAPI(title="CyberHamster Backend")
 
-@app.on_event("startup")
-def on_startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     init_db()
     task_manager.start()
     asyncio.create_task(magick_pool_reaper())
-
-@app.on_event("shutdown")
-def on_shutdown():
+    yield
     task_manager.stop()
 
 
+app = FastAPI(title="CyberHamster Backend", lifespan=lifespan)
 app.include_router(api_router, prefix='/api')
 
 
