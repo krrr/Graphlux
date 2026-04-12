@@ -40,6 +40,13 @@ import { ApiService } from './api.service';
         .app-layout {
             height: 100vh;
             width: 100vw;
+            background: hsl(260deg 22.22% 96.47%);
+        }
+        nz-sider {
+            border-right: 1px solid var(--border-color-split);
+            ::ng-deep .ant-menu-root {
+                border-right: none;
+            }
         }
         .logo {
             height: 64px;
@@ -57,7 +64,7 @@ import { ApiService } from './api.service';
             overflow: hidden;
         }
         nz-layout {
-            // background: transparent;
+            background: transparent;
         }
         nz-content {
         }

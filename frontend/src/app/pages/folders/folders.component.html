@@ -5,7 +5,7 @@
     </div>
 
     @if (folders().length > 0) {
-    <nz-table #basicTable [nzData]="folders()">
+    <nz-table #basicTable [nzData]="folders()" nzBordered>
         <thead>
             <tr>
                 <th>Name</th>

@@ -6,6 +6,7 @@ import { AreaPlugin, AreaExtensions } from 'rete-area-plugin';
 import { ConnectionPlugin, Presets as ConnectionPresets } from 'rete-connection-plugin';
 import { AutoArrangePlugin, Presets as ArrangePresets } from 'rete-auto-arrange-plugin';
 import { AngularPlugin, Presets, AngularArea2D } from 'rete-angular-plugin/18';
+import { getDOMSocketPosition } from 'rete-render-utils'
 import { CustomNodeComponent } from './custom-node/custom-node.component';
 import { ApiService } from '../../../api.service';
 import { lastValueFrom, Subscription, Subject, debounceTime } from 'rxjs';
@@ -209,6 +210,15 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
                         return CustomConnComponent;
                     },
                 },
+                // remove space between socket and svg
+                socketPositionWatcher: getDOMSocketPosition({
+                    offset({ x, y }, nodeId, side, key) {
+                        return {
+                            x: x,
+                            y: y
+                        }
+                    },
+                })
             }),
         );
 

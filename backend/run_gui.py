@@ -7,6 +7,7 @@ import uvicorn
 import webview
 import pystray
 import ctypes
+import argparse
 from pystray import MenuItem as item
 
 # Add current dir to sys.path so cyberhamster can be imported correctly
@@ -28,15 +29,20 @@ def run_server():
 def main():
     global window, should_exit
 
+    parser = argparse.ArgumentParser(description="CyberHamster GUI")
+    parser.add_argument("--web-debug", action="store_true", help="Start in web debug mode (no backend, use localhost:4200)")
+    args = parser.parse_args()
+
     # Set high DPI awareness, prevent blur tray icon
     ctypes.windll.shcore.SetProcessDpiAwareness(1)
     
-    # Start FastAPI in a background thread
-    server_thread = threading.Thread(target=run_server, daemon=True)
-    server_thread.start()
+    if not args.web_debug:
+        # Start FastAPI in a background thread
+        server_thread = threading.Thread(target=run_server, daemon=True)
+        server_thread.start()
 
-    # Wait a moment for the server to start
-    time.sleep(1)
+        # Wait a moment for the server to start
+        time.sleep(1)
 
     def on_closing():
         global window
@@ -89,12 +95,14 @@ def main():
     # Initial request to show window
     show_requested.set()
 
+    url = "http://localhost:4200" if args.web_debug else "http://127.0.0.1:8000"
+
     # Main loop to manage window lifecycle
     while not should_exit:
         if show_requested.wait(timeout=1):
             show_requested.clear()
             if not window:
-                window = webview.create_window("CyberHamster", "http://127.0.0.1:8000", width=1024, height=768, transparent=True)
+                window = webview.create_window("CyberHamster", url, width=1424, height=1068, transparent=True)
                 window.events.closing += on_closing
                 window.events.closed += on_closed
                 webview.start()
