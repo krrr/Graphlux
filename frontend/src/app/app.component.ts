@@ -39,6 +39,7 @@ import { ApiService } from './api.service';
     styles: [`
         .app-layout {
             height: 100vh;
+            width: 100vw;
         }
         .logo {
             height: 64px;
@@ -55,8 +56,10 @@ import { ApiService } from './api.service';
             height: 100%;
             overflow: hidden;
         }
+        nz-layout {
+            // background: transparent;
+        }
         nz-content {
-            background: #fff;
         }
     `],
 })

@@ -2,15 +2,6 @@
     padding: 20px;
 }
 
-.task-icon {
-    font-size: 32px;
-    width: 48px;
-    height: 48px;
-    background-color: #f6f4f8;
-    border-radius: 2px;
-    line-height: 46px;  // without this icon shows
-    text-align: center;
-}
 
 .emoji-trigger {
     font-size: 20px;
@@ -31,6 +22,7 @@
 
 .task-list {
     display: grid;
+    user-select: none;
     grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
     gap: 16px;
     flex-wrap: wrap;
@@ -49,6 +41,21 @@
         justify-content: space-between;
         align-items: flex-start;
         margin-bottom: 12px
+    }
+
+    .task-icon {
+        font-size: 32px;
+        width: 48px;
+        height: 48px;
+        background-color: #f6f4f8;
+        border-radius: 2px;
+        line-height: 46px; // without this icon shows
+        text-align: center;
+        user-select: none;
+    }
+
+    .more-btn {
+        margin-right: -4px;
     }
 }
 

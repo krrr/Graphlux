@@ -4,12 +4,12 @@
 @import '../node_modules/ng-zorro-antd/code-editor/style/entry.less';
 
 // -------- 自定义参数覆盖 -----------
-@primary-color: #8452ea;
+@primary-color: hsl(260.29deg 39% 55%);
 
 html {
     --primary-color: @primary-color;
-    --primary-color-a03: #8552ea4d;
-    --primary-color-tint: #ad90e7;
+    --primary-color-a04: fade(@primary-color, 40%);
+    --primary-color-tint: lighten(@primary-color, 15%);
 }
 
 .ant-menu-item {
