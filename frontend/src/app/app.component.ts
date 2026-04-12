@@ -13,6 +13,7 @@ import { ApiService } from './api.service';
         <nz-layout class="app-layout">
             <nz-sider nzWidth="200px" nzTheme="light">
                 <div class="logo">
+                    <img src="favicon.svg" alt="Logo" style="height: 32px; margin-right: 8px;" />
                     <h2>CyberHamster</h2>
                 </div>
                 <ul nz-menu nzMode="inline">
