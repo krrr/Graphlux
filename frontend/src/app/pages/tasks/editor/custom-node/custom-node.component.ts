@@ -30,7 +30,7 @@ export class CustomNodeComponent implements OnChanges {
     get headerBgColor(): string {
         const iconColor = this.iconColor;
         if (iconColor.startsWith('#')) {
-            return iconColor + '10'; // ~6% opacity
+            return iconColor + '11'; // ~6% opacity
         } else {
             return 'rgba(0,0,0,0.05)';
         }

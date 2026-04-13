@@ -10,7 +10,12 @@
             <nz-dropdown-menu #menu="nzDropdownMenu">
                 <ul nz-menu>
                     @for (t of availableNodes; track t) {
-                        <li nz-menu-item (click)="editorService.addNode(t)">{{ NODE_INFO[t].label }}</li>
+                        <li nz-menu-item (click)="editorService.addNode(t)">
+                            <div class="node-menu-icon" [style.background-color]="NODE_INFO[t].color">
+                                <span nz-icon [nzType]="NODE_INFO[t].icon" class="node-menu-icon-inner"></span>
+                            </div>
+                            {{ NODE_INFO[t].label }}
+                        </li>
                     }
                 </ul>
             </nz-dropdown-menu>
@@ -99,8 +104,12 @@
                 <li nz-submenu nzTitle="Change Type" nzIcon="swap">
                     <ul>
                         @for (t of availableNodes; track t) {
-                            <li nz-menu-item (click)="changeSelectedNodeType(t)">{{
-                            NODE_INFO[t].label }}</li>
+                            <li nz-menu-item (click)="changeSelectedNodeType(t)">
+                                <div class="node-menu-icon" [style.background-color]="NODE_INFO[t].color">
+                                    <span nz-icon [nzType]="NODE_INFO[t].icon" class="node-menu-icon-inner"></span>
+                                </div>
+                                {{ NODE_INFO[t].label }}
+                            </li>
                         }
                     </ul>
                 </li>
@@ -110,7 +119,12 @@
                 <li nz-submenu nzTitle="Add Node" nzIcon="plus">
                     <ul>
                         @for (t of availableNodes; track t) {
-                            <li nz-menu-item (click)="editorService.addNode(t)">{{ NODE_INFO[t].label }}</li>
+                            <li nz-menu-item (click)="editorService.addNode(t)">
+                                <div class="node-menu-icon" [style.background-color]="NODE_INFO[t].color">
+                                    <span nz-icon [nzType]="NODE_INFO[t].icon" class="node-menu-icon-inner"></span>
+                                </div>
+                                {{ NODE_INFO[t].label }}
+                            </li>
                         }
                     </ul>
                 </li>

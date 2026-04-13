@@ -96,3 +96,18 @@
     font-family: monospace;
     margin-bottom: 5px;
 }
+
+.node-menu-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 2px;
+    margin-right: 4px;
+
+    .node-menu-icon-inner {
+        color: white;
+        font-size: 12px;
+    }
+}

@@ -297,45 +297,45 @@ export interface NodeInfo {
 
 export const NODE_INFO: Record<string, NodeInfo> = {
     StartNode: {
-        icon: 'home', color: '#1890ff', label: 'Start',
+        icon: 'home', color: '#2b90ee', label: 'Start',
         outputVar: 'file'
     },
     FinishNode: {
-        icon: 'check-circle', color: '#52c41a', label: 'Finish / Output',
+        icon: 'check-circle', color: '#59b62b', label: 'Finish / Output',
         footerKeys: [],
         outputVar: (config) => config.result_var ? `result: ${config.result_var.split(':').pop()}` : 'no result'
     },
     MetadataReadNode: {
-        icon: 'tag', color: '#c655df', label: 'Read Media Metadata',
+        icon: 'tag', color: '#bb63cf', label: 'Read Media Metadata',
         footerKeys: ['input_file_var', 'read_single_tag'],
         outputVar: 'metadata'
     },
     ConvertNode: {
-        icon: 'sync', color: '#f04951', label: 'Convert Format',
+        icon: 'sync', color: '#e1565d', label: 'Convert Format',
         footerKeys: ['format', 'target_extension'],
         outputVar: 'file'
     },
     CodeEvalNode: {
-        icon: 'code', color: '#945de1', label: 'Code Eval',
+        icon: 'code', color: '#956ad2', label: 'Code Eval',
         footerKeys: [],
         outputVar: (config) => config.output_var || 'eval_result'
     },
     ConditionNode: {
-        icon: 'icon:branches', color: '#faad14', label: 'Condition Branch',
+        icon: 'icon:branches', color: '#e8a826', label: 'Condition Branch',
         footerKeys: ['relation']
     },
     FileOperationNode: {
-        icon: 'file-text', color: '#e1449b', label: 'File Operation',
+        icon: 'file-text', color: '#d05398', label: 'File Operation',
         footerKeys: ['action', 'target_extension'],
         outputVar: 'file'
     },
     MetadataWriteNode: {
-        icon: 'edit', color: '#13c2c2', label: 'Write Media Metadata',
+        icon: 'edit', color: '#23b3b3', label: 'Write Media Metadata',
         footerKeys: ['target_file_var'],
         outputVar: 'file'
     },
     CallTaskNode: {
-        icon: 'function', color: '#c2dd2f', label: 'Call Task',
+        icon: 'function', color: '#b7cb43', label: 'Call Task',
         footerKeys: ['task_id'],
         outputVar: 'result'
     },
