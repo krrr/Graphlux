@@ -69,7 +69,7 @@
         [nzTitle]="isEditing() ? 'Edit Folder' : 'Create New Folder'" (nzOnCancel)="handleCancel()"
         (nzOnOk)="handleOk()" nzWidth="600px">
         <ng-container *nzModalContent>
-            <form nz-form nzLayout="vertical">
+            <form nz-form nzLayout="vertical" class="folder-prop-form">
                 <nz-tabs>
                     <nz-tab nzTitle="General">
                         <nz-form-item>

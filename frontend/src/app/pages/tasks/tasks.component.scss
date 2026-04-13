@@ -40,7 +40,15 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 12px
+        margin-bottom: 12px;
+        > div {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .task-title {
+            font-size: 16px;
+        }
     }
 
     .task-icon {

@@ -9,11 +9,9 @@
         @for (task of tasks(); track task.id) {
         <nz-card nzHoverable (click)="openEditor(task.id)" class="task-card">
             <div class="card-header">
-                <div style="display: flex; align-items: center; gap: 12px">
+                <div>
                     <div class="task-icon">{{ task.icon }}</div>
-                    <div>
-                        <h3 style="margin: 0">{{ task.name }}</h3>
-                    </div>
+                    <div class="task-title">{{ task.name }}</div>
                 </div>
                 <button nz-button nzType="text" nz-dropdown [nzDropdownMenu]="menu" (click)="$event.stopPropagation()" class="more-btn"
                     aria-label="More Options" title="More Options">
