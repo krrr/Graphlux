@@ -107,10 +107,10 @@ import { PropsFinishComponent } from './props-finish.component';
     styles: [`
         .property-editor {
             position: absolute;
-            top: 16px;
+            top: 66px;
             right: 16px;
             width: 380px;
-            max-height: calc(100% - 32px);
+            max-height: calc(100% - 82px);
             background-color: #ffffff;
             border-radius: 2px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);

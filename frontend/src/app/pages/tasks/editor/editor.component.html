@@ -58,8 +58,7 @@
         <app-node-properties [(visible)]="isPropertyPanelVisible" [node]="selectedNode()" />
     </div>
 
-        <nz-modal [nzVisible]="isExecuteModalVisible()" (nzVisibleChange)="isExecuteModalVisible.set($event)"
-
+    <nz-modal [nzVisible]="isExecuteModalVisible()" (nzVisibleChange)="isExecuteModalVisible.set($event)"
         nzTitle="Execute DAG" (nzOnCancel)="handleExecuteCancel()" (nzOnOk)="handleExecuteOk()">
         <ng-container *nzModalContent>
             <form nz-form nzLayout="vertical">

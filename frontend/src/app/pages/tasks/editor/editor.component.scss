@@ -2,10 +2,16 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
+    position: relative;
 }
 .toolbar {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
     padding: 10px 20px;
-    background-color: #ffffff;
+    background-color: #ffffff99;
+    backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border-color-split);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
     z-index: 10;
