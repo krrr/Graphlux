@@ -41,10 +41,10 @@ def update_autostart_registry(enable: bool):
         if enable:
             # We assume sys.argv[0] is the correct path to the executable when packaged
             executable_path = sys.executable if getattr(sys, "frozen", False) else sys.argv[0]
-            winreg.SetValueEx(key, "CyberHamster", 0, winreg.REG_SZ, f'"{executable_path}"')
+            winreg.SetValueEx(key, "Graphlux", 0, winreg.REG_SZ, f'"{executable_path}"')
         else:
             try:
-                winreg.DeleteValue(key, "CyberHamster")
+                winreg.DeleteValue(key, "Graphlux")
             except FileNotFoundError:
                 pass
         winreg.CloseKey(key)
@@ -72,8 +72,8 @@ async def execute_task_endpoint(request: ExecutionRequest):
 
     task_json = request.task
     if request.task_id is not None:
-        from cyberhamster.db import engine
-        from cyberhamster.models import Task
+        from graphlux.db import engine
+        from graphlux.models import Task
         with Session(engine) as session:
             task_obj = session.get(Task, request.task_id)
             if not task_obj:

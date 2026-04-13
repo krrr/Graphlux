@@ -3,7 +3,7 @@ import os
 import shutil
 import tempfile
 from unittest.mock import patch, MagicMock
-from cyberhamster.engine.executor import TaskExecutor
+from graphlux.engine.executor import TaskExecutor
 
 # Create a dummy image for testing
 @pytest.fixture
@@ -43,9 +43,9 @@ SCENARIO_1_DAG = {
     ]
 }
 
-@patch('cyberhamster.tools.pyexiv2_wrapper.Pyexiv2Wrapper.read_metadata')
-@patch('cyberhamster.tools.imagemagick_wrapper.ImageMagickWrapper.run')
-@patch('cyberhamster.tools.pyexiv2_wrapper.Pyexiv2Wrapper.write_metadata')
+@patch('graphlux.tools.pyexiv2_wrapper.Pyexiv2Wrapper.read_metadata')
+@patch('graphlux.tools.imagemagick_wrapper.ImageMagickWrapper.run')
+@patch('graphlux.tools.pyexiv2_wrapper.Pyexiv2Wrapper.write_metadata')
 def test_scenario_1_success_branch(mock_write_meta, mock_imagemagick_run, mock_read_meta, dummy_image):
     # Setup mocks
     mock_read_meta.return_value = {} # No skip metadata
@@ -69,9 +69,9 @@ def test_scenario_1_success_branch(mock_write_meta, mock_imagemagick_run, mock_r
     if os.path.exists(new_dest):
         os.remove(new_dest)
 
-@patch('cyberhamster.tools.pyexiv2_wrapper.Pyexiv2Wrapper.read_metadata')
-@patch('cyberhamster.tools.imagemagick_wrapper.ImageMagickWrapper.run')
-@patch('cyberhamster.tools.pyexiv2_wrapper.Pyexiv2Wrapper.write_metadata')
+@patch('graphlux.tools.pyexiv2_wrapper.Pyexiv2Wrapper.read_metadata')
+@patch('graphlux.tools.imagemagick_wrapper.ImageMagickWrapper.run')
+@patch('graphlux.tools.pyexiv2_wrapper.Pyexiv2Wrapper.write_metadata')
 def test_scenario_1_fail_branch(mock_write_meta, mock_imagemagick_run, mock_read_meta, dummy_image):
     # Setup mocks
     mock_read_meta.return_value = {} # No skip metadata

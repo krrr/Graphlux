@@ -10,10 +10,10 @@ import ctypes
 import argparse
 from pystray import MenuItem as item
 
-# Add current dir to sys.path so cyberhamster can be imported correctly
+# Add current dir to sys.path so graphlux can be imported correctly
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from cyberhamster import app
+from graphlux import app
 
 # Global state
 window = None
@@ -29,7 +29,7 @@ def run_server():
 def main():
     global window, should_exit
 
-    parser = argparse.ArgumentParser(description="CyberHamster GUI")
+    parser = argparse.ArgumentParser(description="Graphlux GUI")
     parser.add_argument("--web-debug", action="store_true", help="Start in web debug mode (no backend, use localhost:4200)")
     args = parser.parse_args()
 
@@ -82,7 +82,7 @@ def main():
         os._exit(0)  # Force exit to cleanly kill the uvicorn daemon thread
 
     def setup_tray():
-        icon = pystray.Icon("CyberHamster", 'E:\\workspace\\CyberHamster\\backend\\dist\\run_gui.dist\\run_gui.exe', "CyberHamster", menu=pystray.Menu(
+        icon = pystray.Icon("Graphlux", 'E:\\workspace\\Graphlux\\backend\\dist\\run_gui.dist\\run_gui.exe', "Graphlux", menu=pystray.Menu(
             item('Open', show_window, default=True),
             item('Quit', quit_app)
         ))
@@ -102,7 +102,7 @@ def main():
         if show_requested.wait(timeout=1):
             show_requested.clear()
             if not window:
-                window = webview.create_window("CyberHamster", url, width=1424, height=1068, transparent=True)
+                window = webview.create_window("Graphlux", url, width=1424, height=1068, transparent=True)
                 window.events.closing += on_closing
                 window.events.closed += on_closed
                 webview.start()

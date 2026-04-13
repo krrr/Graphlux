@@ -43,10 +43,10 @@ class Pyexiv2Wrapper:
                     prefix_lower = prefix.lower()
                     if prefix_lower == 'xmp':
                         # pyexiv2 format: 'Xmp.ns.tag'
-                        xmp_tags[f"Xmp.CyberHamster.{tag}"] = value
+                        xmp_tags[f"Xmp.Graphlux.{tag}"] = value
 
                 if xmp_tags:
-                    pyexiv2.registerNs('CyberHamster metadata', 'CyberHamster')
+                    pyexiv2.registerNs('Graphlux metadata', 'Graphlux')
                     img.modify_xmp(xmp_tags)
             return True
         except Exception as e:

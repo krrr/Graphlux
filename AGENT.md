@@ -1,5 +1,5 @@
 # Background
-The CyberHamster project is a automated batch processing and compressing of images and videos, utilizing a Directed Acyclic Graph (DAG) node pipeline architecture. It provides a web interface, allowing local or remote access.
+The Graphlux project is a automated batch processing and compressing of images and videos, utilizing a Directed Acyclic Graph (DAG) node pipeline architecture. It provides a web interface, allowing local or remote access.
 
 # Frontend
 - Frontend uses Angular with the ng-zorro-antd UI component library. Use the <nz-tabs> element as tab component, <nz-tabset> is deprecated.

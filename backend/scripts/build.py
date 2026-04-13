@@ -4,7 +4,7 @@ import sys
 import shutil
 
 def build():
-    # Get the project root directory (CyberHamster/backend)
+    # Get the project root directory (Graphlux/backend)
     backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     os.chdir(backend_dir)
 
@@ -27,7 +27,7 @@ def build():
         # "--windows-console-mode=disable",
         
         # Include our main package
-        "--include-package=cyberhamster",
+        "--include-package=graphlux",
         
         "--nofollow-import-to=cryptography",
         "--nofollow-import-to=tornado",

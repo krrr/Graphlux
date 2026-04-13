@@ -1,4 +1,4 @@
-# CyberHamster Backend
+# Graphlux Backend
 
 A DAG-based image and video processing backend built with FastAPI.
 

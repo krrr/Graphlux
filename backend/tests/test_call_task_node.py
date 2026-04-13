@@ -2,9 +2,9 @@ import pytest
 import os
 import tempfile
 from sqlmodel import Session, SQLModel, create_engine
-from cyberhamster.engine.executor import TaskExecutor
-from cyberhamster.models import Task
-from cyberhamster.engine.nodes import CallTaskNode
+from graphlux.engine.executor import TaskExecutor
+from graphlux.models import Task
+from graphlux.engine.nodes import CallTaskNode
 from unittest.mock import MagicMock, patch
 
 # In-memory SQLite for testing
@@ -27,7 +27,7 @@ def dummy_image():
         os.remove(path)
 
 # Mocking nodes.engine so it uses our in-memory engine
-@patch("cyberhamster.engine.nodes.engine", engine)
+@patch("graphlux.engine.nodes.engine", engine)
 def test_call_task_node_execution(session, dummy_image):
     # 1. Setup a sub-task in the DB
     sub_dag = {
@@ -67,7 +67,7 @@ def test_call_task_node_execution(session, dummy_image):
     
     assert success is True
 
-@patch("cyberhamster.engine.nodes.engine", engine)
+@patch("graphlux.engine.nodes.engine", engine)
 def test_call_task_node_with_cache(session, dummy_image):
     # 1. Sub-task DAG
     sub_dag = {
@@ -100,7 +100,7 @@ def test_call_task_node_with_cache(session, dummy_image):
     success = executor.execute_with_file(dummy_image)
     assert success is True
 
-@patch("cyberhamster.engine.nodes.engine", engine)
+@patch("graphlux.engine.nodes.engine", engine)
 def test_preload_tasks_recursive(session):
     sub_sub_dag = {
         "start_node": "ss",

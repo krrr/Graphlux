@@ -4,10 +4,10 @@ from contextlib import asynccontextmanager
 import asyncio
 import os
 
-from cyberhamster.api import router as api_router, __version__
-from cyberhamster.db import init_db, get_session
-from cyberhamster.task_manager import task_manager
-from cyberhamster.tools.imagemagick_wrapper import magick_pool_reaper
+from graphlux.api import router as api_router, __version__
+from graphlux.db import init_db, get_session
+from graphlux.task_manager import task_manager
+from graphlux.tools.imagemagick_wrapper import magick_pool_reaper
 
 
 @asynccontextmanager
@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
     task_manager.stop()
 
 
-app = FastAPI(title="CyberHamster Backend", lifespan=lifespan)
+app = FastAPI(title="Graphlux Backend", lifespan=lifespan)
 app.include_router(api_router, prefix='/api')
 
 

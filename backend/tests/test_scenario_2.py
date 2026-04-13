@@ -2,7 +2,7 @@ import pytest
 import os
 import tempfile
 from unittest.mock import patch
-from cyberhamster.engine.executor import TaskExecutor
+from graphlux.engine.executor import TaskExecutor
 
 @pytest.fixture
 def dummy_mp4():
@@ -44,9 +44,9 @@ SCENARIO_2_DAG = {
     ]
 }
 
-@patch('cyberhamster.tools.pyexiv2_wrapper.Pyexiv2Wrapper.read_metadata')
-@patch('cyberhamster.tools.ffmpeg_wrapper.FFmpegWrapper.run')
-@patch('cyberhamster.tools.pyexiv2_wrapper.Pyexiv2Wrapper.write_metadata')
+@patch('graphlux.tools.pyexiv2_wrapper.Pyexiv2Wrapper.read_metadata')
+@patch('graphlux.tools.ffmpeg_wrapper.FFmpegWrapper.run')
+@patch('graphlux.tools.pyexiv2_wrapper.Pyexiv2Wrapper.write_metadata')
 def test_scenario_2_success(mock_write_meta, mock_ffmpeg_run, mock_read_meta, dummy_mp4):
     mock_read_meta.return_value = {} # Not processed yet
     

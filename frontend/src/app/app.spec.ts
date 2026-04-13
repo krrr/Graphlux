@@ -28,6 +28,6 @@ describe('App', () => {
         const fixture = TestBed.createComponent(AppComponent);
         fixture.detectChanges();
         const compiled = fixture.nativeElement as HTMLElement;
-        expect(compiled.querySelector('h2')?.textContent).toContain('CyberHamster');
+        expect(compiled.querySelector('h2')?.textContent).toContain('Graphlux');
     });
 });
