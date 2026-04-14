@@ -36,7 +36,7 @@ import { PropsBase } from './props-base';
                     nzPlaceHolder="Select source node"
                     name="input_file_var"
                 >
-                    @for (i of availableVariables; track i) {
+                    @for (i of availableVariables; track i.value) {
                         <nz-option [nzValue]="i.value" [nzLabel]="i.label"></nz-option>
                     }
                 </nz-select>

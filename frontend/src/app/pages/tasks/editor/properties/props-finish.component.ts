@@ -20,7 +20,7 @@ import { PropsBase } from './props-base';
                 <nz-select [ngModel]="config().result_var" (ngModelChange)="updateConfig('result_var', $event)"
                     name="finish_result_var">
                     <nz-option [nzValue]="null" nzLabel="None" />
-                    @for (i of availableVariables; track i) {
+                    @for (i of availableVariables; track i.value) {
                         <nz-option [nzValue]="i.value" [nzLabel]="i.label"></nz-option>
                     }
                 </nz-select>

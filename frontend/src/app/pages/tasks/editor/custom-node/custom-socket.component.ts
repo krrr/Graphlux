@@ -13,6 +13,11 @@ import { Component, Input, HostBinding, ChangeDetectorRef, OnChanges } from '@an
                 border-radius: 50%;
                 border: 2px solid white;
                 box-shadow: 0 0 0 1px var(--primary-color-tint);
+                transition: background 0.3s, box-shadow 0.3s;
+            }
+            :host:hover {
+                background: var(--primary-color);
+                box-shadow: 0 0 0 1px var(--primary-color);
             }
         `,
     ],

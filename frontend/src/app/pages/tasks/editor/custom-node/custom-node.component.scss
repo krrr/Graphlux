@@ -1,5 +1,4 @@
 :host {
-    display: block;
     user-select: none;  // prevent text selection during dragging
 }
 
@@ -104,6 +103,8 @@
     background: #fafafa;
     border-top: 1px solid #f0f0f0;
     font-size: 11px;
+    border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
 }
 
 .config-row {

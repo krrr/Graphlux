@@ -29,7 +29,7 @@ import { PropsBase } from './props-base';
             <nz-form-control>
                 <nz-select [ngModel]="config().target_file_var" (ngModelChange)="updateConfig('target_file_var', $event)"
                     nzPlaceHolder="Select target node" name="target_file_var">
-                    @for (i of availableVariables; track i) {
+                    @for (i of availableVariables; track i.value) {
                         <nz-option [nzValue]="i.value" [nzLabel]="i.label" />
                     }
                 </nz-select>

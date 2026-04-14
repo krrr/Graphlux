@@ -12,7 +12,7 @@ import { ApiService } from './api.service';
     template: `
         <nz-layout class="app-layout">
             <nz-sider nzWidth="200px" nzTheme="light">
-                <div class="logo">
+                <div class="logo-div">
                     <img src="favicon.svg" alt="Logo" style="height: 32px; margin-right: 8px;" />
                     <h2>Graphlux</h2>
                 </div>
@@ -45,20 +45,24 @@ import { ApiService } from './api.service';
         }
         nz-sider {
             border-right: 1px solid var(--border-color-split);
+            box-shadow: 2px 0px 4px rgba(0, 0, 0, 0.02);
             ::ng-deep .ant-menu-root {
                 border-right: none;
             }
         }
-        .logo {
+        .logo-div {
             height: 64px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-        }
-        .logo h2 {
-            margin: 0;
-            font-size: 18px;
+            border-bottom: 1px solid var(--border-color-split);
+            margin-bottom: 8px;
+            h2 {
+                margin: 0;
+                margin-left: 4px;
+                font-size: 18px;
+            }
         }
         .inner-content {
             height: 100%;
