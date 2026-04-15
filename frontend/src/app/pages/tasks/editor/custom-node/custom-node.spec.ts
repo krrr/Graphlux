@@ -17,6 +17,7 @@ import {
 
 import { CustomNodeComponent } from './custom-node.component';
 import { TaskNode } from '../editor.service';
+import { getTranslocoModule } from '../../../../test-shared';
 
 const icons: IconDefinition[] = [
     FolderOpenOutline,
@@ -35,7 +36,7 @@ describe('CustomNodeComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [CustomNodeComponent, NzIconModule.forRoot(icons)],
+            imports: [CustomNodeComponent, NzIconModule.forRoot(icons), getTranslocoModule()],
             providers: [provideHttpClient(), provideHttpClientTesting()],
         }).compileComponents();
 

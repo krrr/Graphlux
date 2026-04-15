@@ -5,17 +5,16 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { vi } from 'vitest';
-import { NzMessageService } from 'ng-zorro-antd/message';
 
 import { FoldersComponent } from './folders.component';
 import { ApiService } from '../../api.service';
 import { createDefaultFolderForm, Folder, FolderForm } from '../../interfaces/folder.interface';
+import { COMMON_TEST_PROVIDERS, getTranslocoModule, messageServiceSpy } from '../../test-shared';
 
 describe('Folders', () => {
     let component: FoldersComponent;
     let fixture: ComponentFixture<FoldersComponent>;
     let apiServiceSpy: any;
-    let messageServiceSpy: any;
 
     const mockFolders: Folder[] = [
         { id: 1, name: 'Folder 1', watch_folder: '/path1', status: 'active', tasks: [{ id: 1, name: 'Task 1' }], scan_interval: 60, real_time_watch: true },
@@ -37,19 +36,14 @@ describe('Folders', () => {
             listDirectory: vi.fn().mockReturnValue(of([]))
         };
 
-        messageServiceSpy = {
-            success: vi.fn(),
-            warning: vi.fn()
-        };
-
         await TestBed.configureTestingModule({
-            imports: [FoldersComponent, NoopAnimationsModule],
+            imports: [FoldersComponent, NoopAnimationsModule, getTranslocoModule()],
             providers: [
                 provideHttpClient(),
                 provideHttpClientTesting(),
                 provideRouter([]),
                 { provide: ApiService, useValue: apiServiceSpy },
-                { provide: NzMessageService, useValue: messageServiceSpy }
+                ...COMMON_TEST_PROVIDERS
             ],
         }).compileComponents();
 

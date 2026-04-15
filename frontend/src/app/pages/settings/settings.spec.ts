@@ -4,16 +4,15 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 import { vi } from 'vitest';
-import { NzMessageService } from 'ng-zorro-antd/message';
 
 import { SettingsComponent } from './settings.component';
 import { ApiService } from '../../api.service';
+import { COMMON_TEST_PROVIDERS, getTranslocoModule, messageServiceSpy } from '../../test-shared';
 
 describe('Settings', () => {
     let component: SettingsComponent;
     let fixture: ComponentFixture<SettingsComponent>;
     let apiServiceSpy: any;
-    let messageServiceSpy: any;
 
     beforeEach(async () => {
         apiServiceSpy = {
@@ -27,17 +26,14 @@ describe('Settings', () => {
             updateSettings: vi.fn().mockReturnValue(of({}))
         };
 
-        messageServiceSpy = {
-            success: vi.fn()
-        };
 
         await TestBed.configureTestingModule({
-            imports: [SettingsComponent, NoopAnimationsModule],
+            imports: [SettingsComponent, NoopAnimationsModule, getTranslocoModule()],
             providers: [
                 provideHttpClient(),
                 provideHttpClientTesting(),
                 { provide: ApiService, useValue: apiServiceSpy },
-                { provide: NzMessageService, useValue: messageServiceSpy }
+                ...COMMON_TEST_PROVIDERS
             ],
         }).compileComponents();
 

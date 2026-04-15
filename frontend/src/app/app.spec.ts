@@ -1,15 +1,16 @@
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
-import { appConfig } from './app.config';
-
+import { provideNzIcons } from 'ng-zorro-antd/icon';
 import { ActivatedRoute } from '@angular/router';
+import { getTranslocoModule } from './test-shared';
+import { ApartmentOutline, FolderOpenOutline, SettingOutline } from '@ant-design/icons-angular/icons';
 
 describe('App', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [AppComponent],
+            imports: [AppComponent, getTranslocoModule()],
             providers: [
-                ...(appConfig.providers),
+                provideNzIcons([ApartmentOutline, FolderOpenOutline, SettingOutline]),
                 {
                     provide: ActivatedRoute,
                     useValue: {},

@@ -7,18 +7,16 @@ import { of, throwError } from 'rxjs';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { TasksComponent } from './tasks.component';
 import { ApiService } from '../../api.service';
-import { NzMessageService } from 'ng-zorro-antd/message';
-import { NzModalService } from 'ng-zorro-antd/modal';
 import { provideNzIcons } from 'ng-zorro-antd/icon';
 import { EditOutline, DeleteOutline, PlusOutline, MoreOutline, FolderOutline } from '@ant-design/icons-angular/icons';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzDropdownModule } from 'ng-zorro-antd/dropdown';
+import { COMMON_TEST_PROVIDERS, getTranslocoModule, messageServiceSpy } from '../../test-shared';
 
 describe('TasksComponent', () => {
     let component: TasksComponent;
     let fixture: ComponentFixture<TasksComponent>;
     let apiServiceSpy: any;
-    let messageServiceSpy: any;
     let modalServiceSpy: any;
     let routerSpy: any;
 
@@ -35,12 +33,6 @@ describe('TasksComponent', () => {
             deleteTask: vi.fn().mockReturnValue(of({}))
         };
 
-        messageServiceSpy = {
-            success: vi.fn(),
-            warning: vi.fn(),
-            error: vi.fn()
-        };
-
         modalServiceSpy = {
             confirm: vi.fn()
         };
@@ -51,14 +43,14 @@ describe('TasksComponent', () => {
         };
 
         await TestBed.configureTestingModule({
-            imports: [TasksComponent, NoopAnimationsModule, NzMenuModule, NzDropdownModule],
+            imports: [TasksComponent, NoopAnimationsModule, NzMenuModule, NzDropdownModule, getTranslocoModule()],
             providers: [
                 provideHttpClient(),
                 provideHttpClientTesting(),
                 provideRouter([]),
                 provideNzIcons([EditOutline, DeleteOutline, PlusOutline, MoreOutline, FolderOutline]),
+                ...COMMON_TEST_PROVIDERS,
                 { provide: ApiService, useValue: apiServiceSpy },
-                { provide: NzMessageService, useValue: messageServiceSpy },
                 { provide: Router, useValue: routerSpy }
             ],
         }).compileComponents();

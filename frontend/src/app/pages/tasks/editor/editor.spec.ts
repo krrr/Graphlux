@@ -4,10 +4,10 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ActivatedRoute } from '@angular/router';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
-import { NzMessageService } from 'ng-zorro-antd/message';
 import { ApiService } from '../../../api.service';
 import { EditorService } from './editor.service';
 import { vi } from 'vitest';
+import { COMMON_TEST_PROVIDERS, getTranslocoModule, messageServiceSpy } from '../../../test-shared';
 
 import { EditorComponent } from './editor.component';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
@@ -19,7 +19,6 @@ describe('EditorComponent', () => {
     let component: EditorComponent;
     let fixture: ComponentFixture<EditorComponent>;
     let apiServiceSpy: any;
-    let messageServiceSpy: any;
 
     beforeEach(async () => {
         apiServiceSpy = {
@@ -29,24 +28,19 @@ describe('EditorComponent', () => {
             connectLogsWebSocket: vi.fn(),
             disconnectLogsWebSocket: vi.fn(),
         };
-        messageServiceSpy = {
-            success: vi.fn(),
-            error: vi.fn(),
-            warning: vi.fn(),
-        };
 
         await TestBed.configureTestingModule({
-            imports: [EditorComponent, NoopAnimationsModule],
+            imports: [EditorComponent, NoopAnimationsModule, getTranslocoModule()],
             providers: [
                 provideHttpClient(),
                 provideHttpClientTesting(),
                 { provide: ApiService, useValue: apiServiceSpy },
-                { provide: NzMessageService, useValue: messageServiceSpy },
                 {
                     provide: ActivatedRoute,
                     useValue: { paramMap: of(new Map([['id', '1']])) }
                 },
-                EditorService
+                EditorService,
+                ...COMMON_TEST_PROVIDERS
             ],
         })
         .overrideComponent(EditorComponent, {

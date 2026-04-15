@@ -4,6 +4,7 @@ import { vi } from 'vitest';
 
 import { FileDialogComponent } from './file-dialog.component';
 import { ApiService } from '../../api.service';
+import { getTranslocoModule } from '../../test-shared';
 
 describe('FileDialogComponent', () => {
     let component: FileDialogComponent;
@@ -21,7 +22,7 @@ describe('FileDialogComponent', () => {
         };
 
         await TestBed.configureTestingModule({
-            imports: [FileDialogComponent],
+            imports: [FileDialogComponent, getTranslocoModule()],
             providers: [
                 { provide: ApiService, useValue: apiServiceSpy }
             ]
