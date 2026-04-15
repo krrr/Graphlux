@@ -4,5 +4,6 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { FormsModule } from '@angular/forms';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { TranslocoModule } from '@jsverse/transloco';
 
-export const COMMON_IMPORTS = [CommonModule, FormsModule, NzMenuModule, NzIconModule, NzButtonModule, NzInputModule] as const;
+export const COMMON_IMPORTS = [CommonModule, FormsModule, NzMenuModule, NzIconModule, NzButtonModule, NzInputModule, TranslocoModule] as const;

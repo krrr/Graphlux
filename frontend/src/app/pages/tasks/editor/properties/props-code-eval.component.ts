@@ -12,45 +12,47 @@ import type { editor } from 'monaco-editor';
     standalone: true,
     imports: [NzFormModule, NzSelectModule, NzCodeEditorModule, ...COMMON_IMPORTS],
     template: `
-        <nz-form-item>
-            <nz-form-label style="width: 100%; text-align: left">Python Code</nz-form-label>
-            <nz-form-control>
-                <div class="editor-wrap" [class.expanded]="isExpanded()">
-                    <button nz-button nzShape="circle" class="expand-btn" (click)="toggleExpand()"
-                        [nzSize]="isExpanded() ? 'default' : 'small'" [title]="isExpanded() ? 'Minimize' : 'Expand'"
-                        [attr.aria-label]="isExpanded() ? 'Minimize' : 'Expand'">
-                        <i nz-icon [nzType]="isExpanded() ? 'fullscreen-exit' : 'fullscreen'"></i>
-                    </button>
-                    <nz-code-editor class="editor" [nzEditorOption]="editorOpt" [ngModel]="config().code"
-                        (ngModelChange)="updateConfig('code', $event)" (nzEditorInitialized)="onEditorInit($event)" />
-                </div>
-                @if (isExpanded()) {
-                    <div class="ant-modal-mask" (click)="toggleExpand()"></div>
-                }
-            </nz-form-control>
-        </nz-form-item>
-        <nz-form-item>
-            <nz-form-label>Quick Insert Variable</nz-form-label>
-            <nz-form-control>
-                <nz-input-group nzSearch [nzAddOnAfter]="suffixButton">
-                    <nz-select [(ngModel)]="selectedVarForInsert" name="quick_var" nzSize="small">
-                        @for (i of availableVariables; track i.value) {
-                            <nz-option [nzValue]="formatVarForCode(i.value)" [nzLabel]="i.label" />
-                        }
-                    </nz-select>
-                </nz-input-group>
-                <ng-template #suffixButton>
-                    <button nz-button (click)="insertVariableToCode()" nzSize="small">Insert</button>
-                </ng-template>
-            </nz-form-control>
-        </nz-form-item>
-        <nz-form-item>
-            <nz-form-label>Output Variable Name</nz-form-label>
-            <nz-form-control>
-                <input nz-input [ngModel]="config().output_var || 'eval_result'"
-                    (ngModelChange)="updateConfig('output_var', $event)" name="output_var" placeholder="eval_result" />
-            </nz-form-control>
-        </nz-form-item>
+        <ng-container *transloco="let t">
+            <nz-form-item>
+                <nz-form-label style="width: 100%; text-align: left">{{ t('props.python_code') }}</nz-form-label>
+                <nz-form-control>
+                    <div class="editor-wrap" [class.expanded]="isExpanded()">
+                        <button nz-button nzShape="circle" class="expand-btn" (click)="toggleExpand()"
+                            [nzSize]="isExpanded() ? 'default' : 'small'" [title]="isExpanded() ? t('editor.minimize') : t('editor.expand')"
+                            [attr.aria-label]="isExpanded() ? t('editor.minimize') : t('editor.expand')">
+                            <i nz-icon [nzType]="isExpanded() ? 'fullscreen-exit' : 'fullscreen'"></i>
+                        </button>
+                        <nz-code-editor class="editor" [nzEditorOption]="editorOpt" [ngModel]="config().code"
+                            (ngModelChange)="updateConfig('code', $event)" (nzEditorInitialized)="onEditorInit($event)" />
+                    </div>
+                    @if (isExpanded()) {
+                        <div class="ant-modal-mask" (click)="toggleExpand()"></div>
+                    }
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label>{{ t('props.quick_insert_var') }}</nz-form-label>
+                <nz-form-control>
+                    <nz-input-group nzSearch [nzAddOnAfter]="suffixButton">
+                        <nz-select [(ngModel)]="selectedVarForInsert" name="quick_var" nzSize="small">
+                            @for (i of availableVariables; track i.value) {
+                                <nz-option [nzValue]="formatVarForCode(i.value)" [nzLabel]="i.label" />
+                            }
+                        </nz-select>
+                    </nz-input-group>
+                    <ng-template #suffixButton>
+                        <button nz-button (click)="insertVariableToCode()" nzSize="small">{{ t('props.insert') }}</button>
+                    </ng-template>
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label>{{ t('props.output_var_name') }}</nz-form-label>
+                <nz-form-control>
+                    <input nz-input [ngModel]="config().output_var || 'eval_result'"
+                        (ngModelChange)="updateConfig('output_var', $event)" name="output_var" placeholder="eval_result" />
+                </nz-form-control>
+            </nz-form-item>
+        </ng-container>
     `,
     styles: [`
         .editor-wrap {

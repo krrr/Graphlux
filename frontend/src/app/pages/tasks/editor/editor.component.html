@@ -1,55 +1,55 @@
-<div class="editor-container">
+<div class="editor-container" *transloco="let t">
     <div class="toolbar">
         <span style="font-size: 16px">{{ task()?.name }}</span>
         <div style="flex-grow: 1"></div>
-        <button nz-button nzType="primary" (click)="saveDag()"><span nz-icon nzType="save"></span>Save</button>
-        <button nz-button nzType="default" (click)="showExecuteModal()"><nz-icon nzType="bug"/> Run</button>
+        <button nz-button nzType="primary" (click)="saveDag()"><span nz-icon nzType="save"></span>{{ t('editor.save') }}</button>
+        <button nz-button nzType="default" (click)="showExecuteModal()"><nz-icon nzType="bug"/> {{ t('editor.run') }}</button>
         <nz-divider nzType="vertical"/>
         <nz-space-compact>
-            <button nz-button nz-dropdown [nzDropdownMenu]="menu" nzTrigger="click" title="Add Node"><nz-icon nzType="plus" /></button>
+            <button nz-button nz-dropdown [nzDropdownMenu]="menu" nzTrigger="click" [title]="t('editor.add_node')"><nz-icon nzType="plus" /></button>
             <nz-dropdown-menu #menu="nzDropdownMenu">
                 <ul nz-menu>
-                    @for (t of availableNodes; track t) {
-                        <li nz-menu-item (click)="editorService.addNode(t)">
-                            <div class="node-menu-icon" [style.background-color]="NODE_INFO[t].color">
-                                <span nz-icon [nzType]="NODE_INFO[t].icon" class="node-menu-icon-inner"></span>
+                    @for (i of availableNodes; track i) {
+                        <li nz-menu-item (click)="editorService.addNode(i)">
+                            <div class="node-menu-icon" [style.background-color]="NODE_INFO[i].color">
+                                <span nz-icon [nzType]="NODE_INFO[i].icon" class="node-menu-icon-inner"></span>
                             </div>
-                            {{ NODE_INFO[t].label }}
+                            {{ t('node_types.' + i) }}
                         </li>
                     }
                 </ul>
             </nz-dropdown-menu>
-            <button nz-button nzType="default" (click)="autoArrange()" title="Auto Arrange"><nz-icon nzType="layout" /></button>
+            <button nz-button nzType="default" (click)="autoArrange()" [title]="t('editor.auto_arrange')"><nz-icon nzType="layout" /></button>
         </nz-space-compact>
                 
         <nz-divider nzType="vertical"/>
-        <button nz-button routerLink="/tasks/" title="Back"><nz-icon nzType="icon:back"/> Back</button>
+        <button nz-button routerLink="/tasks/" [title]="t('editor.back')"><nz-icon nzType="icon:back"/> {{ t('editor.back') }}</button>
     </div>
     <div class="main-content">
         <div class="rete-area" #rete></div>
 
         <div class="floating-toolbar">
             <div class="toolbar-group">
-                <button nz-button nzType="text" (click)="editorService.undo()" [disabled]="editorService.undoStack().length <= 1" title="Undo (Ctrl+Z)" nzSize="small">
+                <button nz-button nzType="text" (click)="editorService.undo()" [disabled]="editorService.undoStack().length <= 1" [title]="t('editor.undo')" nzSize="small">
                     <span nz-icon nzType="undo"></span>
                 </button>
-                <button nz-button nzType="text" (click)="editorService.redo()" [disabled]="editorService.redoStack().length === 0" title="Redo (Ctrl+Y)" nzSize="small">
+                <button nz-button nzType="text" (click)="editorService.redo()" [disabled]="editorService.redoStack().length === 0" [title]="t('editor.redo')" nzSize="small">
                     <span nz-icon nzType="redo"></span>
                 </button>
             </div>
 
             <div class="toolbar-group">
-                <button nz-button nzType="text" (click)="zoomOut()" nzSize="small" title="Zoom Out">
+                <button nz-button nzType="text" (click)="zoomOut()" nzSize="small" [title]="t('editor.zoom_out')">
                     <span nz-icon nzType="zoom-out"></span>
                 </button>
                 <span class="zoom-indicator">{{ zoomLevel() }}%</span>
-                <button nz-button nzType="text" (click)="zoomIn()" nzSize="small" title="Zoom In">
+                <button nz-button nzType="text" (click)="zoomIn()" nzSize="small" [title]="t('editor.zoom_in')">
                     <span nz-icon nzType="zoom-in"></span>
                 </button>
             </div>
 
             <div class="toolbar-group">
-                <button nz-button nzType="text" (click)="zoomFit()" nzSize="small" title="Fit to Screen">
+                <button nz-button nzType="text" (click)="zoomFit()" nzSize="small" [title]="t('editor.fit_to_screen')">
                     <span nz-icon nzType="icon:fit-screen"></span>
                 </button>
             </div>
@@ -59,15 +59,15 @@
     </div>
 
     <nz-modal [nzVisible]="isExecuteModalVisible()" (nzVisibleChange)="isExecuteModalVisible.set($event)"
-        nzTitle="Execute DAG" (nzOnCancel)="handleExecuteCancel()" (nzOnOk)="handleExecuteOk()">
+        [nzTitle]="t('editor.execute_dag')" (nzOnCancel)="handleExecuteCancel()" (nzOnOk)="handleExecuteOk()">
         <ng-container *nzModalContent>
             <form nz-form nzLayout="vertical">
                 <nz-form-item>
-                    <nz-form-label nzRequired>Input File Path (Absolute)</nz-form-label>
-                    <nz-form-control nzErrorTip="Please input the file path!">
+                    <nz-form-label nzRequired>{{ t('editor.input_file_path') }}</nz-form-label>
+                    <nz-form-control [nzErrorTip]="t('editor.placeholder_file_path')">
                         <div style="display: flex; gap: 8px">
                             <input nz-input [(ngModel)]="executeFilePath" name="executeFilePath" />
-                            <button nz-button type="button" (click)="openFileDialog()">Browse...</button>
+                            <button nz-button type="button" (click)="openFileDialog()">{{ t('editor.browse') }}</button>
                         </div>
                     </nz-form-control>
                 </nz-form-item>
@@ -76,7 +76,7 @@
     </nz-modal>
 
     <nz-modal [nzVisible]="isLogsModalVisible()" (nzVisibleChange)="isLogsModalVisible.set($event)"
-        nzTitle="Console Logs" (nzOnCancel)="handleLogsClose()" [nzFooter]="null" nzWidth="800px">
+        [nzTitle]="t('editor.console_logs')" (nzOnCancel)="handleLogsClose()" [nzFooter]="null" nzWidth="800px">
         <ng-container *nzModalContent>
             <div class="console">
                 <div class="logs-container">
@@ -84,7 +84,7 @@
                         <div>{{ log }}</div>
                     }
                     @if (logs().length === 0) {
-                        <div style="color: #666">Waiting for logs...</div>
+                        <div style="color: #666">{{ t('editor.waiting_for_logs') }}</div>
                     }
                 </div>
             </div>
@@ -93,36 +93,34 @@
 
     <!-- Context Menus -->
     <nz-dropdown-menu #contextMenu="nzDropdownMenu">
-        @if (!!selectedNode()) {
-            <ul nz-menu>
-                <li nz-menu-item (click)="cloneSelectedNode()"><span nz-icon nzType="copy" nzTheme="outline"></span>Clone
+        <ul nz-menu class="editor-menu">
+            @if (!!selectedNode()) {
+                <li nz-menu-item (click)="cloneSelectedNode()"><span nz-icon nzType="copy" nzTheme="outline"></span>{{ t('editor.clone') }}
                 </li>
                 <li nz-menu-item (click)="deleteSelectedNode()"><span nz-icon nzType="delete"
-                        nzTheme="outline"></span>Delete</li>
+                        nzTheme="outline"></span>{{ t('editor.delete') }}</li>
                 <li nz-menu-divider></li>
-                <li nz-submenu nzTitle="Change Type" nzIcon="swap">
+                <li nz-submenu [nzTitle]="t('editor.change_type')" nzIcon="swap">
                     <ul>
-                        @for (t of availableNodes; track t) {
-                            <li nz-menu-item (click)="changeSelectedNodeType(t)">
-                                <div class="node-menu-icon" [style.background-color]="NODE_INFO[t].color">
-                                    <span nz-icon [nzType]="NODE_INFO[t].icon" class="node-menu-icon-inner"></span>
+                        @for (i of availableNodes; track i) {
+                            <li nz-menu-item (click)="changeSelectedNodeType(i)">
+                                <div class="node-menu-icon" [style.background-color]="NODE_INFO[i].color">
+                                    <span nz-icon [nzType]="NODE_INFO[i].icon" class="node-menu-icon-inner"></span>
                                 </div>
-                                {{ NODE_INFO[t].label }}
+                                {{ t('node_types.' + i) }}
                             </li>
                         }
                     </ul>
                 </li>
-            </ul>
-        } @else {
-            <ul nz-menu>
-                <li nz-submenu nzTitle="Add Node" nzIcon="plus">
+            } @else {
+                <li nz-submenu [nzTitle]="t('editor.add_node')" nzIcon="plus">
                     <ul>
-                        @for (t of availableNodes; track t) {
-                            <li nz-menu-item (click)="editorService.addNode(t)">
-                                <div class="node-menu-icon" [style.background-color]="NODE_INFO[t].color">
-                                    <span nz-icon [nzType]="NODE_INFO[t].icon" class="node-menu-icon-inner"></span>
+                        @for (i of availableNodes; track i) {
+                            <li nz-menu-item (click)="editorService.addNode(i)">
+                                <div class="node-menu-icon" [style.background-color]="NODE_INFO[i].color">
+                                    <span nz-icon [nzType]="NODE_INFO[i].icon" class="node-menu-icon-inner"></span>
                                 </div>
-                                {{ NODE_INFO[t].label }}
+                                {{ t('node_types.' + i) }}
                             </li>
                         }
                     </ul>
@@ -130,10 +128,10 @@
                 <li nz-menu-divider></li>
                 <li nz-menu-item (click)="autoArrange()">
                     <nz-icon nzType="layout"/>
-                    <span>Auto Arrange</span>
+                    <span>{{ t('editor.auto_arrange') }}</span>
                 </li>
-            </ul>
-        }
+            }
+        </ul>
     </nz-dropdown-menu>
 </div>
 

@@ -9,6 +9,7 @@ import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { PropsBase } from './props-base';
+import { COMMON_IMPORTS } from '../../../../shared-imports';
 
 @Component({
     selector: 'app-metadata-write-props',
@@ -21,58 +22,61 @@ import { PropsBase } from './props-base';
         NzSelectModule,
         NzTableModule,
         NzButtonModule,
-        NzIconModule
+        NzIconModule,
+        ...COMMON_IMPORTS
     ],
     template: `
-        <nz-form-item>
-            <nz-form-label>Target File Source</nz-form-label>
-            <nz-form-control>
-                <nz-select [ngModel]="config().target_file_var" (ngModelChange)="updateConfig('target_file_var', $event)"
-                    nzPlaceHolder="Select target node" name="target_file_var">
-                    @for (i of availableVariables; track i.value) {
-                        <nz-option [nzValue]="i.value" [nzLabel]="i.label" />
-                    }
-                </nz-select>
-            </nz-form-control>
-        </nz-form-item>
-
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-            <label style="color: rgba(0, 0, 0, 0.85); font-weight: 500;">Tags</label>
-            <button nz-button nzShape="circle" nzSize="small" (click)="addTag()" type="button" aria-label="Add Tag" title="Add Tag">
-                <span nz-icon nzType="plus"></span>
-            </button>
-        </div>
-
-        <nz-form-item>
-            <nz-form-control>
-                <nz-table #basicTable [nzData]="tagEntries" [nzShowPagination]="false" nzSize="small" [nzBordered]="true">
-                    <thead>
-                        <tr class="sm-tr-th">
-                            <th nzWidth="60%">Tag</th>
-                            <th>Value</th>
-                            <th nzWidth="24px"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (data of tagEntries; track data) {
-                            <tr>
-                            <td class="input-cell">
-                                <input nz-input [(ngModel)]="data.key" (ngModelChange)="syncTags()" placeholder="Tag" />
-                            </td>
-                            <td class="input-cell">
-                                <input nz-input [(ngModel)]="data.value" (ngModelChange)="syncTags()" placeholder="Value" />
-                            </td>
-                            <td class="sm-btn-cell">
-                                <button nz-button nzType="text" (click)="removeTag($index)" type="button" nzSize="small" aria-label="Remove Tag" title="Remove Tag">
-                                    <span nz-icon nzType="delete"></span>
-                                </button>
-                            </td>
-                        </tr>
+        <ng-container *transloco="let t">
+            <nz-form-item>
+                <nz-form-label>{{ t('props.target_file_source') }}</nz-form-label>
+                <nz-form-control>
+                    <nz-select [ngModel]="config().target_file_var" (ngModelChange)="updateConfig('target_file_var', $event)"
+                        [nzPlaceHolder]="t('props.placeholder_select_source')" name="target_file_var">
+                        @for (i of availableVariables; track i.value) {
+                            <nz-option [nzValue]="i.value" [nzLabel]="i.label" />
                         }
-                    </tbody>
-                </nz-table>
-            </nz-form-control>
-        </nz-form-item>
+                    </nz-select>
+                </nz-form-control>
+            </nz-form-item>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                <label style="color: rgba(0, 0, 0, 0.85); font-weight: 500;">{{ t('props.tags') }}</label>
+                <button nz-button nzShape="circle" nzSize="small" (click)="addTag()" type="button" [attr.aria-label]="t('props.add_tag')" [title]="t('props.add_tag')">
+                    <span nz-icon nzType="plus"></span>
+                </button>
+            </div>
+
+            <nz-form-item>
+                <nz-form-control>
+                    <nz-table #basicTable [nzData]="tagEntries" [nzShowPagination]="false" nzSize="small" [nzBordered]="true">
+                        <thead>
+                            <tr class="sm-tr-th">
+                                <th nzWidth="60%">{{ t('props.tag') }}</th>
+                                <th>{{ t('props.value') }}</th>
+                                <th nzWidth="24px"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (data of tagEntries; track data) {
+                                <tr>
+                                <td class="input-cell">
+                                    <input nz-input [(ngModel)]="data.key" (ngModelChange)="syncTags()" [placeholder]="t('props.tag')" />
+                                </td>
+                                <td class="input-cell">
+                                    <input nz-input [(ngModel)]="data.value" (ngModelChange)="syncTags()" [placeholder]="t('props.value')" />
+                                </td>
+                                <td class="sm-btn-cell">
+                                    <button nz-button nzType="text" (click)="removeTag($index)" type="button" nzSize="small" [attr.aria-label]="t('props.remove_tag')" [title]="t('props.remove_tag')">
+                                        <span nz-icon nzType="delete"></span>
+                                    </button>
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </nz-table>
+                </nz-form-control>
+            </nz-form-item>
+        </ng-container>
     `
 })
 export class PropsMetadataWriteComponent extends PropsBase implements OnChanges {

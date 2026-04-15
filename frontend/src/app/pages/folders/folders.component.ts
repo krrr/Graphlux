@@ -20,6 +20,7 @@ import { FileDialogComponent } from '../../components/file-dialog/file-dialog.co
 import { Folder, FolderForm, createDefaultFolderForm } from '../../interfaces/folder.interface';
 import { Task } from '../../interfaces/task.interface';
 import { BehaviorSubject, switchMap } from 'rxjs';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
     selector: 'app-folders',

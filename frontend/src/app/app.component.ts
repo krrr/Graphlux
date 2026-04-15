@@ -3,6 +3,7 @@ import { RouterModule } from '@angular/router';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { COMMON_IMPORTS } from './shared-imports';
 import { ApiService } from './api.service';
+import { LanguageService } from './i18n/language.service';
 
 
 @Component({
@@ -10,7 +11,7 @@ import { ApiService } from './api.service';
     standalone: true,
     imports: [RouterModule, NzLayoutModule, ...COMMON_IMPORTS],
     template: `
-        <nz-layout class="app-layout">
+        <nz-layout class="app-layout" *transloco="let t">
             <nz-sider nzWidth="200px" nzTheme="light">
                 <div class="logo-div">
                     <img src="favicon.svg" alt="Logo" style="height: 32px; margin-right: 8px;" />
@@ -18,13 +19,13 @@ import { ApiService } from './api.service';
                 </div>
                 <ul nz-menu nzMode="inline">
                     <li nz-menu-item nzMatchRouter>
-                        <a routerLink="/tasks"><nz-icon nzType="apartment" /> Tasks</a>
+                        <a routerLink="/tasks"><nz-icon nzType="apartment" /> {{ t('menu.tasks') }}</a>
                     </li>
                     <li nz-menu-item nzMatchRouter>
-                        <a routerLink="/folders"><nz-icon nzType="folder-open" /> Folders</a>
+                        <a routerLink="/folders"><nz-icon nzType="folder-open" /> {{ t('menu.folders') }}</a>
                     </li>
                     <li nz-menu-item nzMatchRouter>
-                        <a routerLink="/settings"><nz-icon nzType="setting" /> Settings</a>
+                        <a routerLink="/settings"><nz-icon nzType="setting" /> {{ t('menu.settings') }}</a>
                     </li>
                 </ul>
             </nz-sider>
@@ -77,8 +78,10 @@ import { ApiService } from './api.service';
 })
 export class AppComponent implements OnInit {
     apiService = inject(ApiService);
+    langService = inject(LanguageService);
 
     ngOnInit() {
+        this.langService.init();
         this.apiService.appInfo();  // preload, trigger manually
     }
 }

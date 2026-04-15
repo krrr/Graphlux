@@ -8,18 +8,19 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { PropsBase } from './props-base';
+import { COMMON_IMPORTS } from '../../../../shared-imports';
 
 @Component({
     selector: 'app-finish-props',
     standalone: true,
-    imports: [CommonModule, FormsModule, NzFormModule, NzInputModule, NzSwitchModule, NzSelectModule],
+    imports: [CommonModule, FormsModule, NzFormModule, NzInputModule, NzSwitchModule, NzSelectModule, ...COMMON_IMPORTS],
     template: `
-        <nz-form-item>
-            <nz-form-label>Result</nz-form-label>
+        <nz-form-item *transloco="let t">
+            <nz-form-label>{{ t('props.result') }}</nz-form-label>
             <nz-form-control>
                 <nz-select [ngModel]="config().result_var" (ngModelChange)="updateConfig('result_var', $event)"
                     name="finish_result_var">
-                    <nz-option [nzValue]="null" nzLabel="None" />
+                    <nz-option [nzValue]="null" [nzLabel]="t('props.none')" />
                     @for (i of availableVariables; track i.value) {
                         <nz-option [nzValue]="i.value" [nzLabel]="i.label"></nz-option>
                     }

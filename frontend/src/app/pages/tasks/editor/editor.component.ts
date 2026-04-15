@@ -24,6 +24,7 @@ import { FileDialogComponent } from '../../../components/file-dialog/file-dialog
 import { NodePropertiesComponent } from './properties/node-properties.component';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
+import { TranslocoService } from '@jsverse/transloco';
 
 
 type Schemes = GetSchemes<TaskNode, TaskConnection<TaskNode>>;
@@ -90,6 +91,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         private modal: NzModalService,
         private nzContextMenuService: NzContextMenuService,
         public editorService: EditorService,
+        private translocoService: TranslocoService,
     ) { }
 
     ngOnInit() {
@@ -322,11 +324,11 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         if (!node) return;
 
         if (node.type === 'StartNode') {
-            this.message.error('Cannot clone Start node (only one allowed)');
+            this.message.error(this.translocoService.translate('editor.msg_clone_start_node'));
             return;
         }
 
-        const newNode = new TaskNode(node.type, node.label + ' (Copy)');
+        const newNode = new TaskNode(node.type, node.label + this.translocoService.translate('editor.copy_suffix'));
         await this.editor.addNode(newNode);
 
         const config = this.editorService.nodeConfigs()[node.id]?.config || {};
@@ -344,7 +346,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         if (!node) return;
 
         if (node.type === 'StartNode') {
-            this.message.error('Cannot delete Start node. It is required.');
+            this.message.error(this.translocoService.translate('editor.msg_delete_start_node'));
             return;
         }
 
@@ -362,7 +364,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         if (!node) return;
 
         if (node.type === 'StartNode' || newType === 'StartNode') {
-            this.message.error('Cannot change to or from Start node');
+            this.message.error(this.translocoService.translate('editor.msg_change_start_node'));
             return;
         }
 
@@ -411,7 +413,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
 
     handleExecuteOk() {
         if (!this.executeFilePath()) {
-            this.message.warning('Please enter a file path');
+            this.message.warning(this.translocoService.translate('editor.msg_enter_file_path'));
             return;
         }
         this.isExecuteModalVisible.set(false);
@@ -428,7 +430,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
             next: (res) => console.log('Execution response:', res),
             error: (err) => {
                 console.error('Execution error:', err);
-                this.message.error('Execution failed');
+                this.message.error(this.translocoService.translate('editor.msg_execution_failed'));
             },
         });
     }
@@ -440,14 +442,14 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
 
     async saveDag() {
         if (!this.taskId) {
-            this.message.error('No Task ID associated with this editor');
+            this.message.error(this.translocoService.translate('editor.msg_no_task_id'));
             return;
         }
 
         const dagJson = this.editorService.serializeDag();
         try {
             await lastValueFrom(this.apiService.updateTask(this.taskId, { json_data: dagJson }))
-            this.message.success('Task saved successfully');
+            this.message.success(this.translocoService.translate('editor.msg_task_saved'));
         } catch (e: any) {
             this.message.error(e.error.detail);
         }

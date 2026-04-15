@@ -1,7 +1,7 @@
-<div class="tasks-container">
+<div class="tasks-container" *transloco="let t">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px">
-        <h2>Tasks</h2>
-        <button nz-button nzType="primary" (click)="showModal()"><nz-icon nzType="plus"/> Create Task</button>
+        <h2>{{ t('tasks.title') }}</h2>
+        <button nz-button nzType="primary" (click)='showModal()'><nz-icon nzType="plus"/> {{ t('tasks.create') }}</button>
     </div>
 
     @if (tasks().length > 0) {
@@ -19,14 +19,14 @@
                 </button>
                 <nz-dropdown-menu #menu="nzDropdownMenu">
                     <ul nz-menu>
-                        <li nz-menu-item (click)="showModal(task)"><nz-icon nzType="edit" />Edit Properties</li>
-                        <li nz-menu-item (click)="confirmDeleteTask(task)"><nz-icon nzType="delete" />Delete</li>
+                        <li nz-menu-item (click)="showModal(task)"><nz-icon nzType="edit" />{{ t('tasks.edit_properties') }}</li>
+                        <li nz-menu-item (click)="confirmDeleteTask(task)"><nz-icon nzType="delete" />{{ t('tasks.delete') }}</li>
                     </ul>
                 </nz-dropdown-menu>
             </div>
 
             <p style="color: #595959; margin-bottom: 16px; min-height: 40px" (click)="openEditor(task.id)">
-                {{ task.description || 'No description.' }}
+                {{ task.description || t('tasks.no_description') }}
             </p>
 
             <div class="folder-list" (click)="openEditor(task.id)">
@@ -36,7 +36,7 @@
                         <nz-tag [title]="f.watch_folder">{{ f.name }}</nz-tag>
                     }
                     @if (task.folders.length === 0) {
-                        <div><i>None</i></div>
+                        <div><i>{{ t('tasks.none') }}</i></div>
                     }
                 </div>
             </div>
@@ -46,21 +46,21 @@
     } @else {
     <nz-empty nzNotFoundImage="assets/empty.svg" [nzNotFoundContent]="contentTpl">
         <ng-template #contentTpl>
-            <span style="color: #8c8c8c; font-size: 16px">No tasks created yet</span>
+            <span style="color: #8c8c8c; font-size: 16px">{{ t('tasks.no_tasks') }}</span>
             <br />
-            <span style="color: #bfbfbf">Task define the processing pipeline for your files.</span>
+            <span style="color: #bfbfbf">{{ t('tasks.description_placeholder') }}</span>
         </ng-template>
     </nz-empty>
     }
 
     <nz-modal [nzVisible]="isModalVisible()" (nzVisibleChange)="isModalVisible.set($event)"
-        [nzTitle]="isEditing() ? 'Edit Task' : 'Create Task'" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()">
+        [nzTitle]="isEditing() ? t('tasks.edit') : t('tasks.create')" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()">
         <ng-container *nzModalContent>
             <form nz-form nzLayout="vertical">
                 <div nz-row [nzGutter]="16">
                     <div nz-col [nzSpan]="3">
                         <nz-form-item>
-                            <nz-form-label nzRequired>Icon</nz-form-label>
+                            <nz-form-label nzRequired>{{ t('tasks.icon') }}</nz-form-label>
                             <nz-form-control>
                                 <div class="emoji-trigger" nz-popover #pop="nzPopover" [nzPopoverContent]="emojiPickerTpl"
                                     nzPopoverTrigger="click" nzPopoverPlacement="bottomLeft"
@@ -75,21 +75,21 @@
                     </div>
                     <div nz-col [nzSpan]="21">
                         <nz-form-item>
-                            <nz-form-label nzRequired>Name</nz-form-label>
-                            <nz-form-control nzErrorTip="Please input the task name!">
+                            <nz-form-label nzRequired>{{ t('tasks.name') }}</nz-form-label>
+                            <nz-form-control [nzErrorTip]="t('tasks.name_required')">
                                 <input nz-input [ngModel]="taskForm().name" (ngModelChange)="updateForm('name', $event)"
-                                    name="name" placeholder="Task Name" />
+                                    name="name" [placeholder]="t('tasks.name')" />
                             </nz-form-control>
                         </nz-form-item>
                     </div>
                 </div>
 
                 <nz-form-item>
-                    <nz-form-label>Description</nz-form-label>
+                    <nz-form-label>{{ t('tasks.description') }}</nz-form-label>
                     <nz-form-control>
                         <textarea nz-input [ngModel]="taskForm().description"
                             (ngModelChange)="updateForm('description', $event)" name="description"
-                            placeholder="Description" rows="3"></textarea>
+                            [placeholder]="t('tasks.description')" rows="3"></textarea>
                     </nz-form-control>
                 </nz-form-item>
             </form>

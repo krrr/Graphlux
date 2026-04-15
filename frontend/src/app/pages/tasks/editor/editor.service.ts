@@ -3,6 +3,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { ClassicPreset, NodeEditor } from 'rete';
 import { AreaExtensions, AreaPlugin } from 'rete-area-plugin';
 import { Subject, Subscription } from 'rxjs';
+import { TranslocoService } from '@jsverse/transloco';
 
 
 export interface VariableInfo {
@@ -19,6 +20,7 @@ export class EditorService {
     nodeConfigs = signal<{ [id: string]: any }>({});
     message = inject(NzMessageService);
     change$ = new Subject<void>();
+    translocoService = inject(TranslocoService);
 
     // History state
     undoStack = signal<string[]>([]);
@@ -237,7 +239,7 @@ export class EditorService {
             return;
         }
 
-        const node = new TaskNode(nodeType, NODE_INFO[nodeType].label);
+        const node = new TaskNode(nodeType, this.translocoService.translate('node_types.' + nodeType));
         await this.editor.addNode(node);
         this.addNodeToConfig(node, node.label, {});
 

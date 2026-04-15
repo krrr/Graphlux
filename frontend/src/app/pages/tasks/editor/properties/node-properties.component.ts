@@ -1,5 +1,4 @@
 import { Component, input, model, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -15,12 +14,12 @@ import { PropsFileOperationComponent } from './props-file-operation.component';
 import { PropsMetadataWriteComponent } from './props-metadata-write.component';
 import { PropsCallTaskComponent } from './props-call-task.component';
 import { PropsFinishComponent } from './props-finish.component';
+import { COMMON_IMPORTS } from '../../../../shared-imports';
 
 @Component({
     selector: 'app-node-properties',
     standalone: true,
     imports: [
-        CommonModule,
         FormsModule,
         NzButtonModule,
         NzFormModule,
@@ -34,15 +33,16 @@ import { PropsFinishComponent } from './props-finish.component';
         PropsFileOperationComponent,
         PropsMetadataWriteComponent,
         PropsCallTaskComponent,
-        PropsFinishComponent
+        PropsFinishComponent,
+        ...COMMON_IMPORTS
     ],
     template: `
         @if (node() && visible()) {
-            <div class="property-editor" [animate.enter]="'panel-enter'" [animate.leave]="'panel-leave'">
+            <div class="property-editor" [animate.enter]="'panel-enter'" [animate.leave]="'panel-leave'" *transloco="let t">
                 <div class="title-area">
-                    <div class="title">Node Properties</div>
+                    <div class="title">{{ t('editor.node_properties') }}</div>
                     <button nz-button nzType="text" (click)="visible.set(false)" class="close-btn"
-                        aria-label="Close Properties Panel" title="Close Properties Panel">
+                        [attr.aria-label]="t('editor.close_panel')" [title]="t('editor.close_panel')">
                         <span nz-icon nzType="close"></span>
                     </button>
                 </div>
@@ -50,25 +50,25 @@ import { PropsFinishComponent } from './props-finish.component';
                 <div class="props-area">
                     <div class="ant-form">
                         <nz-form-item>
-                            <nz-form-label [nzSpan]="4" nzLabelAlign="left">Type</nz-form-label>
+                            <nz-form-label [nzSpan]="4" nzLabelAlign="left">{{ t('editor.type') }}</nz-form-label>
                             <nz-form-control>
-                                {{ node().type }}
+                                {{ t('node_types.' + node().type) }}
                                 <span nz-icon [nzType]="getNodeIcon(node().type)"></span>
                             </nz-form-control>
                         </nz-form-item>
                         <nz-form-item>
-                            <nz-form-label [nzSpan]="4" nzLabelAlign="left">Name</nz-form-label>
+                            <nz-form-label [nzSpan]="4" nzLabelAlign="left">{{ t('editor.name') }}</nz-form-label>
                             <nz-form-control>
                                 <input nz-input [ngModel]="node().label"
                                     (ngModelChange)="updateNodeName(node().id, $event)" name="nodeName"
-                                    placeholder="Node Name" />
+                                    [placeholder]="t('editor.placeholder_node_name')" />
                             </nz-form-control>
                         </nz-form-item>
                     </div>
 
                     <nz-divider [style.margin]="'12px 0'"></nz-divider>
 
-                    <div class="divider-title">Configuration</div>
+                    <div class="divider-title">{{ t('editor.configuration') }}</div>
                     <div class="ant-form">
                         @switch (node().type) {
                             @case ('MetadataReadNode') {
@@ -96,7 +96,7 @@ import { PropsFinishComponent } from './props-finish.component';
                                 <app-finish-props [nodeId]="node().id" />
                             }
                             @default {
-                                <i style="color: #6e6e6e">no properties.</i>
+                                <i style="color: #6e6e6e">{{ t('editor.no_properties') }}</i>
                             }
                         }
                     </div>

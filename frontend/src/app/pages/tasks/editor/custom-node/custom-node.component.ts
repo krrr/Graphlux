@@ -1,8 +1,9 @@
-import { Component, Input, ChangeDetectorRef, OnChanges } from '@angular/core';
+import { Component, Input, ChangeDetectorRef, OnChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { ReteModule } from 'rete-angular-plugin/18';
 import { NODE_INFO, TaskNode } from '../editor.service';
+import { TranslocoService } from '@jsverse/transloco';
 
 
 @Component({
@@ -18,6 +19,7 @@ export class CustomNodeComponent implements OnChanges {
     @Input() rendered!: () => void;
 
     seed = 0; // from official demo
+    private translocoService = inject(TranslocoService);
 
     get iconType(): string {
         return NODE_INFO[this.data.type]?.icon || 'setting';
@@ -92,7 +94,8 @@ export class CustomNodeComponent implements OnChanges {
             extension: 'ext',
             tool: 'tool'
         };
-        return labels[key] || key;
+        const shortKey = labels[key] || key;
+        return this.translocoService.translate('node.footer.' + shortKey);
     }
 
     getConfigValue(key: string) {

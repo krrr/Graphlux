@@ -1,18 +1,18 @@
-<div class="folders-container">
+<div class="folders-container" *transloco="let t">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px">
-        <h2>Folders</h2>
-        <button nz-button nzType="primary" (click)="showModal()"><nz-icon nzType="plus"/> Folder</button>
+        <h2>{{ t('folders.title') }}</h2>
+        <button nz-button nzType="primary" (click)="showModal()"><nz-icon nzType="plus"/> {{ t('folders.create') }}</button>
     </div>
 
     @if (folders().length > 0) {
     <nz-table #basicTable [nzData]="folders()" nzBordered>
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Watch Path</th>
-                <th>Tasks</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>{{ t('folders.name') }}</th>
+                <th>{{ t('folders.path') }}</th>
+                <th>{{ t('folders.tasks') }}</th>
+                <th>{{ t('folders.status') }}</th>
+                <th>{{ t('folders.actions') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -22,8 +22,8 @@
                 <td>{{ folder.watch_folder }}</td>
                 <td>
                     <div style="display: flex; flex-wrap: wrap; gap: 4px">
-                        @for (t of folder.tasks; track t.id) {
-                            @let fullTask = taskMap().get(t.id);
+                        @for (i of folder.tasks; track i.id) {
+                            @let fullTask = taskMap().get(i.id);
                             <nz-tag nzColor="blue">
                                 <span style="margin-right: 4px">{{ fullTask?.icon }}</span>
                                 {{ fullTask?.name }}
@@ -37,7 +37,7 @@
                     </nz-tag>
                 </td>
                 <td>
-                    <button nz-button nzType="text" title="Edit Folder" (click)="showModal(folder)">
+                    <button nz-button nzType="text" [title]="t('folders.edit')" (click)="showModal(folder)">
                         <nz-icon nzType="edit"/>
                     </button>
                     <nz-divider nzType="vertical"></nz-divider>
@@ -45,8 +45,8 @@
                         <nz-icon [nzType]="folder.status === 'active' ? 'pause-circle' : 'play-circle'"/>
                     </button>
                     <nz-divider nzType="vertical"></nz-divider>
-                    <button nz-button nzType="text" nzDanger nz-popconfirm title="Delete"
-                        nzPopconfirmTitle="Are you sure you want to delete this folder?"
+                    <button nz-button nzType="text" nzDanger nz-popconfirm [title]="t('tasks.delete')"
+                        [nzPopconfirmTitle]="t('folders.delete_confirm')"
                         (nzOnConfirm)="deleteFolder(folder.id!)">
                         <nz-icon nzType="delete"/>
                     </button>
@@ -58,67 +58,67 @@
     } @else {
     <nz-empty nzNotFoundImage="assets/empty.svg" [nzNotFoundContent]="contentTpl">
         <ng-template #contentTpl>
-            <span style="color: #8c8c8c; font-size: 16px">No folders configured yet</span>
+            <span style="color: #8c8c8c; font-size: 16px">{{ t('folders.no_folders') }}</span>
             <br />
-            <span style="color: #bfbfbf">Folders define the directories to watch for processing.</span>
+            <span style="color: #bfbfbf">{{ t('folders.description_placeholder') }}</span>
         </ng-template>
     </nz-empty>
     }
 
     <nz-modal [nzVisible]="isModalVisible()" (nzVisibleChange)="isModalVisible.set($event)"
-        [nzTitle]="isEditing() ? 'Edit Folder' : 'Create New Folder'" (nzOnCancel)="handleCancel()"
+        [nzTitle]="isEditing() ? t('folders.edit') : t('folders.new')" (nzOnCancel)="handleCancel()"
         (nzOnOk)="handleOk()" nzWidth="600px">
         <ng-container *nzModalContent>
             <form nz-form nzLayout="vertical" class="folder-prop-form">
-                <nz-tabs>
-                    <nz-tab nzTitle="General">
+                <nz-tabs [nzAnimated]="false">
+                    <nz-tab [nzTitle]="t('folders.general')">
                         <nz-form-item>
-                            <nz-form-label nzRequired>Name</nz-form-label>
-                            <nz-form-control nzErrorTip="Please input the folder name!">
+                            <nz-form-label nzRequired>{{ t('folders.name') }}</nz-form-label>
+                            <nz-form-control [nzErrorTip]="t('folders.name_required')">
                                 <input nz-input [ngModel]="folderForm().name"
                                     (ngModelChange)="updateForm('name', $event)" name="name"
-                                    placeholder="Folder Name" />
+                                    [placeholder]="t('folders.name')" />
                             </nz-form-control>
                         </nz-form-item>
 
                         <nz-form-item>
-                            <nz-form-label nzRequired>Watch Folder (Absolute path)</nz-form-label>
-                            <nz-form-control nzErrorTip="Please input the watch folder path!">
+                            <nz-form-label nzRequired>{{ t('folders.watch_path_label') }}</nz-form-label>
+                            <nz-form-control [nzErrorTip]="t('folders.path_required')">
                                 <div style="display: flex; gap: 8px">
                                     <input nz-input [ngModel]="folderForm().watch_folder"
                                         (ngModelChange)="updateForm('watch_folder', $event)" name="watch_folder"
                                         placeholder="/path/to/folder" />
                                     <button nz-button nzType="default" type="button"
-                                        (click)="openFileDialog()">Browse...</button>
+                                        (click)="openFileDialog()">{{ t('folders.browse') }}</button>
                                 </div>
                             </nz-form-control>
                         </nz-form-item>
 
                         <nz-form-item>
-                            <nz-form-label nzRequired>Tasks</nz-form-label>
-                            <nz-form-control nzErrorTip="Please select at least one task!">
+                            <nz-form-label nzRequired>{{ t('folders.tasks') }}</nz-form-label>
+                            <nz-form-control [nzErrorTip]="t('folders.tasks_required')">
                                 <nz-select nzMode="multiple" [ngModel]="folderForm().task_ids"
                                     (ngModelChange)="updateForm('task_ids', $event)" name="task_ids"
-                                    nzPlaceHolder="Select tasks">
-                                    @for (t of tasks(); track t.id) {
-                                        <nz-option [nzValue]="t.id" [nzLabel]="t.icon + ' ' + t.name"></nz-option>
+                                    [nzPlaceHolder]="t('folders.placeholder_select_tasks')">
+                                    @for (t_task of tasks(); track t_task.id) {
+                                        <nz-option [nzValue]="t_task.id" [nzLabel]="t_task.icon + ' ' + t_task.name"></nz-option>
                                     }
                                 </nz-select>
                             </nz-form-control>
                         </nz-form-item>
                     </nz-tab>
-                    <nz-tab nzTitle="Scan">
+                    <nz-tab [nzTitle]="t('folders.scan')">
                         <nz-form-item>
                             <nz-form-control>
                                 <label nz-checkbox [ngModel]="folderForm().real_time_watch"
                                     (ngModelChange)="updateForm('real_time_watch', $event)" name="real_time_watch">
-                                    Real-time watch (Watchdog)
+                                    {{ t('folders.real_time') }}
                                 </label>
                             </nz-form-control>
                         </nz-form-item>
 
                         <nz-form-item>
-                            <nz-form-label>Scan Interval (seconds, 0 to disable)</nz-form-label>
+                            <nz-form-label>{{ t('folders.scan_interval') }}</nz-form-label>
                             <nz-form-control>
                                 <input nz-input type="number" [ngModel]="folderForm().scan_interval"
                                     (ngModelChange)="updateForm('scan_interval', $event)" name="scan_interval" />
@@ -126,7 +126,7 @@
                         </nz-form-item>
 
                         <nz-form-item>
-                            <nz-form-label>Filename Regex (optional)</nz-form-label>
+                            <nz-form-label>{{ t('folders.regex') }}</nz-form-label>
                             <nz-form-control>
                                 <input nz-input [ngModel]="folderForm().filename_regex"
                                     (ngModelChange)="updateForm('filename_regex', $event)" name="filename_regex"

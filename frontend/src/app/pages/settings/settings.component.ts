@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../api.service';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -6,11 +6,14 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { COMMON_IMPORTS } from '../../shared-imports';
+import { LanguageService } from '../../i18n/language.service';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 
 @Component({
     selector: 'app-settings',
     standalone: true,
-    imports: [FormsModule, NzFormModule, NzInputModule, NzInputNumberModule, ...COMMON_IMPORTS],
+    imports: [FormsModule, NzFormModule, NzInputModule, NzInputNumberModule, NzSelectModule, ...COMMON_IMPORTS],
     templateUrl: './settings.component.html',
     styleUrls: ['./settings.component.scss'],
 })
@@ -21,6 +24,9 @@ export class SettingsComponent implements OnInit {
         max_concurrent_tasks: 4,
         auto_start: false,
     });
+    
+    langService = inject(LanguageService);
+    translocoService = inject(TranslocoService);
 
     constructor(
         public apiService: ApiService,
@@ -41,7 +47,7 @@ export class SettingsComponent implements OnInit {
 
     saveSettings() {
         this.apiService.updateSettings(this.settings()).subscribe(() => {
-            this.message.success('Settings saved successfully!');
+            this.message.success(this.translocoService.translate('settings.saved'));
         });
     }
 

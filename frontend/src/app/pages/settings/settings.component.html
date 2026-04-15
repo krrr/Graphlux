@@ -1,8 +1,19 @@
-<div class="settings-container">
-    <h2>Settings <small style="font-weight: normal; font-size: 0.6em; color: #888;">v{{apiService.appInfo()?.version}}</small></h2>
+<div class="settings-container" *transloco="let t">
+    <h2>{{ t('menu.settings') }} <small style="font-weight: normal; font-size: 0.6em; color: #888;">v{{apiService.appInfo()?.version}}</small></h2>
+    
     <form nz-form nzLayout="vertical">
         <nz-form-item>
-            <nz-form-label>FFmpeg Executable Path</nz-form-label>
+            <nz-form-label>{{ t('settings.language') }}</nz-form-label>
+            <nz-form-control>
+                <nz-select [ngModel]="langService.currentLang" (ngModelChange)="langService.setLanguage($event)" name="language">
+                    <nz-option nzValue="en" nzLabel="English"/>
+                    <nz-option nzValue="zh" nzLabel="简体中文"/>
+                </nz-select>
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label>{{ t('settings.ffmpeg') }}</nz-form-label>
             <nz-form-control>
                 <input nz-input [ngModel]="settings().ffmpeg_path" (ngModelChange)="updateField('ffmpeg_path', $event)"
                     name="ffmpeg" placeholder="ffmpeg" />
@@ -10,7 +21,7 @@
         </nz-form-item>
 
         <nz-form-item>
-            <nz-form-label>ImageMagick (magick) Path</nz-form-label>
+            <nz-form-label>{{ t('settings.imagemagick') }}</nz-form-label>
             <nz-form-control>
                 <input nz-input [ngModel]="settings().imagemagick_path"
                     (ngModelChange)="updateField('imagemagick_path', $event)" name="magick" placeholder="magick" />
@@ -18,7 +29,7 @@
         </nz-form-item>
 
         <nz-form-item>
-            <nz-form-label>Max Concurrent Tasks</nz-form-label>
+            <nz-form-label>{{ t('settings.max_tasks') }}</nz-form-label>
             <nz-form-control>
                 <nz-input-number [ngModel]="settings().max_concurrent_tasks"
                     (ngModelChange)="updateField('max_concurrent_tasks', $event)" name="max_concurrent_tasks"
@@ -28,15 +39,15 @@
 
         @if (apiService.appInfo()?.is_packaged) {
             <nz-form-item>
-                <nz-form-label>Start on Boot (Windows)</nz-form-label>
+                <nz-form-label>{{ t('settings.auto_start') }}</nz-form-label>
                 <nz-form-control>
                     <input type="checkbox" [ngModel]="settings().auto_start" (ngModelChange)="updateField('auto_start', $event)" name="auto_start" />
-                    <span style="margin-left: 8px;">Enable</span>
+                    <span style="margin-left: 8px;">{{ t('settings.enable') }}</span>
                 </nz-form-control>
             </nz-form-item>
         }
 
         <button nz-button nzType="primary" (click)="saveSettings()"><nz-icon nzType="save"
-                nzTheme="outline" />Save</button>
+                nzTheme="outline" />{{ t('settings.save') }}</button>
     </form>
 </div>
