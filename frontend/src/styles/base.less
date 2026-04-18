@@ -1,0 +1,23 @@
+@primary-color: hsl(260.29deg 39% 55%);
+
+// zorro内置变量参考
+// https://github.com/NG-ZORRO/ng-zorro-antd/blob/master/components/style/themes/default.less
+
+// 提取公共的 CSS 变量定义逻辑
+.set-css-variables() {
+    --primary-color: @primary-color;
+    --primary-color-a04: fade(@primary-color, 40%);
+    --primary-color-tint: lighten(@primary-color, 15%);
+    --border-color-split: @border-color-split;
+    --border-color-base: @border-color-base;
+    --component-background: @component-background;
+    --popover-background: @popover-background;
+    --border-radius-base: @border-radius-base;
+    --text-color: @text-color;
+    --text-color-inverse: @text-color-inverse;
+    --text-color-secondary: @text-color-secondary;
+    --input-hover-border-color: @input-hover-border-color;
+    --item-hover-bg: @item-hover-bg;
+    --item-active-bg: @item-active-bg;
+    --primary-5: @primary-5;
+}

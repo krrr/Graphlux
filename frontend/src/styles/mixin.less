@@ -1,0 +1,8 @@
+.themeMixin(@rules) {
+  :host-context(html.default) {
+    @rules();
+  }
+  :host-context(html.dark) {
+    @rules();
+  }
+}

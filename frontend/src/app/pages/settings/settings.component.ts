@@ -7,6 +7,7 @@ import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { COMMON_IMPORTS } from '../../shared-imports';
 import { LanguageService } from '../../i18n/language.service';
+import { ThemeService, ThemeType } from '../../services/theme.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 
@@ -23,9 +24,11 @@ export class SettingsComponent implements OnInit {
         imagemagick_path: 'magick',
         max_concurrent_tasks: 4,
         auto_start: false,
+        theme: 'system' as ThemeType
     });
     
     langService = inject(LanguageService);
+    themeService = inject(ThemeService);
     translocoService = inject(TranslocoService);
 
     constructor(
@@ -41,6 +44,9 @@ export class SettingsComponent implements OnInit {
         this.apiService.getSettings().subscribe((s) => {
             if (s) {
                 this.settings.set(s);
+                if (s.theme) {
+                    this.themeService.setTheme(s.theme, false);
+                }
             }
         });
     }
@@ -48,6 +54,7 @@ export class SettingsComponent implements OnInit {
     saveSettings() {
         this.apiService.updateSettings(this.settings()).subscribe(() => {
             this.message.success(this.translocoService.translate('settings.saved'));
+            this.themeService.setTheme(this.settings().theme);
         });
     }
 

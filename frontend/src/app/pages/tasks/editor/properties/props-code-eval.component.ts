@@ -1,10 +1,11 @@
-import { Component, Input, OnChanges, signal } from '@angular/core';
+import { Component, Input, OnChanges, signal, inject, effect } from '@angular/core';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzCodeEditorModule } from 'ng-zorro-antd/code-editor';
 import { PropsBase } from './props-base';
 import { VariableInfo } from '../editor.service';
 import { COMMON_IMPORTS } from '../../../../shared-imports';
+import { ThemeService } from '../../../../services/theme.service';
 import type { editor } from 'monaco-editor';
 
 @Component({
@@ -22,7 +23,7 @@ import type { editor } from 'monaco-editor';
                             [attr.aria-label]="isExpanded() ? t('editor.minimize') : t('editor.expand')">
                             <i nz-icon [nzType]="isExpanded() ? 'fullscreen-exit' : 'fullscreen'"></i>
                         </button>
-                        <nz-code-editor class="editor" [nzEditorOption]="editorOpt" [ngModel]="config().code"
+                        <nz-code-editor class="editor like-ant-input" [nzEditorOption]="editorOpt" [ngModel]="config().code"
                             (ngModelChange)="updateConfig('code', $event)" (nzEditorInitialized)="onEditorInit($event)" />
                     </div>
                     @if (isExpanded()) {
@@ -87,7 +88,6 @@ import type { editor } from 'monaco-editor';
         .editor {
             height: 100%;
             width: 100%;
-            border: 1px solid #d9d9d9;
             border-radius: 2px;
             overflow: hidden;
         }
@@ -108,19 +108,20 @@ import type { editor } from 'monaco-editor';
 export class PropsCodeEvalComponent extends PropsBase implements OnChanges {
     isExpanded = signal(false);
     editor?: editor.ICodeEditor | editor.IEditor;
-
+    private themeService = inject(ThemeService);  // 目前未实现动态切换，不考虑
 
     toggleExpand() {
         this.isExpanded.set(!this.isExpanded());
         setTimeout(() => this.editor?.layout(), 50);
     }
 
-    editorOpt = {
+    editorOpt: any = {
         language: 'python',
         minimap: { enabled: false },
         lineNumbersMinChars: 3,
         glyphMargin: false,
         folding: false,
+        theme: this.themeService.isDark() ? 'vs-dark' : 'vs'
         // lineDecorationsWidth: 0
     }
 

@@ -25,7 +25,7 @@
                 </nz-dropdown-menu>
             </div>
 
-            <p style="color: #595959; margin-bottom: 16px; min-height: 40px" (click)="openEditor(task.id)">
+            <p class="task-desc" (click)="openEditor(task.id)">
                 {{ task.description || t('tasks.no_description') }}
             </p>
 

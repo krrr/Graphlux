@@ -1,9 +1,10 @@
-import { Component, Input, ChangeDetectorRef, OnChanges, inject } from '@angular/core';
+import { Component, Input, ChangeDetectorRef, OnChanges, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { ReteModule } from 'rete-angular-plugin/18';
 import { NODE_INFO, TaskNode } from '../editor.service';
 import { TranslocoService } from '@jsverse/transloco';
+import { ThemeService } from '../../../../services/theme.service';
 
 
 @Component({
@@ -20,6 +21,7 @@ export class CustomNodeComponent implements OnChanges {
 
     seed = 0; // from official demo
     private translocoService = inject(TranslocoService);
+    private themeService = inject(ThemeService);
 
     get iconType(): string {
         return NODE_INFO[this.data.type]?.icon || 'setting';
@@ -31,10 +33,11 @@ export class CustomNodeComponent implements OnChanges {
 
     get headerBgColor(): string {
         const iconColor = this.iconColor;
+        const isDark = this.themeService.isDark();
         if (iconColor.startsWith('#')) {
-            return iconColor + '11'; // ~6% opacity
+            return iconColor + (isDark ? '33' : '11'); // ~20% vs ~6% opacity
         } else {
-            return 'rgba(0,0,0,0.05)';
+            return isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.05)';
         }
     }
 
@@ -113,6 +116,12 @@ export class CustomNodeComponent implements OnChanges {
     constructor(private cdr: ChangeDetectorRef) {
         // from official demo
         this.cdr.detach();
+
+        effect(() => {
+            // Trigger detectChanges when theme changes
+            this.themeService.isDark();
+            this.cdr.detectChanges();
+        });
     }
 
     ngOnChanges() {

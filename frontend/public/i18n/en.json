@@ -6,6 +6,10 @@
   },
   "settings": {
     "language": "Language",
+    "theme": "Theme",
+    "theme_light": "Light",
+    "theme_dark": "Dark",
+    "theme_system": "System",
     "ffmpeg": "FFmpeg Executable Path",
     "imagemagick": "ImageMagick (magick) Path",
     "max_tasks": "Max Concurrent Tasks",

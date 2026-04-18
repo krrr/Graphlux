@@ -13,6 +13,17 @@
         </nz-form-item>
 
         <nz-form-item>
+            <nz-form-label>{{ t('settings.theme') }}</nz-form-label>
+            <nz-form-control>
+                <nz-select [ngModel]="settings().theme" (ngModelChange)="updateField('theme', $event)" name="theme">
+                    <nz-option nzValue="default" [nzLabel]="t('settings.theme_light')"/>
+                    <nz-option nzValue="dark" [nzLabel]="t('settings.theme_dark')"/>
+                    <nz-option nzValue="system" [nzLabel]="t('settings.theme_system')"/>
+                </nz-select>
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
             <nz-form-label>{{ t('settings.ffmpeg') }}</nz-form-label>
             <nz-form-control>
                 <input nz-input [ngModel]="settings().ffmpeg_path" (ngModelChange)="updateField('ffmpeg_path', $event)"

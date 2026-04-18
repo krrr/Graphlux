@@ -67,7 +67,7 @@ export class TasksComponent implements OnInit {
         if (task) {
             this.isEditing.set(true);
             this.editingTaskId.set(task.id);
-            this.taskForm.set({...task});
+            this.taskForm.set({...task, folders: undefined});
         } else {
             this.isEditing.set(false);
             this.editingTaskId.set(null);

@@ -1,6 +1,24 @@
+:root {
+  color-scheme: light dark;
+}
+
 .ant-dropdown-menu-submenu-title > .anticon,
 .ant-dropdown-menu-item > .ant-menu-title-content > .anticon {
     margin-right: 6px;
+}
+
+.ant-menu-item {
+    user-select: none;
+}
+.like-ant-input {
+    border: 1px solid var(--border-color-base);
+    transition: all 0.3s;
+}
+.like-ant-input:hover {
+    border-color: var(--input-hover-border-color);
+}
+.like-ant-input:focus {
+    border-color: var(--primary-color);
 }
 
 .ant-form .ant-form-item:last-child {

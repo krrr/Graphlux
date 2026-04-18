@@ -31,7 +31,7 @@ import { COMMON_IMPORTS } from '../../../../shared-imports';
           </nz-form-item>
 
           @for (cond of config().conditions; track $index) {
-            <div style="border: 1px solid #d9d9d9; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+          <div class="cond-div">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
               <strong>{{ t('props.condition') }} {{ $index + 1 }}</strong>
               <button nz-button nzType="text" nzDanger nzSize="small" (click)="removeCondition($index)" [attr.aria-label]="t('props.remove_condition')" [title]="t('props.remove_condition')"><span nz-icon nzType="delete"></span></button>
@@ -85,6 +85,12 @@ import { COMMON_IMPORTS } from '../../../../shared-imports';
     styles: [`
       .add-btn {
         margin-bottom: 12px;
+      }
+      .cond-div {
+        border: 1px solid var(--border-color-split);
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 4px;
       }
     `]
 })

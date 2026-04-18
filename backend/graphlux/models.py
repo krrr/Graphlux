@@ -35,3 +35,4 @@ class SystemSettings(SQLModel, table=True):
     imagemagick_path: str = Field(default="magick")
     max_concurrent_tasks: int = Field(default=4)
     auto_start: bool = Field(default=False)
+    theme: str = Field(default="system")

@@ -11,7 +11,7 @@ import { Component, Input, HostBinding, ChangeDetectorRef, OnChanges } from '@an
                 height: 12px;
                 background: var(--primary-color-tint);
                 border-radius: 50%;
-                border: 2px solid white;
+                border: 2px solid var(--component-background);
                 box-shadow: 0 0 0 1px var(--primary-color-tint);
                 transition: background 0.3s, box-shadow 0.3s;
             }

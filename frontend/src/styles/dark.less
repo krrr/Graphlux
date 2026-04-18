@@ -1,0 +1,17 @@
+@import "../../node_modules/ng-zorro-antd/ng-zorro-antd.less";
+@import "../../node_modules/ng-zorro-antd/code-editor/style/entry.less";
+@import "../../node_modules/ng-zorro-antd/style/themes/dark.less";
+@import 'base.less';
+
+@body-background: #18181b;
+@popover-background: #1f1f1f;
+@component-background: #18181b;
+
+// 加亮
+@card-background: @popover-background;
+
+// Dark theme overrides
+html.dark {
+    .set-css-variables();
+    // 这里可以添加深色模式特有的 CSS 变量
+}

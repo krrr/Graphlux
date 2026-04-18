@@ -68,8 +68,9 @@
     align-items: center;
     gap: 12px;
     padding: 4px;
-    background: #ffffff;
-    border: 1px solid #f0f0f0;
+    background: var(--popover-background);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color-split);
     border-radius: 2px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     z-index: 6;
@@ -85,7 +86,7 @@
         font-size: 11px;
         font-weight: bold;
         font-family: ui-monospace;
-        color: #555;
+        color: var(--text-color);
         text-align: center;
         width: 38px;
     }
@@ -120,4 +121,18 @@
 
 .editor-menu {
     min-width: 150px;
+}
+
+
+:host-context(html.dark) {
+    .toolbar, .floating-toolbar {
+        background-color: #2a2a2a91;
+    }
+    .floating-toolbar .toolbar-group {
+        background: #282828;
+    }
+
+    .rete-area {
+        background-image: url("/assets/tile-dark.svg");
+    }
 }

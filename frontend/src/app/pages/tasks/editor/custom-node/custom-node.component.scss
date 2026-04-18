@@ -3,11 +3,11 @@
 }
 
 .node-wrapper {
-    background: white;
+    background: var(--popover-background);
     border-radius: 2px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     width: 220px;
-    border: 1px solid var(--border-color-split);
+    border: 1px solid #dbdbdb;  // because of bg pattern
     transition:
         border-color 0.2s,
         box-shadow 0.2s;
@@ -26,7 +26,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--border-color-split);
 
     .icon-container {
         width: 28px;
@@ -41,7 +41,7 @@
 
     .title {
         font-weight: 600;
-        color: #333;
+        color: var(--text-color);
         font-size: 14px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -91,7 +91,7 @@
 
 .socket-label {
     font-size: 12px;
-    color: #666;
+    color: var(text-color-secondary);
     padding: 0 2px;
 }
 .socket-label.finish-node {
@@ -101,7 +101,7 @@
 .node-footer {
     padding: 8px 16px;
     background: #fafafa;
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid var(--border-color-split);
     font-size: 11px;
     border-bottom-left-radius: 2px;
     border-bottom-right-radius: 2px;
@@ -114,14 +114,29 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    > .config-key {
+        color: #888;
+        margin-right: 8px;
+    }
+    > .config-value {
+        color: #333;
+        font-weight: 500;
+    }
 }
 
-.config-key {
-    color: #888;
-    margin-right: 8px;
-}
 
-.config-value {
-    color: #333;
-    font-weight: 500;
+
+ :host-context(html.dark) {
+    .node-footer {
+        background: var(--component-background);
+    }
+    .config-key {
+        color: #a3a3a3;
+    }
+    .config-value {
+        color: #6f6f6f;
+    }
+    .node-wrapper {
+        border-color: #383838;
+    }
 }

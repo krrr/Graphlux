@@ -9,7 +9,7 @@
     height: 32px;
     line-height: 30px;
     text-align: center;
-    border: 1px solid #d9d9d9;
+    border: 1px solid var(--border-color-base);
     border-radius: 2px;
     cursor: pointer;
     transition: border-color 0.3s;
@@ -61,7 +61,11 @@
         text-align: center;
         user-select: none;
     }
-
+    .task-desc {
+        color: #595959;
+        margin-bottom: 16px;
+        min-height: 40px;
+    }
     .more-btn {
         margin-right: -4px;
     }
@@ -78,3 +82,17 @@ nz-card:hover {
     border-radius: 2px;
     display: flex;
 }
+
+
+ :host-context(html.dark) {
+    .task-icon {
+        background-color: #2a2a2a;
+    }
+    .task-desc {
+        color: #bababa;
+    }
+
+    .folder-list {
+        background-color: #2a2a2a;
+    }
+ }

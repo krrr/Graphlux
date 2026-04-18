@@ -111,11 +111,11 @@ import { COMMON_IMPORTS } from '../../../../shared-imports';
             right: 16px;
             width: 380px;
             max-height: calc(100% - 82px);
-            background-color: #ffffff;
+            background: var(--popover-background);
             border-radius: 2px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             z-index: 10;
-            border: 1px solid #f0f0f0;
+            border: 1px solid var(--border-color-split);
             display: flex;
             flex-direction: column;
 
@@ -140,7 +140,7 @@ import { COMMON_IMPORTS } from '../../../../shared-imports';
             .title-area {
                 padding: 8px;
                 margin-bottom: 10px;
-                border-bottom: 1px solid rgba(0, 0, 0, .06);
+                border-bottom: 1px solid var(--border-color-split);
                 display: flex;
 
                 .title {

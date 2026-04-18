@@ -40,7 +40,7 @@ import { COMMON_IMPORTS } from '../../../../shared-imports';
             </nz-form-item>
 
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                <label style="color: rgba(0, 0, 0, 0.85); font-weight: 500;">{{ t('props.tags') }}</label>
+                <label style="font-weight: 500;">{{ t('props.tags') }}</label>
                 <button nz-button nzShape="circle" nzSize="small" (click)="addTag()" type="button" [attr.aria-label]="t('props.add_tag')" [title]="t('props.add_tag')">
                     <span nz-icon nzType="plus"></span>
                 </button>
