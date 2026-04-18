@@ -10,7 +10,7 @@ from typing import List, Any, Dict, Optional
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from .db import get_session
-from .models import Task, Folder, SystemSettings, FolderTaskLink
+from .models import Task, Folder, SystemSettings, FolderTaskLink, SettingsResponse, SettingsConfig
 from .engine.executor import TaskExecutor
 
 router = APIRouter()
@@ -307,7 +307,7 @@ def list_directory(path: str = None, showHidden: bool = False):
 
 # --- SystemSettings ---
 
-@router.get("/settings", response_model=SystemSettings)
+@router.get("/settings", response_model=SettingsResponse)
 def get_settings(session: Session = Depends(get_session)):
     settings = session.get(SystemSettings, 1)
     if not settings:
@@ -315,10 +315,10 @@ def get_settings(session: Session = Depends(get_session)):
         session.add(settings)
         session.commit()
         session.refresh(settings)
-    return settings
+    return settings.to_dict()
 
-@router.put("/settings", response_model=SystemSettings)
-def update_settings(settings_update: SystemSettings, session: Session = Depends(get_session)):
+@router.put("/settings", response_model=SettingsResponse)
+def update_settings(settings_update: SettingsConfig, session: Session = Depends(get_session)):
     settings = session.get(SystemSettings, 1)
     if not settings:
         settings = SystemSettings(id=1)
@@ -330,14 +330,13 @@ def update_settings(settings_update: SystemSettings, session: Session = Depends(
         update_autostart_registry(update_data["auto_start"])
 
     for key, value in update_data.items():
-        if key != "id":
-            setattr(settings, key, value)
+        setattr(settings, key, value)
 
     session.add(settings)
     session.commit()
     session.refresh(settings)
     
-    return settings
+    return settings.to_dict()
 
 
 def validate_dag(dag_json: Any):

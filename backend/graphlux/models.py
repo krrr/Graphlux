@@ -1,4 +1,5 @@
 from typing import Optional, Any, Dict, List
+from pydantic import BaseModel
 from sqlmodel import SQLModel, Field, Column, JSON, Relationship
 from datetime import datetime
 
@@ -29,10 +30,81 @@ class Folder(SQLModel, table=True):
 
     tasks: List[Task] = Relationship(back_populates="folders", link_model=FolderTaskLink)
 
+class SettingsConfig(BaseModel):
+    """
+    All configuration items are defined here.
+    Add new settings here with default values to extend without DB migration.
+    """
+    ffmpeg_path: str = "ffmpeg"
+    imagemagick_path: str = "magick"
+    max_concurrent_tasks: int = 4
+    auto_start: bool = False
+    theme: str = "system"
+
+class SettingsResponse(SettingsConfig):
+    id: int = 1
+
 class SystemSettings(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    ffmpeg_path: str = Field(default="ffmpeg")
-    imagemagick_path: str = Field(default="magick")
-    max_concurrent_tasks: int = Field(default=4)
-    auto_start: bool = Field(default=False)
-    theme: str = Field(default="system")
+    """
+    System settings persistence model.
+    Uses a single JSON field to store all configurations.
+    """
+    id: Optional[int] = Field(default=1, primary_key=True)
+    # Store all config in a single JSON column
+    value: Dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to a flat dictionary for API response."""
+        config = self._get_config().model_dump()
+        config["id"] = self.id
+        return config
+
+    def _get_config(self) -> SettingsConfig:
+        return SettingsConfig(**(self.value or {}))
+
+    def _update_value(self, key: str, val: Any):
+        """Update value dict and ensure SQLAlchemy detects the change."""
+        new_value = dict(self.value or {})
+        new_value[key] = val
+        self.value = new_value
+
+    @property
+    def ffmpeg_path(self) -> str:
+        return self._get_config().ffmpeg_path
+
+    @ffmpeg_path.setter
+    def ffmpeg_path(self, val: str):
+        self._update_value("ffmpeg_path", val)
+
+    @property
+    def imagemagick_path(self) -> str:
+        return self._get_config().imagemagick_path
+
+    @imagemagick_path.setter
+    def imagemagick_path(self, val: str):
+        self._update_value("imagemagick_path", val)
+
+    @property
+    def max_concurrent_tasks(self) -> int:
+        return self._get_config().max_concurrent_tasks
+
+    @max_concurrent_tasks.setter
+    def max_concurrent_tasks(self, val: int):
+        self._update_value("max_concurrent_tasks", val)
+
+    @property
+    def auto_start(self) -> bool:
+        return self._get_config().auto_start
+
+    @auto_start.setter
+    def auto_start(self, val: bool):
+        self._update_value("auto_start", val)
+
+    @property
+    def theme(self) -> str:
+        return self._get_config().theme
+
+    @theme.setter
+    def theme(self, val: str):
+        self._update_value("theme", val)
+
