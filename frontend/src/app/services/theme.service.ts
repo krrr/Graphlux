@@ -14,7 +14,7 @@ export class ThemeService {
   public isDark = computed(() => {
     const theme = this._currentTheme();
     if (theme === 'system') {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+      return window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false;  // unit test has no matchMedia
     }
     return theme === 'dark';
   });
@@ -42,7 +42,11 @@ export class ThemeService {
     let actualTheme: 'default' | 'dark';
     
     if (themePreference === 'system') {
-      actualTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default';
+      if (!window.matchMedia) {  // unit test
+        actualTheme = 'default';
+      } else {
+        actualTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default';
+      }
     } else {
       actualTheme = themePreference as 'default' | 'dark';
     }
@@ -82,6 +86,9 @@ export class ThemeService {
   }
 
   private watchSystemTheme(): void {
+    if (!window.matchMedia) {  // unit test
+      return;
+    }
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
       if (this._currentTheme() === 'system') {
         this.updateTheme(e.matches ? 'dark' : 'default');

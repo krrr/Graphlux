@@ -116,7 +116,7 @@ describe('TasksComponent', () => {
         
         component.handleOk();
 
-        expect(apiServiceSpy.updateTask).toHaveBeenCalledWith(1, { ...mockTasks[0], name: 'Updated Task' });
+        expect(apiServiceSpy.updateTask).toHaveBeenCalledWith(1, { ...mockTasks[0], name: 'Updated Task', folders: undefined });
         expect(messageServiceSpy.success).toHaveBeenCalledWith('Task updated');
         expect(component.isModalVisible()).toBe(false);
     });
