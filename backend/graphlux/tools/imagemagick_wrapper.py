@@ -244,7 +244,7 @@ class ImageMagickWrapper:
             quoted_input = _quote_path(input_file)
             quoted_output = _quote_path(output_file)
             # For arguments, escape any existing double quotes to avoid breaking the command
-            quoted_args = " ".join(f'"{a.replace('"', '\\"')}"' for a in args)
+            quoted_args = " ".join(f'"{a.replace("\"", "\\\"")}"' for a in args)
 
             # Use parenthesis to create an image sequence, process it, write it, and discard it afterwards.
             # This isolates the state perfectly without bleeding into the next command.
