@@ -3,7 +3,6 @@ import threading
 import queue
 import time
 import uuid
-import shlex
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from typing import List, Optional
@@ -25,6 +24,7 @@ class MagickProcess:
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
+            encoding="utf-8",
             bufsize=1  # line buffered
         )
         self.result_queue = queue.Queue()
@@ -241,12 +241,11 @@ class ImageMagickWrapper:
             return False
 
         try:
-            # We want to format the command safely. Use shlex.quote for paths and arguments.
-            # Convert Windows paths appropriately. ImageMagick handles standard quotes well.
-            quoted_input = shlex.quote(input_file)
-            quoted_output = shlex.quote(output_file)
-            quoted_args = " ".join(shlex.quote(a) for a in args)
-            
+            quoted_input = _quote_path(input_file)
+            quoted_output = _quote_path(output_file)
+            # For arguments, escape any existing double quotes to avoid breaking the command
+            quoted_args = " ".join(f'"{a.replace('"', '\\"')}"' for a in args)
+
             # Use parenthesis to create an image sequence, process it, write it, and discard it afterwards.
             # This isolates the state perfectly without bleeding into the next command.
             script_cmd = f"( -read {quoted_input} {quoted_args} -write {quoted_output} ) -delete 0--1"
@@ -272,3 +271,13 @@ async def magick_pool_reaper():
         except Exception as e:
             logger.error(f"Error in magick_pool_reaper: {e}")
 
+
+def _quote_path(path: str) -> str:
+    # Normalize Windows paths: convert backslashes to forward slashes
+    # ImageMagick accepts forward slashes on all platforms
+    ret = path.replace('\\', '/')
+    # Use double quotes for paths with spaces or special characters
+    # ImageMagick's -read directive accepts quoted paths
+    if ' ' in ret or '"' in ret:
+        ret = f'"{ret}"'
+    return ret

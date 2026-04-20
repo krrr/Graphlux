@@ -101,8 +101,8 @@ class MetadataReadNode(DAGNode):
         logger.info(f"[{self.name}] Reading metadata for {file_path}")
         metadata = Pyexiv2Wrapper.read_metadata(file_path)
         if metadata is None:
-            logger.error(f"[{self.name}] Failed to read metadata from {file_path}")
-            return False, None, {}
+            logger.warning(f"[{self.name}] Failed to read metadata from {file_path}")
+            return True, "default", {"metadata": None}
 
         enable_single_tag = self.config.get("enable_single_tag", False)
         
@@ -179,7 +179,7 @@ class ConditionNode(DAGNode):
             target = cond.get("target")
 
             val = inputs.get(var_name)
-            if val is None:
+            if var_name not in inputs:
                 logger.error(f"[{self.name}] Input data variable '{var_name}' not found. Defaulting to False for this condition.")
                 results.append(False)
                 continue

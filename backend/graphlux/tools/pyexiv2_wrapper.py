@@ -11,6 +11,7 @@ class Pyexiv2Wrapper:
         :param file_path: Path to the file.
         :return: A dictionary of metadata, or None if reading fails.
         """
+        file_path = file_path.replace('\\', '/')
         try:
             with pyexiv2.Image(file_path) as img:
                 metadata = {}

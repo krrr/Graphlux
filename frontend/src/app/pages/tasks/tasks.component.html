@@ -32,7 +32,7 @@
             <div class="folder-list" (click)="openEditor(task.id)">
                 <span nz-icon nzType="folder"></span>
                 <div style="margin-left: 10px; color: #595959">
-                    @for (f of task.folders; track f.id) {
+                    @for (f of task.folders; track f) {
                         <nz-tag [title]="f.watch_folder">{{ f.name }}</nz-tag>
                     }
                     @if (task.folders.length === 0) {
