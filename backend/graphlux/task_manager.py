@@ -149,7 +149,7 @@ class TaskManager:
 
         if folder.real_time_watch:
             logger.info(f"Setting up real-time watch for Folder {folder.id} on path: {folder.watch_folder}")
-            watch = self.observer.schedule(handler, folder.watch_folder, recursive=False)
+            watch = self.observer.schedule(handler, folder.watch_folder, recursive=True)
             self.active_watches[folder.id] = watch
 
         # Set up periodic scan
@@ -192,14 +192,20 @@ class TaskManager:
                     self._scan_folder(folder, handler)
 
     def _scan_folder(self, folder: Folder, handler: FolderEventHandler):
-        """Scans the watch folder for existing files and queues them for processing."""
+        """Scans the watch folder recursively for existing files and queues them for processing."""
         if not os.path.exists(folder.watch_folder):
             return
 
-        logger.info(f"Scanning files for Folder {folder.id} in {folder.watch_folder}")
-        for filename in os.listdir(folder.watch_folder):
-            filepath = os.path.join(folder.watch_folder, filename)
-            if os.path.isfile(filepath) and not filename.startswith('.'):
+        logger.info(f"Scanning files for Folder {folder.id} in {folder.watch_folder} (recursive)")
+        for root, dirs, files in os.walk(folder.watch_folder):
+            # Prune hidden directories in-place to prevent os.walk from entering them
+            dirs[:] = [d for d in dirs if not d.startswith('.')]
+            
+            for filename in files:
+                if filename.startswith('.'):
+                    continue
+                
+                filepath = os.path.join(root, filename)
                 if folder.filename_regex:
                     if not re.search(folder.filename_regex, filename):
                         continue

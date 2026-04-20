@@ -68,7 +68,6 @@ class StartNode(DAGNode):
             logger.error(f"[{self.name}] No input file provided to StartNode.")
             return False, None, {}
 
-        logger.info(f"[{self.name}] Starting pipeline for file: {file_obj.get('path')}")
         return True, "default", {"file": file_obj}
 
 
@@ -95,13 +94,13 @@ class MetadataReadNode(DAGNode):
 
         file_path = file_obj["path"]
         if not os.path.exists(file_path):
-            logger.error(f"[{self.name}] Input file not found: {file_path}")
+            logger.error(f"[{self.name}] Input file not found: '{file_path}'")
             return False, None, {}
 
-        logger.info(f"[{self.name}] Reading metadata for {file_path}")
+        logger.info(f"[{self.name}] Reading metadata for '{file_path}'")
         metadata = Pyexiv2Wrapper.read_metadata(file_path)
         if metadata is None:
-            logger.warning(f"[{self.name}] Failed to read metadata from {file_path}")
+            logger.warning(f"[{self.name}] Failed to read metadata from '{file_path}'")
             return True, "default", {"metadata": None}
 
         enable_single_tag = self.config.get("enable_single_tag", False)
@@ -122,7 +121,7 @@ class ConvertNode(DAGNode):
 
         input_file = file_obj["path"]
         if not os.path.exists(input_file):
-            logger.error(f"[{self.name}] Input file not found: {input_file}")
+            logger.error(f"[{self.name}] Input file not found: '{input_file}'")
             return False, None, {}
 
         target_ext = self.config.get("target_extension", ".avif")
@@ -142,7 +141,7 @@ class ConvertNode(DAGNode):
         tool = self.config.get("tool", "imagemagick")
         args = self.config.get("args", [])
         
-        logger.info(f"[{self.name}] Converting {input_file} to {temp_path} using {tool}")
+        logger.info(f"[{self.name}] Converting '{input_file}' to '{temp_path}' using {tool}")
         success = False
         if tool == "imagemagick":
             success = ImageMagickWrapper.run(input_file, temp_path, args)
@@ -307,15 +306,15 @@ class MetadataWriteNode(DAGNode):
         target_file = file_obj["path"]
             
         if not os.path.exists(target_file):
-            logger.error(f"[{self.name}] Target file for metadata write not found: {target_file}")
+            logger.error(f"[{self.name}] Target file for metadata write not found: '{target_file}'")
             return False, None, {}
 
-        logger.info(f"[{self.name}] Writing tags to {target_file}: {tags}")
+        logger.info(f"[{self.name}] Writing tags to '{target_file}': {tags}")
         success = Pyexiv2Wrapper.write_metadata(target_file, tags)
         if success:
             return True, "default", {"file": file_obj}
         else:
-            logger.error(f"[{self.name}] Failed to write metadata to {target_file}")
+            logger.error(f"[{self.name}] Failed to write metadata to '{target_file}'")
             return False, None, {}
 
 

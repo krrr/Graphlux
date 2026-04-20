@@ -94,9 +94,9 @@ class TaskExecutor:
                 "ctime": os.path.getctime(file_path),
             }
         except Exception as e:
-            raise RuntimeError(f"Failed to get info for {file_path}: {e}")
+            raise RuntimeError(f"Failed to get info for '{file_path}': {e}")
 
-        logger.info(f"Starting DAG execution for file: {file_path}")
+        logger.info(f"Starting DAG execution for file: '{file_path}'")
         inputs = {'file': initial_file_obj}
         return self.execute(inputs)
 
