@@ -1,9 +1,10 @@
-import { Component, Input, Output, EventEmitter, OnInit, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, signal, inject } from '@angular/core';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzListModule } from 'ng-zorro-antd/list';
 import { ApiService } from '../../api.service';
 import { COMMON_IMPORTS } from '../../shared-imports';
 import { lastValueFrom } from 'rxjs';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 interface FileItem {
     name: string;
@@ -14,7 +15,7 @@ interface FileItem {
 @Component({
     selector: 'app-file-dialog',
     standalone: true,
-    imports: [NzModalModule, NzListModule, ...COMMON_IMPORTS ],
+    imports: [NzModalModule, NzListModule, ...COMMON_IMPORTS, TranslocoModule ],
     templateUrl: './file-dialog.component.html',
     styleUrls: ['./file-dialog.component.scss'],
 })
@@ -30,7 +31,8 @@ export class FileDialogComponent implements OnInit {
     loading = signal(false);
     selectedPath = signal<string | null>(null);
 
-    constructor(private apiService: ApiService) {}
+    apiService = inject(ApiService);
+    translocoService = inject(TranslocoService);
 
     ngOnInit(): void {
         if (this.isVisible) {
@@ -129,7 +131,7 @@ export class FileDialogComponent implements OnInit {
 
     onPathInputChange(path: string) {
         if (!path) {
-            this.currentPath = 'System Roots';
+            this.currentPath = this.translocoService.translate('file_dialog.system_roots');
         } else {
             this.currentPath = path;
         }

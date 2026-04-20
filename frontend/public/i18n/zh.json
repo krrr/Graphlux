@@ -31,7 +31,14 @@
     "name": "名称",
     "description": "描述",
     "name_required": "请输入任务名称！",
-    "no_description": "暂无描述。"
+    "no_description": "暂无描述。",
+    "delete_confirm": "确定要删除此任务吗？",
+    "msg_fill_name": "请填写任务名称",
+    "msg_updated": "任务已更新",
+    "msg_created": "任务已创建",
+    "msg_deleted": "任务已删除",
+    "msg_cannot_delete_used": "无法删除被文件夹使用的任务",
+    "msg_delete_failed": "删除任务失败"
   },
   "folders": {
     "title": "文件夹",
@@ -50,17 +57,31 @@
     "watch_path_label": "监视文件夹 (绝对路径)",
     "browse": "浏览...",
     "real_time": "实时监视",
-    "scan_interval": "扫描间隔 (秒，0 为禁用)",
+    "scan_interval": "完整扫描间隔 (秒，0 为禁用)",
     "regex": "文件名正则 (可选)",
     "delete_confirm": "确定要删除此文件夹吗？",
     "name_required": "请输入文件夹名称！",
     "path_required": "请输入监视路径！",
     "tasks_required": "请至少选择一个任务！",
-    "placeholder_select_tasks": "选择任务"
+    "placeholder_select_tasks": "选择任务",
+    "pause": "暂停",
+    "resume": "恢复",
+    "msg_fill_required": "请填写所有必填字段（名称、监视文件夹、任务）",
+    "msg_updated": "文件夹已更新",
+    "msg_created": "文件夹已创建",
+    "msg_deleted": "文件夹已删除",
+    "msg_paused": "文件夹已暂停",
+    "msg_resumed": "文件夹已恢复"
   },
   "common": {
     "ok": "确定",
     "cancel": "取消"
+  },
+  "file_dialog": {
+    "select_folder": "选择文件夹",
+    "select_file": "选择文件",
+    "go_up": "返回上级目录",
+    "system_roots": "系统根目录"
   },
   "editor": {
     "save": "保存",

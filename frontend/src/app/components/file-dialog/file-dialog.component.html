@@ -1,17 +1,18 @@
 <nz-modal
   [(nzVisible)]="isVisible"
-  [nzTitle]="mode === 'folder' ? 'Select Folder' : 'Select File'"
+  [nzTitle]="mode === 'folder' ? t('file_dialog.select_folder') : t('file_dialog.select_file')"
   (nzOnCancel)="handleCancel()"
   (nzOnOk)="handleOk()"
   nzWidth="600px"
+  *transloco="let t"
 >
   <ng-container *nzModalContent>
     <div class="file-dialog-container">
       <div class="path-header">
-        <button nz-button nzType="default" (click)="goUp()" [disabled]="!currentPath" aria-label="Go up one directory" title="Go up one directory">
+        <button nz-button nzType="default" (click)="goUp()" [disabled]="!currentPath" [attr.aria-label]="t('file_dialog.go_up')" [title]="t('file_dialog.go_up')">
           <i nz-icon nzType="arrow-up"></i>
         </button>
-        <input nz-input #pathInput [ngModel]="currentPath || 'System Roots'" (keydown.enter)="onPathInputChange(pathInput.value)" class="path-input" />
+        <input nz-input #pathInput [ngModel]="currentPath || t('file_dialog.system_roots')" (keydown.enter)="onPathInputChange(pathInput.value)" class="path-input" />
       </div>
 
       <div class="file-list" [class.loading]="loading()">

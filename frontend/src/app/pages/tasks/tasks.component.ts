@@ -15,6 +15,7 @@ import { NzTagComponent } from 'ng-zorro-antd/tag';
 import { EmojiPickerComponent } from '../../components/emoji-picker/emoji-picker.component';
 import { NzPopoverModule } from 'ng-zorro-antd/popover';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Component({
     selector: 'app-tasks',
@@ -51,6 +52,7 @@ export class TasksComponent implements OnInit {
         private router: Router,
         private message: NzMessageService,
         private modal: NzModalService,
+        private translocoService: TranslocoService,
     ) {}
 
     ngOnInit() {
@@ -83,13 +85,13 @@ export class TasksComponent implements OnInit {
     handleOk() {
         const currentForm = this.taskForm();
         if (!currentForm.name) {
-            this.message.warning('Please fill the task name');
+            this.message.warning(this.translocoService.translate('tasks.msg_fill_name'));
             return;
         }
 
         if (this.isEditing() && this.editingTaskId()) {
             this.apiService.updateTask(this.editingTaskId()!, currentForm).subscribe(() => {
-                this.message.success('Task updated');
+                this.message.success(this.translocoService.translate('tasks.msg_updated'));
                 this.loadTasks();
                 this.isModalVisible.set(false);
             });
@@ -102,7 +104,7 @@ export class TasksComponent implements OnInit {
             };
 
             this.apiService.createTask(taskPayload).subscribe(() => {
-                this.message.success('Task created');
+                this.message.success(this.translocoService.translate('tasks.msg_created'));
                 this.loadTasks();
                 this.isModalVisible.set(false);
             });
@@ -111,27 +113,25 @@ export class TasksComponent implements OnInit {
 
     confirmDeleteTask(task: any) {
         this.modal.confirm({
-            nzTitle: 'Are you sure you want to delete this task?',
+            nzTitle: this.translocoService.translate('tasks.delete_confirm'),
             nzContent: `<b>${task.name}</b>`,
-            nzOkText: 'Yes',
             nzOkType: 'primary',
             nzOkDanger: true,
             nzOnOk: () => this.deleteTask(task.id),
-            nzCancelText: 'No',
         });
     }
 
     deleteTask(id: number) {
         this.apiService.deleteTask(id).subscribe({
             next: () => {
-                this.message.success('Task deleted');
+                this.message.success(this.translocoService.translate('tasks.msg_deleted'));
                 this.loadTasks();
             },
             error: (err) => {
                 if (err.status === 400) {
-                    this.message.error(err.error.detail || 'Cannot delete task used by folders');
+                    this.message.error(err.error.detail || this.translocoService.translate('tasks.msg_cannot_delete_used'));
                 } else {
-                    this.message.error('Failed to delete task');
+                    this.message.error(this.translocoService.translate('tasks.msg_delete_failed'));
                 }
             },
         });

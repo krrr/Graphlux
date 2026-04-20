@@ -20,7 +20,7 @@ import { FileDialogComponent } from '../../components/file-dialog/file-dialog.co
 import { Folder, FolderForm, createDefaultFolderForm } from '../../interfaces/folder.interface';
 import { Task } from '../../interfaces/task.interface';
 import { BehaviorSubject, switchMap } from 'rxjs';
-import { TranslocoModule } from '@jsverse/transloco';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 @Component({
     selector: 'app-folders',
@@ -40,6 +40,7 @@ import { TranslocoModule } from '@jsverse/transloco';
         NzEmptyModule,
         FileDialogComponent,
         ...COMMON_IMPORTS,
+        TranslocoModule,
     ],
     templateUrl: './folders.component.html',
     styleUrls: ['./folders.component.scss'],
@@ -48,6 +49,7 @@ export class FoldersComponent implements OnInit {
     private apiService = inject(ApiService);
     private router = inject(Router);
     private message = inject(NzMessageService);
+    private translocoService = inject(TranslocoService);
 
     private refreshFolders$ = new BehaviorSubject<void>(undefined);
     folders = toSignal(
@@ -98,7 +100,7 @@ export class FoldersComponent implements OnInit {
     handleOk() {
         const currentForm = this.folderForm();
         if (!currentForm.name || !currentForm.watch_folder || !currentForm.task_ids.length) {
-            this.message.warning('Please fill all required fields (Name, Watch Folder, Task)');
+            this.message.warning(this.translocoService.translate('folders.msg_fill_required'));
             return;
         }
 
@@ -111,13 +113,13 @@ export class FoldersComponent implements OnInit {
 
         if (this.isEditing() && this.editingFolderId()) {
             this.apiService.updateFolder(this.editingFolderId()!, payload).subscribe(() => {
-                this.message.success('Folder updated');
+                this.message.success(this.translocoService.translate('folders.msg_updated'));
                 this.refreshFolders$.next();
                 this.isModalVisible.set(false);
             });
         } else {
             this.apiService.createFolder(payload).subscribe(() => {
-                this.message.success('Folder created');
+                this.message.success(this.translocoService.translate('folders.msg_created'));
                 this.refreshFolders$.next();
                 this.isModalVisible.set(false);
             });
@@ -126,7 +128,7 @@ export class FoldersComponent implements OnInit {
 
     deleteFolder(id: number) {
         this.apiService.deleteFolder(id).subscribe(() => {
-            this.message.success('Folder deleted');
+            this.message.success(this.translocoService.translate('folders.msg_deleted'));
                 this.refreshFolders$.next();
         });
     }
@@ -140,7 +142,8 @@ export class FoldersComponent implements OnInit {
         console.log(payload);
         
         this.apiService.updateFolder(folder.id!, payload).subscribe(() => {
-            this.message.success(`Folder ${newStatus === 'active' ? 'resumed' : 'paused'}`);
+            const msgKey = newStatus === 'active' ? 'folders.msg_resumed' : 'folders.msg_paused';
+            this.message.success(this.translocoService.translate(msgKey));
             this.refreshFolders$.next();
         });
     }

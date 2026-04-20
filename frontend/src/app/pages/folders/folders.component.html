@@ -24,7 +24,7 @@
                     <div style="display: flex; flex-wrap: wrap; gap: 4px">
                         @for (i of folder.tasks; track i.id) {
                             @let fullTask = taskMap().get(i.id);
-                            <nz-tag nzColor="blue">
+                            <nz-tag>
                                 <span style="margin-right: 4px">{{ fullTask?.icon }}</span>
                                 {{ fullTask?.name }}
                             </nz-tag>
@@ -41,7 +41,7 @@
                         <nz-icon nzType="edit"/>
                     </button>
                     <nz-divider nzType="vertical"></nz-divider>
-                    <button nz-button nzType="text" [title]="folder.status === 'active' ? 'Pause' : 'Resume'" (click)="toggleFolderStatus(folder)">
+                    <button nz-button nzType="text" [title]="folder.status === 'active' ? t('folders.pause') : t('folders.resume')" (click)="toggleFolderStatus(folder)">
                         <nz-icon [nzType]="folder.status === 'active' ? 'pause-circle' : 'play-circle'"/>
                     </button>
                     <nz-divider nzType="vertical"></nz-divider>
