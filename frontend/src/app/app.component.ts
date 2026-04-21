@@ -3,7 +3,7 @@ import { RouterModule } from '@angular/router';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { COMMON_IMPORTS } from './shared-imports';
 import { ApiService } from './api.service';
-import { LanguageService } from './i18n/language.service';
+import { LanguageService } from './services/language.service';
 import { ThemeService } from './services/theme.service';
 
 

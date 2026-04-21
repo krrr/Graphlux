@@ -6,7 +6,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { COMMON_IMPORTS } from '../../shared-imports';
-import { LanguageService } from '../../i18n/language.service';
+import { LanguageService } from '../../services/language.service';
 import { ThemeService, ThemeType } from '../../services/theme.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { NzSelectModule } from 'ng-zorro-antd/select';
