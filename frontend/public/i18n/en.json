@@ -1,9 +1,24 @@
 {
   "menu": {
-    "tasks": "Tasks",
-    "folders": "Folders",
-    "settings": "Settings"
+      "tasks": "Tasks",
+      "folders": "Folders",
+      "history": "History",
+      "settings": "Settings"
   },
+  "history": {
+      "title": "Execution Records",
+      "filterTask": "Filter by Task",
+      "filterFolder": "Filter by Folder",
+      "time": "Time",
+      "task": "Task",
+      "folder": "Folder",
+      "input": "Input File",
+      "status": "Status",
+      "status_running": "Running",
+      "status_success": "Success",
+      "status_failed": "Failed"
+  },
+
   "settings": {
     "language": "Language",
     "theme": "Theme",

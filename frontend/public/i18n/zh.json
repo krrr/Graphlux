@@ -1,9 +1,24 @@
 {
   "menu": {
-    "tasks": "任务",
-    "folders": "文件夹",
-    "settings": "设置"
+      "tasks": "任务",
+      "folders": "文件夹",
+      "history": "执行记录",
+      "settings": "系统设置"
   },
+  "history": {
+      "title": "执行记录",
+      "filterTask": "按任务筛选",
+      "filterFolder": "按文件夹筛选",
+      "time": "执行时间",
+      "task": "任务",
+      "folder": "文件夹",
+      "input": "输入文件",
+      "status": "状态",
+      "status_running": "运行中",
+      "status_success": "成功",
+      "status_failed": "失败"
+  },
+
   "settings": {
     "language": "语言",
     "theme": "主题",

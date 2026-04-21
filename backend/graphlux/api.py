@@ -10,7 +10,7 @@ from typing import List, Any, Dict, Optional
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from .db import get_session
-from .models import Task, Folder, SystemSettings, FolderTaskLink, SettingsResponse, SettingsConfig
+from .models import Task, Folder, SystemSettings, FolderTaskLink, SettingsResponse, SettingsConfig, ExecutionRecord
 from .engine.executor import TaskExecutor
 
 router = APIRouter()
@@ -86,7 +86,7 @@ async def execute_task_endpoint(request: ExecutionRequest):
     # Send a log message via websocket
     await manager.broadcast(f"Starting execution for: {request.file_path}")
 
-    executor = TaskExecutor(task_json)
+    executor = TaskExecutor(task_json, task_id=request.task_id)
 
     # Run in threadpool to not block the asyncio loop
     loop = asyncio.get_event_loop()
@@ -406,4 +406,33 @@ def validate_dag(dag_json: Any):
 
     if not check_node(start_node_id):
         raise HTTPException(status_code=400, detail="Validation Failed: Every path from Start must lead to a Finish node")
+
+# --- Execution Records ---
+
+@router.get("/history")
+def get_history(
+    task_id: Optional[int] = None,
+    folder_id: Optional[int] = None,
+    page: int = 1,
+    page_size: int = 20,
+    session: Session = Depends(get_session)
+):
+    statement = select(ExecutionRecord).order_by(ExecutionRecord.start_time.desc())
+    
+    if task_id:
+        statement = statement.where(ExecutionRecord.task_id == task_id)
+    if folder_id:
+        statement = statement.where(ExecutionRecord.folder_id == folder_id)
+    
+    # Total count
+    total = len(session.exec(statement).all())
+    
+    # Pagination
+    statement = statement.offset((page - 1) * page_size).limit(page_size)
+    records = session.exec(statement).all()
+    
+    return {
+        "total": total,
+        "items": [r.model_dump() for r in records]
+    }
 

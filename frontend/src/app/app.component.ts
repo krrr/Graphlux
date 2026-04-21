@@ -26,6 +26,9 @@ import { ThemeService } from './services/theme.service';
                         <a routerLink="/folders"><nz-icon nzType="folder-open" /> {{ t('menu.folders') }}</a>
                     </li>
                     <li nz-menu-item nzMatchRouter>
+                        <a routerLink="/history"><nz-icon nzType="history" /> {{ t('menu.history') }}</a>
+                    </li>
+                    <li nz-menu-item nzMatchRouter>
                         <a routerLink="/settings"><nz-icon nzType="setting" /> {{ t('menu.settings') }}</a>
                     </li>
                 </ul>

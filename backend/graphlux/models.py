@@ -7,6 +7,19 @@ class FolderTaskLink(SQLModel, table=True):
     folder_id: Optional[int] = Field(default=None, foreign_key="folder.id", primary_key=True)
     task_id: Optional[int] = Field(default=None, foreign_key="task.id", primary_key=True)
 
+class ExecutionRecord(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    task_id: int = Field(foreign_key="task.id")
+    folder_id: Optional[int] = Field(default=None, foreign_key="folder.id", nullable=True)
+    start_time: datetime = Field(default_factory=datetime.utcnow)
+    end_time: Optional[datetime] = None
+    status: str = Field(default="running") # running, success, failed
+    input_path: str
+    input_size: int
+    output_path: Optional[str] = None
+    output_size: Optional[int] = None
+    error_message: Optional[str] = None
+
 class Task(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(index=True)

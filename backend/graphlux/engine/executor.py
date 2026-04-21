@@ -1,20 +1,26 @@
 import os
+import datetime
 from typing import Dict, Any, List, Optional, Tuple
+from sqlmodel import Session
 from .context import FileContext
 from .nodes import NODE_TYPES, StartNode, FinishNode
 from ..logger import logger
+from ..db import engine
+from ..models import ExecutionRecord
 
 class DagExecError(Exception):
     pass
 
 
 class TaskExecutor:
-    def __init__(self, dag_json: Dict[str, Any], task_cache: Dict[int, Dict[str, Any]] = None):
+    def __init__(self, dag_json: Dict[str, Any], task_cache: Dict[int, Dict[str, Any]] = None, task_id: int = None, folder_id: int = None):
         """
         Initialize the executor with a JSON representation of the DAG.
         """
         self.dag_json = dag_json
         self.task_cache = task_cache if task_cache is not None else {}
+        self.task_id = task_id
+        self.folder_id = folder_id
         self.nodes = {}
         self.edges = {} # source_id -> { branch_name: target_id }
         self.start_node_id = dag_json.get("start_node")
@@ -98,7 +104,64 @@ class TaskExecutor:
 
         logger.info(f"Starting DAG execution for file: '{file_path}'")
         inputs = {'file': initial_file_obj}
-        return self.execute(inputs)
+
+        # Insert execution record
+        record_id = None
+        if self.task_id is not None:
+            try:
+                with Session(engine) as session:
+                    record = ExecutionRecord(
+                        task_id=self.task_id,
+                        folder_id=self.folder_id,
+                        input_path=file_path,
+                        input_size=initial_file_obj["size"],
+                        status="running"
+                    )
+                    session.add(record)
+                    session.commit()
+                    session.refresh(record)
+                    record_id = record.id
+            except Exception as e:
+                logger.error(f"Failed to create execution record: {e}")
+
+        # Execution
+        success = False
+        output_data = {}
+        error_msg = None
+        try:
+            success, output_data = self.execute(inputs)
+        except Exception as e:
+            error_msg = str(e)
+            logger.error(f"Execution failed: {e}")
+
+        # Update execution record
+        if record_id is not None:
+            try:
+                with Session(engine) as session:
+                    record = session.get(ExecutionRecord, record_id)
+                    if record:
+                        record.status = "success" if success else "failed"
+                        record.end_time = datetime.datetime.now()
+                        record.error_message = error_msg
+                        
+                        # Try to find output file info
+                        if success and output_data:
+                            # result_var in FinishNode can point to a file object
+                            result = output_data.get("result")
+                            if isinstance(result, dict) and "path" in result and "size" in result:
+                                record.output_path = result["path"]
+                                record.output_size = result["size"]
+                            elif "file" in output_data and isinstance(output_data["file"], dict):
+                                # Fallback if result is not set but 'file' is in output
+                                record.output_path = output_data["file"].get("path")
+                                record.output_size = output_data["file"].get("size")
+
+                        session.add(record)
+                        session.commit()
+            except Exception as e:
+                logger.error(f"Failed to update execution record: {e}")
+
+        return success
 
     def execute_with_output(self, file_path: str, initial_inputs: Dict[str, Any] = None, context: FileContext = None) -> Tuple[bool, Optional[str], Dict[str, Any]]:
         """
@@ -157,13 +220,13 @@ class TaskExecutor:
             logger.error(f"Error in execute_with_output: {e}")
             return False, None, {}
 
-    def execute(self, inputs: Dict[str, Any], context: FileContext = None) -> Any:
+    def execute(self, inputs: Dict[str, Any], context: FileContext = None) -> Tuple[bool, Dict[str, Any]]:
         """
         Execute the DAG.
         
         :param context:
         :param inputs: input to StartNode
-        :return: returned value by FinishNode
+        :return: (success, last_node_output)
         """
         if context is None:
             context = FileContext()
@@ -174,7 +237,7 @@ class TaskExecutor:
         start_node = self.nodes.get(current_node_id)
         assert start_node and isinstance(start_node, StartNode)
         
-
+        output_data = {}
         try:
             while current_node_id:
                 if current_node_id not in self.nodes:
@@ -197,7 +260,7 @@ class TaskExecutor:
                 if not success:
                     logger.warning(f"DAG execution halted at node: {current_node.name} (ID: {current_node_id})")
                     # Could handle specific failure logic or fallback branches here
-                    return False
+                    return False, output_data
 
                 if isinstance(current_node, FinishNode):
                     current_node_id = None
@@ -209,7 +272,7 @@ class TaskExecutor:
                     raise DagExecError(f"No outgoing edge for branch '{next_branch}' from node {current_node_id}")
 
             logger.info(f"Successfully completed DAG execution for inputs: {inputs}")
-            return True
+            return True, output_data
         except Exception as e:
             raise DagExecError(f"Unexpected error during DAG execution for inputs {inputs}: {e}")
         finally:

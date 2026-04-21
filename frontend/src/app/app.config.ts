@@ -52,6 +52,9 @@ import {
     BugOutline,
     ZoomInOutline,
     ZoomOutOutline,
+    HistoryOutline,
+    ReloadOutline,
+    ArrowRightOutline,
 } from '@ant-design/icons-angular/icons';
 import { TranslocoHttpLoader } from './transloco-loader';
 import { provideTransloco, TranslocoService } from '@jsverse/transloco';
@@ -101,6 +104,9 @@ const icons: IconDefinition[] = [
     BugOutline,
     ZoomInOutline,
     ZoomOutOutline,
+    ReloadOutline,
+    ArrowRightOutline,
+    HistoryOutline,
 ];
 
 export const appConfig: ApplicationConfig = {

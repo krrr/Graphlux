@@ -3,18 +3,41 @@ import { AppComponent } from './app.component';
 import { provideNzIcons } from 'ng-zorro-antd/icon';
 import { ActivatedRoute } from '@angular/router';
 import { getTranslocoModule } from './test-shared';
-import { ApartmentOutline, FolderOpenOutline, SettingOutline } from '@ant-design/icons-angular/icons';
+import { ApartmentOutline, FolderOpenOutline, HistoryOutline, SettingOutline } from '@ant-design/icons-angular/icons';
+import { ApiService } from './api.service';
+import { ThemeService } from './services/theme.service';
+import { LanguageService } from './services/language.service';
+import { of } from 'rxjs';
+import { vi } from 'vitest';
 
 describe('App', () => {
     beforeEach(async () => {
+        const apiServiceSpy = {
+            getSettings: vi.fn().mockReturnValue(of({ theme: 'light' })),
+            appInfo: vi.fn().mockReturnValue(of({ version: '1.0.0', is_packaged: false })),
+        };
+
+        const themeServiceSpy = {
+            isDark: vi.fn().mockReturnValue(false),
+            loadTheme: vi.fn(),
+            setTheme: vi.fn(),
+        };
+
+        const languageServiceSpy = {
+            init: vi.fn(),
+        };
+
         await TestBed.configureTestingModule({
             imports: [AppComponent, getTranslocoModule()],
             providers: [
-                provideNzIcons([ApartmentOutline, FolderOpenOutline, SettingOutline]),
+                provideNzIcons([ApartmentOutline, FolderOpenOutline, SettingOutline, HistoryOutline]),
                 {
                     provide: ActivatedRoute,
                     useValue: {},
                 },
+                { provide: ApiService, useValue: apiServiceSpy },
+                { provide: ThemeService, useValue: themeServiceSpy },
+                { provide: LanguageService, useValue: languageServiceSpy },
             ],
         }).compileComponents();
     });

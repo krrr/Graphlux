@@ -52,14 +52,14 @@ class FolderEventHandler(FileSystemEventHandler):
                 logger.warning(f"No tasks found for folder {self.folder_id}")
                 return
             
-            task_jsons = [t.json_data for t in tasks]
+            task_data = [(t.id, t.json_data) for t in tasks]
             
             # Pre-populate cache recursively for all tasks in this folder
-            for tj in task_jsons:
+            for tid, tj in task_data:
                 TaskExecutor.preload_tasks_recursive(tj, self.task_cache, session=session)
 
-        for i in task_jsons:
-            executor = TaskExecutor(i, task_cache=self.task_cache)
+        for tid, i in task_data:
+            executor = TaskExecutor(i, task_cache=self.task_cache, task_id=tid, folder_id=self.folder_id)
 
             # Fire and forget execution to avoid blocking watchdog thread
             def run_executor(exec_obj, path):

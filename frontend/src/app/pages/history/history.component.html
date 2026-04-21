@@ -1,0 +1,94 @@
+<div class="history-container" *transloco="let t">
+    <div class="header">
+        <h2>{{ t('history.title') }}</h2>
+        <div class="filters">
+            <nz-select
+                style="width: 200px;"
+                [ngModel]="filterTaskId()"
+                [nzPlaceHolder]="t('history.filterTask')"
+                nzAllowClear
+                (ngModelChange)="filterTaskId.set($event); loadHistory(1)"
+            >
+            @for (i of tasks(); track i.id) {
+                <nz-option [nzValue]="i.id" [nzLabel]="i.name"/>
+            }
+            </nz-select>
+
+            <nz-select
+                style="width: 200px;"
+                [ngModel]="filterFolderId()"
+                [nzPlaceHolder]="t('history.filterFolder')"
+                nzAllowClear
+                (ngModelChange)="filterFolderId.set($event); loadHistory(1)"
+            >
+            @for (i of folders(); track i.id) {
+                <nz-option [nzValue]="i.id" [nzLabel]="i.name"/>
+            }
+            </nz-select>
+
+            <button nz-button (click)="loadHistory(1)"><nz-icon nzType="reload" /></button>
+        </div>
+    </div>
+
+    <nz-table
+        #historyTable
+        [nzData]="items()"
+        [nzLoading]="loading()"
+        [nzTotal]="total()"
+        [nzPageIndex]="pageIndex()"
+        [nzPageSize]="pageSize()"
+        [nzFrontPagination]="false"
+        (nzPageIndexChange)="loadHistory($event)"
+        nzBordered
+        nzSize="middle"
+    >
+        <thead>
+            <tr>
+                <th nzWidth="150px">{{ t('history.time') }}</th>
+                <th nzWidth="150px">{{ t('history.task') }}</th>
+                <th nzWidth="150px">{{ t('history.folder') }}</th>
+                <th>{{ t('history.input') }}</th>
+                <th nzWidth="100px">{{ t('history.status') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (data of historyTable.data; track $index) {
+            <tr>
+                <td>{{ data.start_time + 'Z' | date: 'yyyy-MM-dd HH:mm:ss' }}</td>
+                <td>{{ taskMap().get(data.task_id)?.name }}</td>
+                <td>{{ folderMap().get(data.folder_id)?.name || '-' }}</td>
+                <td>
+                    <div class="file-info">
+                        <span class="path" [title]="data.input_path">{{ basename(data.input_path) }}</span>
+                        @if (data.output_size !== null) {
+                        <div class="size-change">
+                            <span class="old-size">{{ formatSize(data.input_size) }}</span>
+                            <span class="new-size"><nz-icon nzType="arrow-right"/> {{ formatSize(data.output_size) }}</span>
+                            <span class="percent" [class.negative]="data.output_size < data.input_size">
+                                ({{ ((data.output_size - data.input_size) / data.input_size * 100).toFixed(1) }}%)
+                            </span>
+                        </div>
+                        } @else {
+                        <div class="size-only">
+                            {{ formatSize(data.input_size) }}
+                        </div>
+                        }
+                    </div>
+                </td>
+                <td>
+                    <nz-badge [nzStatus]="getStatusColor(data.status)" [nzText]="t('history.status_' + data.status)"/>
+                        
+                    @if (data.status === 'failed' && data.error_message) {
+                    <nz-icon
+                        nzType="info-circle"
+                        nz-tooltip
+                        [nzTooltipTitle]="data.error_message"
+                        style="margin-left: 4px; color: #ab2e30; cursor: help;"
+                    />
+                    }
+                </td>
+            </tr>
+            }
+        </tbody>
+    </nz-table>
+</div>

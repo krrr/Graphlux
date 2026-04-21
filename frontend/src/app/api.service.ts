@@ -56,6 +56,11 @@ export class ApiService {
         return this.http.delete<any>(`/api/folders/${id}`);
     }
 
+    getHistory(task_id?: number, folder_id?: number, page?: number, page_size?: number) {
+        return this.http.get<{ total: number; items: any[] }>('/api/history', {params:
+            filterEmptyAttr({ task_id, folder_id, page, page_size})});
+    }
+
     getSettings(): Observable<any> {
         return this.http.get<any>('/api/settings');
     }
@@ -107,4 +112,16 @@ export class ApiService {
             this.socket = null;
         }
     }
+}
+
+
+function filterEmptyAttr(obj: { [key: string]: any }) {
+    let ret: { [key: string]: any } = {};
+    for (let key in obj) {
+        if (obj[key] != null) {
+            ret[key] = obj[key];
+        }
+    }
+
+    return ret;
 }
