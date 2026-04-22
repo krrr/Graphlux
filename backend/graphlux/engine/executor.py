@@ -94,11 +94,7 @@ class TaskExecutor:
         """
         # Prepare the initial file object for the start node
         try:
-            initial_file_obj = {
-                "path": file_path,
-                "size": os.path.getsize(file_path) if os.path.exists(file_path) else 0,
-                "ctime": os.path.getctime(file_path),
-            }
+            initial_file_obj = self.create_file_obj(file_path)
         except Exception as e:
             raise RuntimeError(f"Failed to get info for '{file_path}': {e}")
 
@@ -163,62 +159,13 @@ class TaskExecutor:
 
         return success
 
-    def execute_with_output(self, file_path: str, initial_inputs: Dict[str, Any] = None, context: FileContext = None) -> Tuple[bool, Optional[str], Dict[str, Any]]:
-        """
-        Execute the DAG and return the output of the terminal node.
-        Used by CallTaskNode to execute sub-DAGs.
-        """
-        if context is None:
-            context = FileContext()
-        
-        inputs = {}
-        if file_path:
-            try:
-                initial_file_obj = {
-                    "path": file_path,
-                    "size": os.path.getsize(file_path) if os.path.exists(file_path) else 0,
-                    "ctime": os.path.getctime(file_path),
-                }
-                inputs['file'] = initial_file_obj
-            except Exception as e:
-                logger.error(f"Failed to get info for {file_path}: {e}")
-                return False, None, {}
-
-        if initial_inputs:
-            inputs.update(initial_inputs)
-
-        current_node_id = self.start_node_id
-        last_output_data = {}
-
-        try:
-            while current_node_id:
-                current_node = self.nodes.get(current_node_id)
-                if not current_node:
-                    raise DagExecError(f"Node {current_node_id} not found.")
-
-                if current_node_id == self.start_node_id:
-                    node_inputs = inputs
-                else:
-                    node_inputs = self._build_inputs_for_node(current_node_id, context)
-
-                success, last_branch, last_output_data = current_node.execute(node_inputs, context)
-                context.set_node_output(current_node_id, last_output_data)
-
-                if not success:
-                    return False, last_branch, last_output_data
-
-                if isinstance(current_node, FinishNode):
-                    break
-                
-                if last_branch and current_node_id in self.edges and last_branch in self.edges[current_node_id]:
-                    current_node_id = self.edges[current_node_id][last_branch]
-                else:
-                    raise DagExecError(f"No outgoing edge for branch '{last_branch}' from node {current_node_id}")
-
-            return True, "default", last_output_data
-        except Exception as e:
-            logger.error(f"Error in execute_with_output: {e}")
-            return False, None, {}
+    def create_file_obj(self, file_path: str):
+        file_obj = {
+            "path": file_path,
+            "size": os.path.getsize(file_path) if os.path.exists(file_path) else 0,
+            "ctime": os.path.getctime(file_path),
+        }
+        return file_obj
 
     def execute(self, inputs: Dict[str, Any], context: FileContext = None) -> Tuple[bool, Dict[str, Any]]:
         """

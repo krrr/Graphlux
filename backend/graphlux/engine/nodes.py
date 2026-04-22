@@ -387,7 +387,8 @@ class CallTaskNode(DAGNode):
         file_path = file_obj.get("path", "") if file_obj else ""
 
         logger.info(f"[{self.name}] Calling subtask {task_id} ('{task_name}') for file: {file_path}")
-        success, next_branch, output_data = executor.execute_with_output(file_path, initial_inputs=inputs, context=context)
+        inputs = {'file': file_obj}
+        success, output_data = executor.execute(inputs=inputs, context=context)
 
         if success:
             logger.info(f"[{self.name}] Subtask {task_id} completed successfully.")
