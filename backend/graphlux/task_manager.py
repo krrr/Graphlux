@@ -6,30 +6,46 @@ from concurrent.futures import ThreadPoolExecutor
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from sqlmodel import Session, select
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Tuple
 
 from .db import engine
 from .models import Task, Folder, SystemSettings
 from .engine.executor import TaskExecutor
 from .logger import logger
 
+
 class FolderEventHandler(FileSystemEventHandler):
-    def __init__(self, folder_id: int, executor_pool: ThreadPoolExecutor):
+    def __init__(self, folder_id: int, executor_pool: ThreadPoolExecutor, fingerprints: Dict[Any, Any]):
         self.folder_id = folder_id
         self.executor_pool = executor_pool
+        self.fingerprints = fingerprints
         # Simple debounce to prevent multiple triggers for the same file rapidly
         self.recently_processed: Dict[str, float] = {}
         # Cache for tasks used by this folder (including sub-tasks)
         self.task_cache: Dict[int, Dict[str, Any]] = {}
 
-    def _handle_event(self, file_path: str):
+    def _handle_event(self, file_path: str, stat_info: Optional[os.stat_result] = None):
         # Ignore directories and hidden files
         if os.path.isdir(file_path) or os.path.basename(file_path).startswith('.'):
             return
 
         now = time.time()
-        # Debounce: 5 seconds
-        if file_path in self.recently_processed and now - self.recently_processed[file_path] < 5:
+        # Debounce: 30 seconds
+        if file_path in self.recently_processed and now - self.recently_processed[file_path] < 30:
+            return
+
+        try:
+            if stat_info is None:
+                stat_info = os.stat(file_path)
+            
+            key = (self.folder_id, stat_info.st_dev, stat_info.st_ino)
+            fingerprint = (stat_info.st_mtime_ns, stat_info.st_size)
+            
+            # If already processed and not changed, skip
+            if self.fingerprints.get(key) == fingerprint:
+                return
+        except Exception as e:
+            logger.warning(f"Could not get stat for {file_path}: {e}")
             return
 
         # Get Task definition for this folder
@@ -58,18 +74,23 @@ class FolderEventHandler(FileSystemEventHandler):
             for tid, tj in task_data:
                 TaskExecutor.preload_tasks_recursive(tj, self.task_cache, session=session)
 
-        for tid, i in task_data:
-            executor = TaskExecutor(i, task_cache=self.task_cache, task_id=tid, folder_id=self.folder_id)
-
-            # Fire and forget execution to avoid blocking watchdog thread
-            def run_executor(exec_obj, path):
+        def run_tasks(path, k, f):
+            all_success = True
+            for tid, i in task_data:
+                executor = TaskExecutor(i, task_cache=self.task_cache, task_id=tid, folder_id=self.folder_id)
                 try:
-                    exec_obj.execute_with_file(path)
+                    success = executor.execute_with_file(path)
+                    if not success:
+                        all_success = False
                 except Exception as e:
-                    logger.error(f"Executor failed for {path}: {e}")
+                    logger.error(f"Executor failed for {path} (task {tid}): {e}")
+                    all_success = False
+            
+            if all_success:  # Fingerprint is at file level, not task level; only update when all tasks succeed
+                self.fingerprints[k] = f
 
-            # Use the thread pool to execute the task, respecting the max_workers limit
-            self.executor_pool.submit(run_executor, executor, file_path)
+        # Use the thread pool to execute the tasks
+        self.executor_pool.submit(run_tasks, file_path, key, fingerprint)
 
     def on_created(self, event):
         self._handle_event(event.src_path)
@@ -84,6 +105,8 @@ class TaskManager:
         self.active_scans = {} # folder_id -> threading.Event (to stop)
         self._is_running = False
         self.executor_pool: Optional[ThreadPoolExecutor] = None
+        # (folder_id, dev, ino) -> (mtime_ns, size)
+        self.file_fingerprints: Dict[Tuple[int, int, int], Tuple[int, int]] = {}
 
     def _get_max_concurrent_tasks(self) -> int:
         try:
@@ -145,7 +168,7 @@ class TaskManager:
             logger.warning(f"Folder {folder.id}: Watch folder '{folder.watch_folder}' does not exist.")
             return
 
-        handler = FolderEventHandler(folder.id, self.executor_pool)
+        handler = FolderEventHandler(folder.id, self.executor_pool, self.file_fingerprints)
 
         if folder.real_time_watch:
             logger.info(f"Setting up real-time watch for Folder {folder.id} on path: {folder.watch_folder}")
@@ -188,7 +211,7 @@ class TaskManager:
             with Session(engine) as session:
                 folder = session.get(Folder, folder_id)
                 if folder and folder.status == "active":
-                    handler = FolderEventHandler(folder.id, self.executor_pool)
+                    handler = FolderEventHandler(folder.id, self.executor_pool, self.file_fingerprints)
                     self._scan_folder(folder, handler)
 
     def _scan_folder(self, folder: Folder, handler: FolderEventHandler):
@@ -197,19 +220,33 @@ class TaskManager:
             return
 
         logger.info(f"Scanning files for Folder {folder.id} in {folder.watch_folder} (recursive)")
-        for root, dirs, files in os.walk(folder.watch_folder):
-            # Prune hidden directories in-place to prevent os.walk from entering them
-            dirs[:] = [d for d in dirs if not d.startswith('.')]
-            
-            for filename in files:
-                if filename.startswith('.'):
-                    continue
-                
-                filepath = os.path.join(root, filename)
-                if folder.filename_regex:
-                    if not re.search(folder.filename_regex, filename):
-                        continue
-                handler._handle_event(filepath)
+        
+        def _recursive_scan(path):
+            try:
+                with os.scandir(path) as it:
+                    for entry in it:
+                        if entry.is_dir(follow_symlinks=False):
+                            if not entry.name.startswith('.'):
+                                _recursive_scan(entry.path)
+                        elif entry.is_file(follow_symlinks=False):
+                            if entry.name.startswith('.'):
+                                continue
+                            
+                            if folder.filename_regex and not re.search(folder.filename_regex, entry.name):
+                                continue
+                            
+                            try:
+                                # Get stat for fingerprint
+                                info = entry.stat()
+                                handler._handle_event(entry.path, stat_info=info)
+                            except Exception as e:
+                                logger.warning(f"Could not stat file {entry.path}: {e}")
+            except PermissionError:
+                pass
+            except Exception as e:
+                logger.error(f"Error scanning {path}: {e}")
+
+        _recursive_scan(folder.watch_folder)
 
 # Global singleton
 task_manager = TaskManager()
