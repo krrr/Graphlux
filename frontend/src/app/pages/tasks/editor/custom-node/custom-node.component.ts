@@ -2,7 +2,7 @@ import { Component, Input, ChangeDetectorRef, OnChanges, inject, effect } from '
 import { CommonModule } from '@angular/common';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { ReteModule } from 'rete-angular-plugin/18';
-import { NODE_INFO, TaskNode } from '../editor.service';
+import { NODE_INFO, TaskNode, EditorService } from '../editor.service';
 import { TranslocoService } from '@jsverse/transloco';
 import { ThemeService } from '../../../../services/theme.service';
 
@@ -22,6 +22,7 @@ export class CustomNodeComponent implements OnChanges {
     seed = 0; // from official demo
     private translocoService = inject(TranslocoService);
     private themeService = inject(ThemeService);
+    private editorService = inject(EditorService);
 
     get iconType(): string {
         return NODE_INFO[this.data.type]?.icon || 'setting';
@@ -106,6 +107,12 @@ export class CustomNodeComponent implements OnChanges {
         let val = config[key];
         if (typeof val === 'object') {
             val = JSON.stringify(val);
+        } else if (typeof val === 'string' && key.endsWith('_var') && val.includes(':')) {
+            const [nodeId, varName] = val.split(':');
+            const nodeName = this.editorService.nodeConfigs()[nodeId]?.name;
+            if (nodeName) {
+                val = `${nodeName} > ${varName}`;
+            }
         }
         if (String(val).length > 20) {
             return String(val).substring(0, 20) + '...';
@@ -118,8 +125,9 @@ export class CustomNodeComponent implements OnChanges {
         this.cdr.detach();
 
         effect(() => {
-            // Trigger detectChanges when theme changes
+            // Trigger detectChanges when theme or node configurations (names) change
             this.themeService.isDark();
+            this.editorService.nodeConfigs();
             this.cdr.detectChanges();
         });
     }

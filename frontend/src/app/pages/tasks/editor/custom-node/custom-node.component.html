@@ -46,7 +46,8 @@
             @for (key of configDisplayKeys; track key) {
                 <div class="config-row">
                     <span class="config-key">{{ getConfigKeyLabel(key) }}:</span>
-                    <span class="config-value" [title]="getConfigValue(key)">{{ getConfigValue(key) }}</span>
+                    @let value = getConfigValue(key);
+                    <span class="config-value" [title]="value">{{ value }}</span>
                 </div>
             }
         </div>
