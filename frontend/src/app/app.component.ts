@@ -20,7 +20,7 @@ import { ThemeService } from './services/theme.service';
                 </div>
                 <ul nz-menu nzMode="inline" [nzTheme]="themeService.isDark() ? 'dark' : 'light'">
                     <li nz-menu-item nzMatchRouter>
-                        <a routerLink="/tasks"><nz-icon nzType="apartment" /> {{ t('menu.tasks') }}</a>
+                        <a routerLink="/tasks"><nz-icon nzType="icon:task" /> {{ t('menu.tasks') }}</a>
                     </li>
                     <li nz-menu-item nzMatchRouter>
                         <a routerLink="/folders"><nz-icon nzType="folder-open" /> {{ t('menu.folders') }}</a>

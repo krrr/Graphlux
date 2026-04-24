@@ -3,6 +3,7 @@
         <h2>{{ t('history.title') }}</h2>
         <div class="filters">
             <nz-select
+                [nzPrefix]="prefix1"
                 style="width: 200px;"
                 [ngModel]="filterTaskId()"
                 [nzPlaceHolder]="t('history.filterTask')"
@@ -13,8 +14,12 @@
                 <nz-option [nzValue]="i.id" [nzLabel]="i.name"/>
             }
             </nz-select>
+            <ng-template #prefix1>
+                <nz-icon nzType="icon:task" />
+            </ng-template>
 
             <nz-select
+                [nzPrefix]="prefix2"
                 style="width: 200px;"
                 [ngModel]="filterFolderId()"
                 [nzPlaceHolder]="t('history.filterFolder')"
@@ -25,6 +30,9 @@
                 <nz-option [nzValue]="i.id" [nzLabel]="i.name"/>
             }
             </nz-select>
+            <ng-template #prefix2>
+                <nz-icon nzType="folder-open" />
+            </ng-template>
 
             <nz-space-compact>
                 <button nz-button nzType="default" (click)="clearHistory()">
