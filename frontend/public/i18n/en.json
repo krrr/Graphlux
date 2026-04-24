@@ -16,7 +16,8 @@
       "status": "Status",
       "status_running": "Running",
       "status_success": "Success",
-      "status_failed": "Failed"
+      "status_failed": "Failed",
+      "clear_confirm": "Are you sure you want to clear history?"
   },
 
   "settings": {

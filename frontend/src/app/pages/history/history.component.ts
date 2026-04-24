@@ -9,19 +9,25 @@ import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzBadgeModule } from 'ng-zorro-antd/badge';
+import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
+import { TranslocoService } from '@jsverse/transloco';
 import { Task } from '../../interfaces/task.interface';
 import { Folder } from '../../interfaces/folder.interface';
+import { lastValueFrom } from 'rxjs';
+import { NzSpaceModule } from 'ng-zorro-antd/space';
 
 
 @Component({
     selector: 'app-history',
     standalone: true,
-    imports: [CommonModule, FormsModule, NzSelectModule, NzTableModule, NzTagModule, NzTooltipModule, NzBadgeModule, ...COMMON_IMPORTS],
+    imports: [CommonModule, FormsModule, NzSelectModule, NzTableModule, NzTagModule, NzTooltipModule, NzBadgeModule, NzModalModule, NzSpaceModule, ...COMMON_IMPORTS],
     templateUrl: './history.component.html',
     styleUrls: ['./history.component.scss'],
 })
 export class HistoryComponent implements OnInit {
     apiService = inject(ApiService);
+    private modal = inject(NzModalService);
+    private translocoService = inject(TranslocoService);
 
     tasks = toSignal(this.apiService.getTasks(), { initialValue: [] as Task[] });
     taskMap = computed(() => new Map(this.tasks().map((task) => [task.id, task])));
@@ -52,6 +58,22 @@ export class HistoryComponent implements OnInit {
                 this.loading.set(false);
             },
             error: () => this.loading.set(false)
+        });
+    }
+
+    clearHistory() {
+        this.modal.confirm({
+            nzTitle: this.translocoService.translate('history.clear_confirm'),
+            nzOkDanger: true,
+            nzOnOk: async () => {
+                this.loading.set(true);
+                try {
+                    await lastValueFrom(this.apiService.clearHistory());
+                    this.loadHistory(1);
+                } finally {
+                    this.loading.set(false);
+                }
+            }
         });
     }
 

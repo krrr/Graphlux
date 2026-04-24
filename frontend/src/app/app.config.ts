@@ -55,6 +55,7 @@ import {
     HistoryOutline,
     ReloadOutline,
     ArrowRightOutline,
+    ClearOutline,
 } from '@ant-design/icons-angular/icons';
 import { TranslocoHttpLoader } from './transloco-loader';
 import { provideTransloco, TranslocoService } from '@jsverse/transloco';
@@ -107,6 +108,7 @@ const icons: IconDefinition[] = [
     ReloadOutline,
     ArrowRightOutline,
     HistoryOutline,
+    ClearOutline,
 ];
 
 export const appConfig: ApplicationConfig = {

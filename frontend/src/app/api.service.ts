@@ -61,6 +61,10 @@ export class ApiService {
             filterEmptyAttr({ task_id, folder_id, page, page_size})});
     }
 
+    clearHistory() {
+        return this.http.delete<any>('/api/history');
+    }
+
     getSettings(): Observable<any> {
         return this.http.get<any>('/api/settings');
     }

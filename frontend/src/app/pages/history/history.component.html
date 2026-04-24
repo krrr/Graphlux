@@ -26,7 +26,14 @@
             }
             </nz-select>
 
-            <button nz-button (click)="loadHistory(1)"><nz-icon nzType="reload" /></button>
+            <nz-space-compact>
+                <button nz-button nzType="default" (click)="clearHistory()">
+                    <nz-icon nzType="clear" />
+                </button>
+                <button nz-button (click)="loadHistory(1)" >
+                    <nz-icon nzType="reload" />
+                </button>
+            </nz-space-compact>
         </div>
     </div>
 

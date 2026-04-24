@@ -5,7 +5,7 @@ import asyncio
 import datetime
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from sqlalchemy.orm import selectinload, defer
-from sqlmodel import Session, select
+from sqlmodel import delete, Session, select
 from typing import List, Any, Dict, Optional
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -435,4 +435,10 @@ def get_history(
         "total": total,
         "items": [r.model_dump() for r in records]
     }
+
+@router.delete("/history")
+def clear_history(session: Session = Depends(get_session)):
+    session.exec(delete(ExecutionRecord))
+    session.commit()
+    return {"message": "History cleared successfully"}
 
