@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 import asyncio
 import os
 
-from graphlux.api import router as api_router, __version__
+from graphlux.api import router as api_router, __version__, log_broadcaster
 from graphlux.db import init_db, get_session
 from graphlux.task_manager import task_manager
 from graphlux.tools.imagemagick_wrapper import magick_pool_reaper
@@ -15,6 +15,7 @@ async def lifespan(app: FastAPI):
     init_db()
     task_manager.start()
     asyncio.create_task(magick_pool_reaper())
+    asyncio.create_task(log_broadcaster())
     yield
     task_manager.stop()
 

@@ -10,7 +10,7 @@ import { Task } from './interfaces/task.interface';
 })
 export class ApiService {
     private socket: WebSocket | null = null;
-    public logs$ = new Subject<string>();
+    public logs$ = new Subject<any>();
     private http = inject(HttpClient);
     public appInfo = toSignal(this.getAppInfo());
 
@@ -65,6 +65,10 @@ export class ApiService {
         return this.http.delete<any>('/api/history');
     }
 
+    getLogHistory(): Observable<any[]> {
+        return this.http.get<any[]>('/api/logs/history');
+    }
+
     getSettings(): Observable<any> {
         return this.http.get<any>('/api/settings');
     }
@@ -98,7 +102,12 @@ export class ApiService {
         this.socket = new WebSocket(wsUrl);
 
         this.socket.onmessage = (event) => {
-            this.logs$.next(event.data);
+            try {
+                const data = JSON.parse(event.data);
+                this.logs$.next(data);
+            } catch (e) {
+                console.error('Error parsing log message:', e);
+            }
         };
 
         this.socket.onerror = (error) => {

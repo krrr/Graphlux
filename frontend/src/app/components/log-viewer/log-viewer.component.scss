@@ -1,0 +1,62 @@
+.log-viewer {
+    background: #1d1d1d;
+    color: rgba(255, 255, 255, 0.85);
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    padding: 12px;
+    height: 100%;
+    overflow-y: auto;
+    font-size: 13px;
+    line-height: 1.5;
+    border-radius: var(--border-radius-base);
+    border: 1px solid var(--border-color-split);
+
+    .log-entry {
+        white-space: pre-wrap;
+        word-break: break-all;
+
+        .time {
+            color: #888;
+            margin-right: 8px;
+        }
+
+        .level {
+            font-weight: bold;
+            margin-right: 8px;
+            min-width: 60px;
+            display: inline-block;
+        }
+
+        &.info .level { color: #4caf50; }
+
+        &.warning .level { color: #ff9800; }
+
+        &.error .level { color: #f44336; }
+
+        &.debug .level { color: #9e9e9e; }
+    }
+
+    .empty-logs {
+        color: #555;
+        text-align: center;
+        font-size: 20px;
+        margin-top: 15px;
+    }
+
+    /* Scrollbar style */
+    &::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #2d2d2d;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #555;
+        border-radius: 2px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: #777;
+    }
+}

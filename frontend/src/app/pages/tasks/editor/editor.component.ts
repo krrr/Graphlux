@@ -95,8 +95,9 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     ) { }
 
     ngOnInit() {
-        this.logSubscription = this.apiService.logs$.subscribe((log) => {
-            this.logs.update((l) => [...l, log]);
+        this.logSubscription = this.apiService.logs$.subscribe((data) => {
+            const msg = typeof data === 'string' ? data : data.message;
+            this.logs.update((l) => [...l, msg]);
         });
 
         this.routeSub = this.route.paramMap.subscribe((params) => {

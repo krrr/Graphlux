@@ -6,19 +6,25 @@
       "settings": "Settings"
   },
   "history": {
-      "title": "Execution Records",
-      "filterTask": "Filter by Task",
-      "filterFolder": "Filter by Folder",
-      "time": "Time",
-      "task": "Task",
-      "folder": "Folder",
-      "input": "Input File",
-      "status": "Status",
-      "status_running": "Running",
-      "status_success": "Success",
-      "status_failed": "Failed",
-      "clear_confirm": "Are you sure you want to clear history?"
-  },
+        "title": "Execution History",
+        "tab_history": "History",
+        "tab_logs": "Program Logs",
+        "filterTask": "Filter by Task",
+        "filterFolder": "Filter by Folder",
+        "time": "Time",
+        "task": "Task",
+        "folder": "Folder",
+        "input": "Input File",
+        "status": "Status",
+        "status_running": "Running",
+        "status_success": "Success",
+        "status_failed": "Failed",
+        "clear_confirm": "Are you sure you want to clear the history?",
+        "filter_log_level": "Filter by Log Level",
+        "level_all": "All Levels",
+        "clear_logs": "Clear Logs"
+    },
+
 
   "settings": {
     "language": "Language",

@@ -111,11 +111,36 @@ class ConnectionManager:
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
 
-    async def broadcast(self, message: str):
-        for connection in self.active_connections:
-            await connection.send_text(message)
+    async def broadcast(self, message: Any):
+        for i in self.active_connections:
+            try:
+                await i.send_json(message)
+            except Exception:
+                pass
 
 manager = ConnectionManager()
+
+async def log_broadcaster():
+    """Background task to broadcast structured logs from the queue to websocket clients."""
+    from .logger import log_queue
+    loop = asyncio.get_event_loop()
+    while True:
+        try:
+            # Non-blocking get from thread-safe queue
+            msg = await loop.run_in_executor(None, log_queue.get)
+            if msg is None: # Sentinel to stop
+                break
+            await manager.broadcast(msg)
+        except asyncio.CancelledError:
+            break
+        except Exception:
+            await asyncio.sleep(1) # Wait a bit on error
+
+@router.get("/logs/history")
+async def get_log_history():
+    """Retrieve the buffered log history."""
+    from .logger import log_history
+    return list(log_history)
 
 @router.websocket("/logs")
 async def websocket_endpoint(websocket: WebSocket):

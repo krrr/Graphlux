@@ -7,6 +7,8 @@
   },
   "history": {
       "title": "执行记录",
+      "tab_history": "历史记录",
+      "tab_logs": "程序日志",
       "filterTask": "按任务筛选",
       "filterFolder": "按文件夹筛选",
       "time": "执行时间",
@@ -17,7 +19,10 @@
       "status_running": "运行中",
       "status_success": "成功",
       "status_failed": "失败",
-      "clear_confirm": "确定要清空历史记录吗？"
+      "clear_confirm": "确定要清空历史记录吗？",
+      "filter_log_level": "按日志级别筛选",
+      "level_all": "全部级别",
+      "clear_logs": "清空日志"
   },
 
   "settings": {

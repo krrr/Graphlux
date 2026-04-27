@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop'
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -13,14 +13,28 @@ import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { TranslocoService } from '@jsverse/transloco';
 import { Task } from '../../interfaces/task.interface';
 import { Folder } from '../../interfaces/folder.interface';
-import { lastValueFrom } from 'rxjs';
+import { lastValueFrom, Subscription } from 'rxjs';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
-
+import { NzRadioModule } from 'ng-zorro-antd/radio';
+import { LogViewerComponent } from '../../components/log-viewer/log-viewer.component';
 
 @Component({
     selector: 'app-history',
     standalone: true,
-    imports: [CommonModule, FormsModule, NzSelectModule, NzTableModule, NzTagModule, NzTooltipModule, NzBadgeModule, NzModalModule, NzSpaceModule, ...COMMON_IMPORTS],
+    imports: [
+        CommonModule,
+        FormsModule,
+        NzSelectModule,
+        NzTableModule,
+        NzTagModule,
+        NzTooltipModule,
+        NzBadgeModule,
+        NzModalModule,
+        NzSpaceModule,
+        NzRadioModule,
+        LogViewerComponent,
+        ...COMMON_IMPORTS
+    ],
     templateUrl: './history.component.html',
     styleUrls: ['./history.component.scss'],
 })
@@ -28,6 +42,8 @@ export class HistoryComponent implements OnInit {
     apiService = inject(ApiService);
     private modal = inject(NzModalService);
     private translocoService = inject(TranslocoService);
+
+    viewMode = signal<'history' | 'logs'>('history');
 
     tasks = toSignal(this.apiService.getTasks(), { initialValue: [] as Task[] });
     taskMap = computed(() => new Map(this.tasks().map((task) => [task.id, task])));
@@ -42,9 +58,18 @@ export class HistoryComponent implements OnInit {
     filterTaskId = signal<number | null>(null);
     filterFolderId = signal<number | null>(null);
 
+    // Log viewer
+    logLevel = signal<string | null>(null);
+    logViewer = viewChild<LogViewerComponent>("logViewer");
 
     ngOnInit() {
         this.loadHistory();
+    }
+
+    onViewModeChange(mode: 'history' | 'logs') {
+        if (mode === 'history') {
+            this.loadHistory(1);
+        }
     }
 
     loadHistory(page: number = this.pageIndex()) {
