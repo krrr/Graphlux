@@ -78,15 +78,8 @@
     <nz-modal [nzVisible]="isLogsModalVisible()" (nzVisibleChange)="isLogsModalVisible.set($event)"
         [nzTitle]="t('editor.console_logs')" (nzOnCancel)="handleLogsClose()" [nzFooter]="null" nzWidth="800px">
         <ng-container *nzModalContent>
-            <div class="console">
-                <div class="logs-container">
-                    @for (log of logs(); track $index) {
-                        <div>{{ log }}</div>
-                    }
-                    @if (logs().length === 0) {
-                        <div style="color: #666">{{ t('editor.waiting_for_logs') }}</div>
-                    }
-                </div>
+            <div style="height: 400px">
+                <app-log-viewer />
             </div>
         </ng-container>
     </nz-modal>

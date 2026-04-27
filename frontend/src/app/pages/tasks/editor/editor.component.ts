@@ -27,6 +27,8 @@ import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { TranslocoService } from '@jsverse/transloco';
 
 
+import { LogViewerComponent } from '../../../components/log-viewer/log-viewer.component';
+
 type Schemes = GetSchemes<TaskNode, TaskConnection<TaskNode>>;
 type AreaExtra = AngularArea2D<Schemes>;
 
@@ -47,6 +49,7 @@ type AreaExtra = AngularArea2D<Schemes>;
         RouterLink,
         NodePropertiesComponent,
         NzSpaceModule,
+        LogViewerComponent,
     ],
     providers: [EditorService],
     templateUrl: './editor.component.html',
@@ -56,8 +59,6 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild('rete') container!: ElementRef<HTMLElement>;
     @ViewChild('contextMenu') contextMenu!: NzDropdownMenuComponent;
 
-    logs = signal<string[]>([]);
-    private logSubscription: Subscription | undefined;
     private routeSub: Subscription | undefined;
     private changeSub: Subscription | undefined;
     private movementSubject = new Subject<void>();
@@ -95,11 +96,6 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     ) { }
 
     ngOnInit() {
-        this.logSubscription = this.apiService.logs$.subscribe((data) => {
-            const msg = typeof data === 'string' ? data : data.message;
-            this.logs.update((l) => [...l, msg]);
-        });
-
         this.routeSub = this.route.paramMap.subscribe((params) => {
             const idStr = params.get('taskId');
             if (idStr) {
@@ -131,9 +127,6 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        if (this.logSubscription) {
-            this.logSubscription.unsubscribe();
-        }
         if (this.routeSub) {
             this.routeSub.unsubscribe();
         }
@@ -143,7 +136,6 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         if (this.changeSub) {
             this.changeSub.unsubscribe();
         }
-        this.apiService.disconnectLogsWebSocket();
         document.removeEventListener('keydown', this.keydownListener);
     }
 
@@ -423,9 +415,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
 
     executeDag() {
         const dag = this.editorService.serializeDag();
-        this.logs.set([]);
         this.isLogsModalVisible.set(true);
-        this.apiService.connectLogsWebSocket();
 
         this.apiService.executeTask(dag, this.executeFilePath(), this.taskId).subscribe({
             next: (res) => console.log('Execution response:', res),
@@ -438,7 +428,6 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
 
     handleLogsClose() {
         this.isLogsModalVisible.set(false);
-        this.apiService.disconnectLogsWebSocket();
     }
 
     async saveDag() {

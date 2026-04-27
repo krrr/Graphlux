@@ -1,14 +1,20 @@
+.container {
+    border-radius: var(--border-radius-base);
+    border: 1px solid var(--border-color-split);
+    height: 100%;
+    overflow: hidden;
+}
+
 .log-viewer {
     background: #1d1d1d;
     color: rgba(255, 255, 255, 0.85);
     font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
     padding: 12px;
     height: 100%;
+    width: 100%;
     overflow-y: auto;
     font-size: 13px;
     line-height: 1.5;
-    border-radius: var(--border-radius-base);
-    border: 1px solid var(--border-color-split);
 
     .log-entry {
         white-space: pre-wrap;
