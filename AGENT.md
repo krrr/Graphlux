@@ -3,7 +3,7 @@ The Graphlux project is a automated batch processing and compressing of images a
 
 # Frontend
 - Frontend uses Angular with the ng-zorro-antd UI component library. Use the <nz-tabs> element as tab component, <nz-tabset> is deprecated.
-- Frontend Angular commands should be executed from the frontend/ directory using npx ng or pnpm (e.g., pnpm run test -- --watch=false, pnpm run build).
+- Frontend Angular commands should be executed from the frontend/ directory using npx ng (e.g., npx ng test --watch=false, npx ng build).
 - Frontend development server can be started for local testing by running pnpm run start within the frontend directory.
 - 项目使用transloco进行国际化
 
