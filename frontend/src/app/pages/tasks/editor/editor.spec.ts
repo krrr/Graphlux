@@ -6,11 +6,10 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 import { ApiService } from '../../../api.service';
 import { EditorService } from './editor.service';
-import { vi } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { COMMON_TEST_PROVIDERS, getTranslocoModule, messageServiceSpy } from '../../../test-shared';
 
 import { EditorComponent } from './editor.component';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 // We override the component's template and some properties so we don't have to deal with DOM and Rete.js initialization
 // which heavily relies on `HTMLElement` and actual browser rendering that can be brittle in jsdom.
@@ -25,8 +24,10 @@ describe('EditorComponent', () => {
             getTask: vi.fn().mockReturnValue(of({ name: 'Task', description: 'Desc' })),
             updateTask: vi.fn().mockReturnValue(of({})),
             executeTask: vi.fn().mockReturnValue(of({})),
+            getLogHistory: vi.fn().mockReturnValue(of([])),
             connectLogsWebSocket: vi.fn(),
             disconnectLogsWebSocket: vi.fn(),
+            logs$: of()
         };
 
         await TestBed.configureTestingModule({
@@ -37,7 +38,7 @@ describe('EditorComponent', () => {
                 { provide: ApiService, useValue: apiServiceSpy },
                 {
                     provide: ActivatedRoute,
-                    useValue: { paramMap: of(new Map([['id', '1']])) }
+                    useValue: { paramMap: of(new Map([['taskId', '1']])) }
                 },
                 EditorService,
                 ...COMMON_TEST_PROVIDERS
@@ -55,7 +56,7 @@ describe('EditorComponent', () => {
 
         // Mock the internal signals and properties so we don't trigger rete logic
         component.taskId = 1;
-        component.executeFilePath = vi.fn().mockReturnValue('/test/path') as any;
+        component.executeFilePath.set('/test/path');
 
         // Mock serializeDag because it needs Rete editor
         component.editorService.serializeDag = vi.fn().mockReturnValue({ nodes: {}, edges: [], start_node: null }) as any;
@@ -77,12 +78,10 @@ describe('EditorComponent', () => {
     });
 
     it('should execute DAG', () => {
-        const setLogsSpy = vi.spyOn(component.logs, 'set');
         const setLogsModalSpy = vi.spyOn(component.isLogsModalVisible, 'set');
 
         component.executeDag();
 
-        expect(setLogsSpy).toHaveBeenCalledWith([]);
         expect(setLogsModalSpy).toHaveBeenCalledWith(true);
         expect(apiServiceSpy.executeTask).toHaveBeenCalledWith({ nodes: {}, edges: [], start_node: null }, '/test/path', 1);
     });

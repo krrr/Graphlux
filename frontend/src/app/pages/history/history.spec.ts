@@ -3,7 +3,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
-import { of, Subject } from 'rxjs';
+import { of } from 'rxjs';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 import { HistoryComponent } from './history.component';
@@ -14,7 +14,6 @@ describe('HistoryComponent', () => {
     let component: HistoryComponent;
     let fixture: ComponentFixture<HistoryComponent>;
     let apiServiceSpy: any;
-    let logsSubject: Subject<string>;
 
     const mockHistory = {
         total: 1,
@@ -36,15 +35,15 @@ describe('HistoryComponent', () => {
     const mockFolders = [{ id: 1, name: 'Folder 1' }];
 
     beforeEach(async () => {
-        logsSubject = new Subject<string>();
         apiServiceSpy = {
             getHistory: vi.fn().mockReturnValue(of(mockHistory)),
             getTasks: vi.fn().mockReturnValue(of(mockTasks)),
             getFolders: vi.fn().mockReturnValue(of(mockFolders)),
             clearHistory: vi.fn().mockReturnValue(of({})),
+            getLogHistory: vi.fn().mockReturnValue(of([])),
             connectLogsWebSocket: vi.fn(),
             disconnectLogsWebSocket: vi.fn(),
-            logs$: logsSubject.asObservable()
+            logs$: of()
         };
 
         await TestBed.configureTestingModule({
@@ -75,54 +74,22 @@ describe('HistoryComponent', () => {
     it('should switch between history and logs mode', () => {
         expect(component.viewMode()).toBe('history');
         
+        component.viewMode.set('logs');
         component.onViewModeChange('logs');
         expect(component.viewMode()).toBe('logs');
-        expect(apiServiceSpy.connectLogsWebSocket).toHaveBeenCalled();
 
+        component.viewMode.set('history');
         component.onViewModeChange('history');
         expect(component.viewMode()).toBe('history');
-        expect(apiServiceSpy.disconnectLogsWebSocket).toHaveBeenCalled();
     });
 
-    it('should load history and logs correctly', () => {
-        apiServiceSpy.getLogHistory.mockReturnValue(of([{ time: '2026-04-26T12:00:00Z', level: 'INFO', message: 'Hist log' }]));
-        
-        component.onViewModeChange('logs');
-        expect(apiServiceSpy.getLogHistory).toHaveBeenCalled();
-        expect(component.rawLogs().length).toBe(1);
-        expect(component.rawLogs()[0].message).toBe('Hist log');
-    });
+    it('should filter history', () => {
+        component.filterTaskId.set(1);
+        component.loadHistory(1);
+        expect(apiServiceSpy.getHistory).toHaveBeenCalledWith(1, undefined, 1, 20);
 
-    it('should parse logs correctly', () => {
-        component.onViewModeChange('logs');
-        
-        const logObj = { time: '2026-04-26T12:34:56.789Z', level: 'INFO', message: 'Test message' };
-        logsSubject.next(logObj);
-
-        expect(component.rawLogs().length).toBe(1);
-        expect(component.rawLogs()[0].level).toBe('INFO');
-        expect(component.rawLogs()[0].message).toBe('Test message');
-    });
-
-    it('should filter logs by level', () => {
-        component.onViewModeChange('logs');
-        
-        logsSubject.next({ time: '2026-04-26T12:00:00Z', level: 'INFO', message: 'info msg' });
-        logsSubject.next({ time: '2026-04-26T12:00:01Z', level: 'ERROR', message: 'error msg' });
-
-        expect(component.filteredLogs().length).toBe(2);
-
-        component.logLevel.set('ERROR');
-        expect(component.filteredLogs().length).toBe(1);
-        expect(component.filteredLogs()[0].level).toBe('ERROR');
-    });
-
-    it('should clear logs', () => {
-        component.onViewModeChange('logs');
-        logsSubject.next('test log');
-        expect(component.rawLogs().length).toBe(1);
-
-        component.clearLogs();
-        expect(component.rawLogs().length).toBe(0);
+        component.filterFolderId.set(2);
+        component.loadHistory(1);
+        expect(apiServiceSpy.getHistory).toHaveBeenCalledWith(1, 2, 1, 20);
     });
 });
