@@ -99,7 +99,8 @@
                     <th nzWidth="150px">{{ t('history.task') }}</th>
                     <th nzWidth="150px">{{ t('history.folder') }}</th>
                     <th>{{ t('history.input') }}</th>
-                    <th nzWidth="100px">{{ t('history.status') }}</th>
+                    <th nzWidth="200px">{{ t('history.size') }}</th>
+                    <th nzWidth="70px">{{ t('history.status') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -108,23 +109,23 @@
                     <td>{{ data.start_time + 'Z' | date: 'yyyy-MM-dd HH:mm:ss' }}</td>
                     <td>{{ taskMap().get(data.task_id)?.name }}</td>
                     <td>{{ folderMap().get(data.folder_id)?.name || '-' }}</td>
+                    <td class="path-col">
+                        <span class="path" [title]="data.input_path">{{ data.input_path }}</span>
+                    </td>
                     <td>
-                        <div class="file-info">
-                            <span class="path" [title]="data.input_path">{{ basename(data.input_path) }}</span>
-                            @if (data.output_size !== null) {
-                            <div class="size-change">
-                                <span class="old-size">{{ formatSize(data.input_size) }}</span>
-                                <span class="new-size"><nz-icon nzType="arrow-right"/> {{ formatSize(data.output_size) }}</span>
-                                <span class="percent" [class.negative]="data.output_size < data.input_size">
-                                    ({{ ((data.output_size - data.input_size) / data.input_size * 100).toFixed(1) }}%)
-                                </span>
-                            </div>
-                            } @else {
-                            <div class="size-only">
-                                {{ formatSize(data.input_size) }}
-                            </div>
-                            }
+                        @if (data.output_size !== null) {
+                        <div class="size-change">
+                            <span class="old-size">{{ formatSize(data.input_size) }}</span>
+                            <span class="new-size"><nz-icon nzType="arrow-right"/> {{ formatSize(data.output_size) }}</span>
+                            <span class="percent" [class.negative]="data.output_size < data.input_size">
+                                ({{ ((data.output_size - data.input_size) / data.input_size * 100).toFixed(1) }}%)
+                            </span>
                         </div>
+                        } @else {
+                        <div class="size-only">
+                            {{ formatSize(data.input_size) }}
+                        </div>
+                        }
                     </td>
                     <td>
                         <nz-badge [nzStatus]="getStatusColor(data.status)" [nzText]="t('history.status_' + data.status)"/>

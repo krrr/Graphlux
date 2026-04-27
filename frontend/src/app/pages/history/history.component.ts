@@ -53,7 +53,7 @@ export class HistoryComponent implements OnInit {
     total = signal(0);
     loading = signal(false);
     pageIndex = signal(1);
-    pageSize = signal(20);
+    pageSize = signal(15);
 
     filterTaskId = signal<number | null>(null);
     filterFolderId = signal<number | null>(null);
@@ -109,11 +109,6 @@ export class HistoryComponent implements OnInit {
             case 'running': return 'processing';
             default: return 'default';
         }
-    }
-
-    basename(path: string): string {
-        if (!path) return '';
-        return path.split(/[\\\/]/).pop() || '';
     }
 
     formatSize(bytes: number): string {

@@ -3,7 +3,7 @@ import { AppComponent } from './app.component';
 import { provideNzIcons } from 'ng-zorro-antd/icon';
 import { ActivatedRoute } from '@angular/router';
 import { getTranslocoModule } from './test-shared';
-import { ApartmentOutline, FolderOpenOutline, HistoryOutline, SettingOutline } from '@ant-design/icons-angular/icons';
+import { FolderOpenOutline, HistoryOutline, SettingOutline } from '@ant-design/icons-angular/icons';
 import { ApiService } from './api.service';
 import { ThemeService } from './services/theme.service';
 import { LanguageService } from './services/language.service';
@@ -30,7 +30,7 @@ describe('App', () => {
         await TestBed.configureTestingModule({
             imports: [AppComponent, getTranslocoModule()],
             providers: [
-                provideNzIcons([ApartmentOutline, FolderOpenOutline, SettingOutline, {name: 'icon:task', icon: '<svg></svg>'}]),
+                provideNzIcons([HistoryOutline, FolderOpenOutline, SettingOutline, {name: 'icon:task', icon: '<svg></svg>'}]),
                 {
                     provide: ActivatedRoute,
                     useValue: {},

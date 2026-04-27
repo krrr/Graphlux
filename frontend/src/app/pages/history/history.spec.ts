@@ -86,10 +86,10 @@ describe('HistoryComponent', () => {
     it('should filter history', () => {
         component.filterTaskId.set(1);
         component.loadHistory(1);
-        expect(apiServiceSpy.getHistory).toHaveBeenCalledWith(1, undefined, 1, 20);
+        expect(apiServiceSpy.getHistory).toHaveBeenCalledWith(1, undefined, 1, component.pageSize());
 
         component.filterFolderId.set(2);
         component.loadHistory(1);
-        expect(apiServiceSpy.getHistory).toHaveBeenCalledWith(1, 2, 1, 20);
+        expect(apiServiceSpy.getHistory).toHaveBeenCalledWith(1, 2, 1, component.pageSize());
     });
 });

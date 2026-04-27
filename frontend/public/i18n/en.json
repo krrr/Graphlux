@@ -15,6 +15,7 @@
         "task": "Task",
         "folder": "Folder",
         "input": "Input File",
+        "size": "Size",
         "status": "Status",
         "status_running": "Running",
         "status_success": "Success",
