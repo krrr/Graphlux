@@ -56,9 +56,9 @@ export class ApiService {
         return this.http.delete<any>(`/api/folders/${id}`);
     }
 
-    getHistory(task_id?: number, folder_id?: number, page?: number, page_size?: number) {
+    getHistory(task_id?: number, folder_id?: number, page?: number, page_size?: number, size_mode?: string) {
         return this.http.get<{ total: number; items: any[] }>('/api/history', {params:
-            filterEmptyAttr({ task_id, folder_id, page, page_size})});
+            filterEmptyAttr({ task_id, folder_id, page, page_size, size_mode})});
     }
 
     clearHistory() {

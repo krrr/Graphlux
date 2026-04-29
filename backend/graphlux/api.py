@@ -438,6 +438,7 @@ def validate_dag(dag_json: Any):
 def get_history(
     task_id: Optional[int] = None,
     folder_id: Optional[int] = None,
+    size_mode: Optional[str] = None, # decreased, increased, unchanged
     page: int = 1,
     page_size: int = 20,
     session: Session = Depends(get_session)
@@ -449,8 +450,18 @@ def get_history(
     if folder_id:
         statement = statement.where(ExecutionRecord.folder_id == folder_id)
     
+    if size_mode:
+        if size_mode == 'decreased':
+            statement = statement.where(ExecutionRecord.output_size != None, ExecutionRecord.output_size < ExecutionRecord.input_size)
+        elif size_mode == 'increased':
+            statement = statement.where(ExecutionRecord.output_size != None, ExecutionRecord.output_size > ExecutionRecord.input_size)
+        elif size_mode == 'none':
+            statement = statement.where(ExecutionRecord.output_size == None)
+    
     # Total count
-    total = len(session.exec(statement).all())
+    # Use func.count for efficiency in real apps, but here we follow existing pattern for simplicity
+    all_matching = session.exec(statement).all()
+    total = len(all_matching)
     
     # Pagination
     statement = statement.offset((page - 1) * page_size).limit(page_size)

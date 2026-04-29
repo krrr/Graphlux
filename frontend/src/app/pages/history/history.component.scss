@@ -20,6 +20,7 @@
 }
 .filters {
     display: flex;
+    align-items: center;
     gap: 12px;
 }
 
@@ -45,10 +46,8 @@
     font-size: 12px;
     gap: 4px;
     .old-size {
-        color: var(--text-color-secondary);
     }
     .new-size {
-        color: var(--text-color-secondary);
         .anticon {
             font-size: 9px;
             vertical-align: baseline;
@@ -65,9 +64,5 @@
 .size-only {
     display: inline-block;
     font-size: 12px;
-    color: var(--text-color-secondary);
-}
-
-.filter-icon {
     color: var(--text-color-secondary);
 }
