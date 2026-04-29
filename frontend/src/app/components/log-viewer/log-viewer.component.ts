@@ -76,7 +76,9 @@ export class LogViewerComponent implements OnInit, OnDestroy {
     }
 
     clearLogs() {
-        this.rawLogs.set([]);
+        this.apiService.clearLogs().subscribe(() => {
+            this.rawLogs.set([]);
+        });
     }
 
 }

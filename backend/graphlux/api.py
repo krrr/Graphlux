@@ -142,6 +142,13 @@ async def get_log_history():
     from .logger import log_history
     return list(log_history)
 
+@router.delete("/logs")
+async def clear_log_history():
+    """Clear the buffered log history."""
+    from .logger import log_history
+    log_history.clear()
+    return {"message": "Logs cleared successfully"}
+
 @router.websocket("/logs")
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)

@@ -69,6 +69,10 @@ export class ApiService {
         return this.http.get<any[]>('/api/logs/history');
     }
 
+    clearLogs(): Observable<any> {
+        return this.http.delete<any>('/api/logs');
+    }
+
     getSettings(): Observable<any> {
         return this.http.get<any>('/api/settings');
     }

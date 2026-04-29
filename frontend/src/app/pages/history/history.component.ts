@@ -56,9 +56,9 @@ export class HistoryComponent implements OnInit {
     pageIndex = signal(1);
     pageSize = signal(15);
 
-    private currentFilters: { taskId?: number; folderId?: number; sizeMode?: string } = {};
+    currentFilters: { taskId?: number; folderId?: number; sizeMode?: string } = {};
 
-    tableSizeFilters: NzTableFilterList = [
+    tableFilters: NzTableFilterList = [
         { text: this.translocoService.translate('history.size_decreased'), value: 'decreased', byDefault: true },
         { text: this.translocoService.translate('history.size_increased'), value: 'increased' },
         { text: this.translocoService.translate('history.size_none'), value: 'none' }

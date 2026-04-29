@@ -6,7 +6,8 @@
       "Bash(npx ng:*)",
       "Bash(pnpm run:*)",
       "Bash(npx vitest:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(npm test:*)"
     ]
   },
   "outputStyle": "Explanatory"
