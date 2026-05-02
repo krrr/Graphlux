@@ -21,6 +21,7 @@ describe('LogViewerComponent', () => {
             getLogHistory: vi.fn().mockReturnValue(of([])),
             connectLogsWebSocket: vi.fn(),
             disconnectLogsWebSocket: vi.fn(),
+            clearLogs: vi.fn().mockReturnValue(of(null)),
             logs$: logsSubject.asObservable()
         };
 

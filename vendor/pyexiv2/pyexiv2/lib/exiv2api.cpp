@@ -88,8 +88,11 @@ py::str version()
 
 
 class Image{
+private:
+    py::object passed_py_buffer;
 public:
     Exiv2::Image::UniquePtr img;
+
 
     Image(const char *filename){
         img = Exiv2::ImageFactory::open(filename);
@@ -100,6 +103,7 @@ public:
     }
 
     Image(py::buffer buffer){
+        passed_py_buffer = buffer;  // keep ref count
         py::buffer_info info = buffer.request();
         const auto *data_ptr = static_cast<const Exiv2::byte *>(info.ptr);
         long data_size = info.size * info.itemsize;

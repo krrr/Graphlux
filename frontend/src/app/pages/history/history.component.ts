@@ -126,6 +126,8 @@ export class HistoryComponent implements OnInit {
                 this.loading.set(true);
                 try {
                     await lastValueFrom(this.apiService.clearHistory());
+                    this.items.set([]);
+                    this.total.set(0);
                     this.pageIndex.set(1);
                 } finally {
                     this.loading.set(false);
