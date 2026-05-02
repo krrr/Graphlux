@@ -3,6 +3,8 @@ from typing import Dict, Any, Optional
 from ..logger import logger
 
 class Pyexiv2Wrapper:
+    """Read first and then pass bytes array to avoid unicode code page problem on Windows."""
+
     @staticmethod
     def read_metadata(file_path: str) -> Optional[Dict[str, Any]]:
         """
@@ -11,16 +13,15 @@ class Pyexiv2Wrapper:
         :param file_path: Path to the file.
         :return: A dictionary of metadata, or None if reading fails.
         """
-        file_path = file_path.replace('\\', '/')
         try:
-            with pyexiv2.Image(file_path) as img:
+            with open(file_path, 'rb') as f, pyexiv2.ImageData(f.read()) as img:
                 metadata = {}
                 metadata.update(img.read_exif())
                 metadata.update(img.read_iptc())
                 metadata.update(img.read_xmp())
                 return metadata
         except Exception as e:
-            logger.error(f"pyexiv2 read error for {file_path}: {e}")
+            logger.error(f"pyexiv2 read error for '{file_path}': {e}")
             return None
 
     @staticmethod
@@ -33,7 +34,8 @@ class Pyexiv2Wrapper:
         :return: True if successful, False otherwise.
         """
         try:
-            with pyexiv2.Image(file_path) as img:
+            write_data = None
+            with open(file_path, 'rb') as f, pyexiv2.ImageData(f.read()) as img:
                 xmp_tags = {}
 
                 for key, value in tags.items():
@@ -49,6 +51,10 @@ class Pyexiv2Wrapper:
                 if xmp_tags:
                     pyexiv2.registerNs('Graphlux metadata', 'Graphlux')
                     img.modify_xmp(xmp_tags)
+                    write_data = img.get_bytes()
+            if write_data:
+                with open(file_path, 'wb') as f:
+                    f.write(write_data)
             return True
         except Exception as e:
             logger.error(f"pyexiv2 write error for {file_path}: {e}")

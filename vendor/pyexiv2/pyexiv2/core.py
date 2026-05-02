@@ -171,20 +171,13 @@ class ImageData(Image):
     """
     def __init__(self, data: bytes):
         """ Open an image and load its metadata. """
-        length = len(data)
-        if length >= 2**31:
-            raise ValueError('Only images smaller than 2GB can be opened. The size of your image is {} bytes.'.format(length))
-        self.buffer = exiv2api.Buffer(data, length)
-        self._exiv2api_image = exiv2api.Image(self.buffer)
+        if len(data) >= 2**31:
+            raise ValueError('Only images smaller than 2GB can be opened. The size of your image is {} bytes.'.format(len(data)))
+        self._exiv2api_image = exiv2api.Image.from_bytes(data)
 
     def get_bytes(self) -> bytes:
         """ Get the bytes data of the image. """
         return self._exiv2api_image.get_bytes()
-
-    def close(self):
-        """ Free the memory for storing image data. """
-        self.buffer.destroy()
-        super().close()
 
 
 def registerNs(namespace: str, prefix: str):

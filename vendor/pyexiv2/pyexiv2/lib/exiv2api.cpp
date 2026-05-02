@@ -86,30 +86,6 @@ py::str version()
         return result;                                          \
     }
 
-class Buffer{
-public:
-    char *data;
-    long size;
-
-    Buffer(const char *data_, long size_){
-        size = size_;
-        data = (char *)calloc(size, sizeof(char));
-        if(data == NULL)
-            throw std::runtime_error("Failed to allocate memory.");
-        memcpy(data, data_, size);
-    }
-
-    void destroy(){
-        if(data){
-            free(data);
-            data = NULL;
-        }
-    }
-
-    py::bytes dump(){
-        return py::bytes((char *)data, size);
-    }
-};
 
 class Image{
 public:
@@ -123,8 +99,12 @@ public:
         check_error_log();
     }
 
-    Image(Buffer buffer){
-        img = Exiv2::ImageFactory::open((Exiv2::byte *)buffer.data, buffer.size);
+    Image(py::buffer buffer){
+        py::buffer_info info = buffer.request();
+        const auto *data_ptr = static_cast<const Exiv2::byte *>(info.ptr);
+        long data_size = info.size * info.itemsize;
+        
+        img = Exiv2::ImageFactory::open(data_ptr, data_size);
         if (img.get() == 0)
             throw Exiv2::Error(Exiv2::ErrorCode::kerErrorMessage, "Can not open this image.");
         img->readMetadata();
@@ -682,15 +662,12 @@ PYBIND11_MODULE(exiv2api, m)
     m.def("version"      , &version);
     m.def("registerNs"   , &Exiv2::XmpProperties::registerNs);
     m.def("set_log_level", &set_log_level);
-    py::class_<Buffer>(m, "Buffer")
-        .def(py::init<const char *  , long>())
-        .def_readonly("data"        , &Buffer::data)
-        .def_readonly("size"        , &Buffer::size)
-        .def("destroy"              , &Buffer::destroy)
-        .def("dump"                 , &Buffer::dump);
     py::class_<Image>(m, "Image")
         .def(py::init<const char *>())
-        .def(py::init<Buffer &>())
+        .def(py::init<py::buffer>())
+        .def_static("from_bytes", [](py::buffer b) {
+            return Image(b);
+        })
         .def("close_image"          , &Image::close_image)
         .def("get_bytes"            , &Image::get_bytes)
         .def("get_pixel_width"      , &Image::get_pixel_width)
