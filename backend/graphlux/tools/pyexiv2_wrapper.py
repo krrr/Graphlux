@@ -1,6 +1,8 @@
 import pyexiv2
+import logging
 from typing import Dict, Any, Optional
-from ..logger import logger
+
+logger = logging.getLogger('engine')
 
 class Pyexiv2Wrapper:
     """Read first and then pass bytes array to avoid unicode code page problem on Windows."""

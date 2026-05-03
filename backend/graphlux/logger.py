@@ -1,14 +1,26 @@
 import logging
 import sys
 import queue
+import contextvars
 from collections import deque
 
 import datetime
+
+# Thread-safe context variable to store the current execution record ID
+record_id_ctx = contextvars.ContextVar("record_id", default=None)
 
 # Thread-safe queue to store logs for websocket broadcasting
 log_queue = queue.Queue(maxsize=1000)
 # Store the last 500 lines of logs for history retrieval
 log_history = deque(maxlen=500)
+
+
+class ContextFilter(logging.Filter):
+    """Custom filter that injects the current record_id into the log record."""
+    def filter(self, record):
+        record.record_id = record_id_ctx.get() or "-"
+        return True
+
 
 class QueueHandler(logging.Handler):
     """Custom logging handler that puts structured log data into a queue and history buffer."""
@@ -20,6 +32,7 @@ class QueueHandler(logging.Handler):
                 "name": record.name,
                 "level": record.levelname,
                 "message": record.getMessage(),
+                "record_id": getattr(record, "record_id", None),
             }
             log_queue.put_nowait(log_data)
             log_history.append(log_data)
@@ -29,25 +42,26 @@ class QueueHandler(logging.Handler):
             self.handleError(record)
 
 
+_datefmt='%m-%d %H:%M:%S'
 
-def setup_logger(name: str = "graphlux", level: int = logging.INFO) -> logging.Logger:
+def setup_logger(name: str, level: int = logging.INFO) -> logging.Logger:
     """Sets up a logger with a standard format."""
     logger = logging.getLogger(name)
     if not logger.handlers:
+        if name == 'engine':
+            logger.addFilter(ContextFilter())
+            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s [%(record_id)s] - %(message)s', datefmt=_datefmt)
+        else:
+            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt=_datefmt)
+
         handler = logging.StreamHandler(sys.stdout)
-        formatter = logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        )
         handler.setFormatter(formatter)
         logger.addHandler(handler)
-        
+
         # Add QueueHandler for websocket broadcasting
         q_handler = QueueHandler()
         q_handler.setFormatter(formatter)
         logger.addHandler(q_handler)
-        
+
         logger.setLevel(level)
     return logger
-
-# Create a default logger instance
-logger = setup_logger()

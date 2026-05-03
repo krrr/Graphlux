@@ -8,6 +8,11 @@ from graphlux.api import router as api_router, __version__, log_broadcaster
 from graphlux.db import init_db, get_session
 from graphlux.task_manager import task_manager
 from graphlux.tools.imagemagick_wrapper import magick_pool_reaper
+from graphlux.logger import setup_logger
+
+logger = setup_logger('app')
+logger.info('Graphlux v' + __version__)
+setup_logger('engine')
 
 
 @asynccontextmanager

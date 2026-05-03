@@ -3,15 +3,17 @@ import shutil
 import tempfile
 import ast
 import send2trash
+import logging
 from typing import Any, Dict, Optional, Tuple, TypedDict
 from sqlmodel import Session
 from .context import FileContext
 from ..tools.ffmpeg_wrapper import FFmpegWrapper
 from ..tools.pyexiv2_wrapper import Pyexiv2Wrapper
 from ..tools.imagemagick_wrapper import ImageMagickWrapper
-from ..logger import logger
 from ..db import engine
 from ..models import Task
+
+logger = logging.getLogger('engine')
 
 class FileObject(TypedDict, total=False):
     """Encapsulates a file being processed."""

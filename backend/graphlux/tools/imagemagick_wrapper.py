@@ -4,13 +4,15 @@ import queue
 import time
 import uuid
 import asyncio
+import logging
 from concurrent.futures import ThreadPoolExecutor
 from typing import List, Optional
-from ..logger import logger
 
 from sqlmodel import Session
 from ..db import engine
 from ..models import SystemSettings
+
+logger = logging.getLogger('engine')
 
 # A thread pool only for pipe readers
 _magick_executor = ThreadPoolExecutor(max_workers=64, thread_name_prefix="Magick")

@@ -2,6 +2,7 @@ import os
 import time
 import re
 import threading
+import logging
 from concurrent.futures import ThreadPoolExecutor
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -11,7 +12,9 @@ from typing import Dict, Any, Optional, Tuple
 from .db import engine
 from .models import Task, Folder, SystemSettings
 from .engine.executor import TaskExecutor
-from .logger import logger
+
+
+logger = logging.getLogger('app')
 
 
 class FolderEventHandler(FileSystemEventHandler):
@@ -165,18 +168,19 @@ class TaskManager:
             self.remove_folder(folder)
 
         if not folder.watch_folder or not os.path.exists(folder.watch_folder):
-            logger.warning(f"Folder {folder.id}: Watch folder '{folder.watch_folder}' does not exist.")
+            logger.warning(f"Folder '{folder.name}': Watch folder '{folder.watch_folder}' does not exist.")
             return
 
         handler = FolderEventHandler(folder.id, self.executor_pool, self.file_fingerprints)
 
         if folder.real_time_watch:
-            logger.info(f"Setting up real-time watch for Folder {folder.id} on path: {folder.watch_folder}")
+            logger.info(f"Setting up real-time watch for Folder '{folder.name}' on path: {folder.watch_folder}")
             watch = self.observer.schedule(handler, folder.watch_folder, recursive=True)
             self.active_watches[folder.id] = watch
 
         # Set up periodic scan
         if folder.scan_interval > 0:
+            logger.info(f"Starting periodic scan for Folder '{folder.name}' every {folder.scan_interval}s")
             stop_event = threading.Event()
             self.active_scans[folder.id] = stop_event
             threading.Thread(target=self._periodic_scan_loop, args=(folder.id, folder.scan_interval, stop_event), daemon=True).start()
@@ -192,17 +196,16 @@ class TaskManager:
 
     def remove_folder(self, folder: Folder):
         if folder.id in self.active_watches:
-            logger.info(f"Removing real-time watch for Folder {folder.id}")
+            logger.info(f"Removing real-time watch for Folder '{folder.name}'")
             watch = self.active_watches.pop(folder.id)
             self.observer.unschedule(watch)
 
         if folder.id in self.active_scans:
-            logger.info(f"Stopping periodic scan for Folder {folder.id}")
+            logger.info(f"Stopping periodic scan for Folder '{folder.name}'")
             self.active_scans[folder.id].set()
             self.active_scans.pop(folder.id)
 
     def _periodic_scan_loop(self, folder_id: int, interval: int, stop_event: threading.Event):
-        logger.info(f"Starting periodic scan for Folder {folder_id} every {interval}s")
         while not stop_event.is_set():
             time.sleep(interval)
             if stop_event.is_set():
@@ -219,7 +222,7 @@ class TaskManager:
         if not os.path.exists(folder.watch_folder):
             return
 
-        logger.info(f"Scanning files for Folder {folder.id} in {folder.watch_folder} (recursive)")
+        logger.info(f"Scanning files for Folder {folder.name} in {folder.watch_folder} (recursive)")
         
         def _recursive_scan(path):
             try:

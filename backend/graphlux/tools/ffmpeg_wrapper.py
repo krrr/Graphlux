@@ -1,10 +1,11 @@
 import subprocess
+import logging
 from typing import List
 from sqlmodel import Session
-from ..logger import logger
 from ..db import engine
 from ..models import SystemSettings
 
+logger = logging.getLogger('engine')
 
 class FFmpegWrapper:
     @staticmethod

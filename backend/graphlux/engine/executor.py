@@ -1,12 +1,17 @@
 import os
 import datetime
+import logging
 from typing import Dict, Any, List, Optional, Tuple
 from sqlmodel import Session
 from .context import FileContext
 from .nodes import NODE_TYPES, StartNode, FinishNode
-from ..logger import logger
+from ..logger import record_id_ctx
 from ..db import engine
 from ..models import ExecutionRecord
+
+
+logger = logging.getLogger('engine')
+
 
 class DagExecError(Exception):
     pass
@@ -124,11 +129,15 @@ class TaskExecutor:
         success = False
         output_data = {}
         error_msg = None
+        # Set record_id in contextvar for logging
+        token = record_id_ctx.set(record_id)
         try:
             success, output_data = self.execute(inputs)
         except Exception as e:
             error_msg = str(e)
             logger.error(f"Execution failed: {e}")
+        finally:
+            record_id_ctx.reset(token)
 
         # Update execution record
         if record_id is not None:

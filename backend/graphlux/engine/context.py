@@ -1,12 +1,17 @@
 import os
+import logging
 from typing import Dict, Any, List
-from ..logger import logger
+
+
+logger = logging.getLogger('engine')
+
 
 class FileContext:
-    def __init__(self):
+    def __init__(self, record_id: int = None):
         """
         Initialize the context for processing a single file.
         """
+        self.record_id = record_id
         self.temp_files: List[str] = []
         self.outputs: Dict[str, Dict[str, Any]] = {}
 
