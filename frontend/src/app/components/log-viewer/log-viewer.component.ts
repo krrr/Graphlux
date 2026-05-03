@@ -16,11 +16,18 @@ export class LogViewerComponent implements OnInit, OnDestroy {
     private logSub?: Subscription;
     rawLogs = signal<LogMessage[]>([]);
     logLevel = input<string | null>('ALL');
+    filterRecordId = input<number | null>(null);
     
 
     filteredLogs = computed(() => {
         const level = this.logLevel();
-        const logs = this.rawLogs();
+        const recordId = this.filterRecordId();
+        let logs = this.rawLogs();
+
+        if (recordId != null) {  // 前台过滤。偷懒做法
+            logs = logs.filter(l => l.record_id === recordId);
+        }
+
         if (level == null || level === 'ALL') return logs;
         
         const minPriority = LEVEL_PRIORITY[level] ?? 0;

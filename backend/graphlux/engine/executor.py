@@ -90,7 +90,21 @@ class TaskExecutor:
                 
         return inputs
 
-    def execute_with_file(self, file_path: str) -> Any:
+    def create_exec_record(self, input_path, input_size):
+        with Session(engine) as session:
+            record = ExecutionRecord(
+                task_id=self.task_id,
+                folder_id=self.folder_id,
+                input_path=input_path,
+                input_size=input_size,
+                status="running"
+            )
+            session.add(record)
+            session.commit()
+            session.refresh(record)
+            return record
+
+    def execute_with_file(self, file_path: str, record_id: int = None) -> Any:
         """
         Execute the DAG for a given file.
 
@@ -107,21 +121,11 @@ class TaskExecutor:
         inputs = {'file': initial_file_obj}
 
         # Insert execution record
-        record_id = None
-        if self.task_id is not None:
+        record = None
+        if record_id is None and self.task_id is not None:
             try:
-                with Session(engine) as session:
-                    record = ExecutionRecord(
-                        task_id=self.task_id,
-                        folder_id=self.folder_id,
-                        input_path=file_path,
-                        input_size=initial_file_obj["size"],
-                        status="running"
-                    )
-                    session.add(record)
-                    session.commit()
-                    session.refresh(record)
-                    record_id = record.id
+                record = self.create_exec_record(file_path, initial_file_obj["size"])
+                record_id = record.id
             except Exception as e:
                 logger.error(f"Failed to create execution record: {e}")
 
@@ -143,26 +147,26 @@ class TaskExecutor:
         if record_id is not None:
             try:
                 with Session(engine) as session:
-                    record = session.get(ExecutionRecord, record_id)
-                    if record:
-                        record.status = "success" if success else "failed"
-                        record.end_time = datetime.datetime.now()
-                        record.error_message = error_msg
-                        
-                        # Try to find output file info
-                        if success and output_data:
-                            # result_var in FinishNode can point to a file object
-                            result = output_data.get("result")
-                            if isinstance(result, dict) and "path" in result and "size" in result:
-                                record.output_path = result["path"]
-                                record.output_size = result["size"]
-                            elif "file" in output_data and isinstance(output_data["file"], dict):
-                                # Fallback if result is not set but 'file' is in output
-                                record.output_path = output_data["file"].get("path")
-                                record.output_size = output_data["file"].get("size")
+                    if record is None:
+                        record = session.get(ExecutionRecord, record_id)
+                    record.status = "success" if success else "failed"
+                    record.end_time = datetime.datetime.now()
+                    record.error_message = error_msg
 
-                        session.add(record)
-                        session.commit()
+                    # Try to find output file info
+                    if success and output_data:
+                        # result_var in FinishNode can point to a file object
+                        result = output_data.get("result")
+                        if isinstance(result, dict) and "path" in result and "size" in result:
+                            record.output_path = result["path"]
+                            record.output_size = result["size"]
+                        elif "file" in output_data and isinstance(output_data["file"], dict):
+                            # Fallback if result is not set but 'file' is in output
+                            record.output_path = output_data["file"].get("path")
+                            record.output_size = output_data["file"].get("size")
+
+                    session.add(record)
+                    session.commit()
             except Exception as e:
                 logger.error(f"Failed to update execution record: {e}")
 

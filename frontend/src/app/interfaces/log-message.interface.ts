@@ -3,4 +3,5 @@ export interface LogMessage {
     level: string;
     message: string;
     name?: string;
+    record_id?: number | null;
 }

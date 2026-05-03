@@ -3,7 +3,7 @@ import sys
 import ctypes
 import asyncio
 import datetime
-from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect, BackgroundTasks
 from sqlalchemy.orm import selectinload, defer
 from sqlmodel import delete, Session, select
 from typing import List, Any, Dict, Optional
@@ -63,7 +63,7 @@ class FolderCreate(BaseModel):
 
 
 @router.post("/execute")
-async def execute_task_endpoint(request: ExecutionRequest):
+async def execute_task_endpoint(request: ExecutionRequest, background_tasks: BackgroundTasks, session: Session = Depends(get_session)):
     """
     Endpoint to trigger Task execution.
     """
@@ -72,32 +72,22 @@ async def execute_task_endpoint(request: ExecutionRequest):
 
     task_json = request.task
     if request.task_id is not None:
-        from graphlux.db import engine
-        from graphlux.models import Task
-        with Session(engine) as session:
-            task_obj = session.get(Task, request.task_id)
-            if not task_obj:
-                return JSONResponse(status_code=404, content={"error": "Task not found"})
-            task_json = task_obj.json_data
+        task_obj = session.get(Task, request.task_id)
+        if not task_obj:
+            return JSONResponse(status_code=404, content={"error": "Task not found"})
+        task_json = task_obj.json_data
 
     if not task_json:
         return JSONResponse(status_code=400, content={"error": "No Task provided"})
 
-    # Send a log message via websocket
-    await manager.broadcast(f"Starting execution for: {request.file_path}")
-
     executor = TaskExecutor(task_json, task_id=request.task_id)
+    # Pre-create the execution record to get a record_id
+    record_id = executor.create_exec_record(request.file_path, os.path.getsize(request.file_path)).id
 
-    # Run in threadpool to not block the asyncio loop
-    loop = asyncio.get_event_loop()
-    success = await loop.run_in_executor(None, executor.execute_with_file, request.file_path)
+    # Use BackgroundTasks to run executor
+    background_tasks.add_task(executor.execute_with_file, request.file_path, record_id)
 
-    if success:
-        await manager.broadcast(f"Successfully finished execution for: {request.file_path}")
-        return {"status": "success", "message": "Task execution completed"}
-    else:
-        await manager.broadcast(f"Failed execution for: {request.file_path}")
-        return JSONResponse(status_code=500, content={"status": "error", "message": "Task execution failed"})
+    return {"status": "started", "message": "Task execution started", "record_id": record_id}
 
 # In-memory store for connected websocket clients for logs
 class ConnectionManager:

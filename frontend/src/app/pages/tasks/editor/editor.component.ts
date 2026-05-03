@@ -76,6 +76,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
 
     isExecuteModalVisible = signal(false);
     isLogsModalVisible = signal(false);
+    logRecordId = signal<number | null>(null);
     isFileDialogVisible = false;
     executeFilePath = signal('');
     private readonly keydownListener = this.handleKeyDown.bind(this);
@@ -415,10 +416,16 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
 
     executeDag() {
         const dag = this.editorService.serializeDag();
+        this.logRecordId.set(null);
         this.isLogsModalVisible.set(true);
 
         this.apiService.executeTask(dag, this.executeFilePath(), this.taskId).subscribe({
-            next: (res) => console.log('Execution response:', res),
+            next: (res) => {
+                console.debug('Execution response:', res);
+                if (res.record_id) {
+                    this.logRecordId.set(res.record_id);
+                }
+            },
             error: (err) => {
                 console.error('Execution error:', err);
                 this.message.error(this.translocoService.translate('editor.msg_execution_failed'));

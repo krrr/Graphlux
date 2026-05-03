@@ -18,7 +18,7 @@ log_history = deque(maxlen=500)
 class ContextFilter(logging.Filter):
     """Custom filter that injects the current record_id into the log record."""
     def filter(self, record):
-        record.record_id = record_id_ctx.get() or "-"
+        record.record_id = record_id_ctx.get()
         return True
 
 

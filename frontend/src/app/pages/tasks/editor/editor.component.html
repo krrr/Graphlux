@@ -79,7 +79,7 @@
         [nzTitle]="t('editor.console_logs')" (nzOnCancel)="handleLogsClose()" [nzFooter]="null" nzWidth="800px">
         <ng-container *nzModalContent>
             <div style="height: 400px">
-                <app-log-viewer />
+                <app-log-viewer [filterRecordId]="logRecordId()" />
             </div>
         </ng-container>
     </nz-modal>
