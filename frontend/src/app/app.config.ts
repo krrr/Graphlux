@@ -1,8 +1,7 @@
 import { ApplicationConfig, importProvidersFrom, isDevMode, inject } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withHashLocation } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { en_US, zh_CN, provideNzI18n, NZ_I18N } from 'ng-zorro-antd/i18n';
 import { registerLocaleData } from '@angular/common';
 import en from '@angular/common/locales/en';
@@ -117,9 +116,8 @@ const icons: IconDefinition[] = [
 
 export const appConfig: ApplicationConfig = {
     providers: [
-        provideRouter(routes),
+        provideRouter(routes, withHashLocation()),
         provideHttpClient(),
-        provideAnimationsAsync(),
         {
             provide: NZ_I18N,
             useFactory: () => {
