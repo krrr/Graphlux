@@ -3,7 +3,7 @@
         @for (log of filteredLogs(); track $index) {
         <div class="log-entry" [class]="log.level.toLowerCase()">
             <span class="time">[{{ log.time | date:'HH:mm:ss' }}]</span>
-            <span class="level">{{ log.level }}</span>
+            <span class="level">{{ levelShortNames[log.level] || log.level }}</span>
             <span class="message">{{ log.message }}</span>
         </div>
         } @empty {

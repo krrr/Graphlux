@@ -36,6 +36,8 @@ export class LogViewerComponent implements OnInit, OnDestroy {
     });
 
 
+    levelShortNames = LEVEL_SHORT_NAMES;
+
     constructor() {
         // Automatically scroll to bottom whenever logs change
         effect(() => {
@@ -92,13 +94,18 @@ export class LogViewerComponent implements OnInit, OnDestroy {
             this.rawLogs.set([]);
         });
     }
-
 }
 
+const LEVEL_PRIORITY: Record<string, number> = {
+    'DEBUG': 0,
+    'INFO': 1,
+    'WARNING': 2,
+    'ERROR': 3,
+};
 
-    const LEVEL_PRIORITY: Record<string, number> = {
-        'DEBUG': 0,
-        'INFO': 1,
-        'WARNING': 2,
-        'ERROR': 3,
-    };
+const LEVEL_SHORT_NAMES: Record<string, string> = {
+    'DEBUG': 'DBG',
+    'INFO': 'INF',
+    'WARNING': 'WRN',
+    'ERROR': 'ERR',
+};
