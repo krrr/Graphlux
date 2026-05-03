@@ -21,6 +21,7 @@
         "status_running": "Running",
         "status_success": "Success",
         "status_failed": "Failed",
+        "error_detail": "Error Details",
         "clear_confirm": "Are you sure you want to clear the history?",
         "filter_log_level": "Filter by Log Level",
         "level_all": "All Levels",
@@ -99,7 +100,8 @@
   },
   "common": {
     "ok": "OK",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "close": "Close"
   },
   "file_dialog": {
     "select_folder": "Select Folder",

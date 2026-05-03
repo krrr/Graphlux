@@ -16,6 +16,7 @@ export class LogViewerComponent implements OnInit, OnDestroy {
     private logSub?: Subscription;
     rawLogs = signal<LogMessage[]>([]);
     logLevel = input<string | null>('ALL');
+    logs = input<LogMessage[] | null>(null);
     filterRecordId = input<number | null>(null);
     
 
@@ -44,7 +45,11 @@ export class LogViewerComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.connectLogs();
+        if (this.logs() == null) {
+            this.connectLogs();
+        } else {
+            this.rawLogs.set(this.logs()!);
+        }
     }
 
     ngOnDestroy() {

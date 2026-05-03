@@ -57,6 +57,7 @@ import {
     ArrowRightOutline,
     ClearOutline,
     ExceptionOutline,
+    EyeOutline,
 } from '@ant-design/icons-angular/icons';
 import { TranslocoHttpLoader } from './transloco-loader';
 import { provideTransloco, TranslocoService } from '@jsverse/transloco';
@@ -67,6 +68,7 @@ registerLocaleData(zh);
 const icons: IconDefinition[] = [
     SaveOutline,
     AlertOutline,
+    EyeOutline,
     AlertFill,
     MoreOutline,
     DeploymentUnitOutline,

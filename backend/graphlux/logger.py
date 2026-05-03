@@ -2,9 +2,9 @@ import logging
 import sys
 import queue
 import contextvars
-from collections import deque
-
 import datetime
+from collections import deque
+from logging import LogRecord
 
 # Thread-safe context variable to store the current execution record ID
 record_id_ctx = contextvars.ContextVar("record_id", default=None)
@@ -24,7 +24,7 @@ class ContextFilter(logging.Filter):
 
 class QueueHandler(logging.Handler):
     """Custom logging handler that puts structured log data into a queue and history buffer."""
-    def emit(self, record):
+    def emit(self, record: LogRecord):
         try:
             # Create a structured dictionary instead of a string
             log_data = {

@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal, viewChild } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, TemplateRef, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop'
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -59,7 +59,7 @@ export class HistoryComponent implements OnInit {
     currentFilters: { taskId?: number; folderId?: number; sizeMode?: string } = {};
 
     tableFilters: NzTableFilterList = [
-        { text: this.translocoService.translate('history.size_decreased'), value: 'decreased', byDefault: true },
+        { text: this.translocoService.translate('history.size_decreased'), value: 'decreased', byDefault: false },
         { text: this.translocoService.translate('history.size_increased'), value: 'increased' },
         { text: this.translocoService.translate('history.size_none'), value: 'none' }
     ]
@@ -69,6 +69,7 @@ export class HistoryComponent implements OnInit {
     // Log viewer
     logLevel = signal<string | null>(null);
     logViewer = viewChild<LogViewerComponent>("logViewer");
+    errorTpl = viewChild<TemplateRef<{ $implicit: any }>>('errorTpl');
 
     ngOnInit() {
         // loadData will be called by onQueryParamsChange on init
@@ -151,5 +152,21 @@ export class HistoryComponent implements OnInit {
         const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    showError(message: string) {
+        let parsed: any = [{time: 0, message: 'Failed parsing message', level: 'ERROR'}];
+        try {
+            parsed = JSON.parse(message);
+        } catch { }
+
+        let comp = this.modal.create({
+            nzTitle: this.translocoService.translate('history.error_detail'),
+            nzContent: this.errorTpl(),
+            nzData: parsed,
+            nzWidth: 900,
+            nzFooter: [{label: this.translocoService.translate('common.close'), key: 'close', onClick: () => comp.close()}],
+            nzMaskClosable: true
+        });
     }
 }

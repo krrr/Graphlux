@@ -1,3 +1,4 @@
+import json
 import os
 import datetime
 import logging
@@ -132,13 +133,11 @@ class TaskExecutor:
         # Execution
         success = False
         output_data = {}
-        error_msg = None
         # Set record_id in contextvar for logging
         token = record_id_ctx.set(record_id)
         try:
             success, output_data = self.execute(inputs)
         except Exception as e:
-            error_msg = str(e)
             logger.error(f"Execution failed: {e}")
         finally:
             record_id_ctx.reset(token)
@@ -146,12 +145,16 @@ class TaskExecutor:
         # Update execution record
         if record_id is not None:
             try:
+                from ..logger import log_history
+                # Collect error logs from history
+                logs = [i for i in log_history if i.get("record_id") == record_id and i.get("level") == "ERROR"]
+
                 with Session(engine) as session:
                     if record is None:
                         record = session.get(ExecutionRecord, record_id)
                     record.status = "success" if success else "failed"
                     record.end_time = datetime.datetime.now()
-                    record.error_message = error_msg
+                    record.error_message = json.dumps(logs) if logs else None
 
                     # Try to find output file info
                     if success and output_data:
