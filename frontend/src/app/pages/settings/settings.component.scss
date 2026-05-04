@@ -1,15 +1,22 @@
 .settings-container {
     padding: 20px;
-    overflow: auto;
+    overflow-y: auto;
     height: 100%;
 }
 
 .ant-form {
-    max-width: 600px;
-
+    max-width: 1000px;
+    margin-right: auto;
     nz-divider:not(:first-child) {
         margin-top: 48px;
     }
+}
+
+.anchor {
+    position: sticky;
+    top: 0;
+    min-width: 180px;
+    user-select: none;
 }
 
 .warn {

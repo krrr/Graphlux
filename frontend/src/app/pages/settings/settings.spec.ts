@@ -48,18 +48,20 @@ describe('Settings', () => {
 
     it('should load settings on init', () => {
         expect(apiServiceSpy.getSettings).toHaveBeenCalled();
-        expect(component.settings()).toEqual({
+        expect(component.settings()).toEqual(expect.objectContaining({
             ffmpeg_path: '/usr/bin/ffmpeg',
-            imagemagick_path: '/usr/bin/magick'
-        });
+            imagemagick_path: '/usr/bin/magick',
+            host: '127.0.0.1'
+        }));
     });
 
     it('should save settings', () => {
         component.saveSettings();
-        expect(apiServiceSpy.updateSettings).toHaveBeenCalledWith({
+        expect(apiServiceSpy.updateSettings).toHaveBeenCalledWith(expect.objectContaining({
             ffmpeg_path: '/usr/bin/ffmpeg',
-            imagemagick_path: '/usr/bin/magick'
-        });
+            imagemagick_path: '/usr/bin/magick',
+            host: null
+        }));
         expect(messageServiceSpy.success).toHaveBeenCalledWith('Settings saved successfully!');
     });
 

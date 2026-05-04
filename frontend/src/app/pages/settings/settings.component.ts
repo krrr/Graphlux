@@ -13,6 +13,8 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzDividerComponent } from "ng-zorro-antd/divider";
+import { NzAnchorModule } from 'ng-zorro-antd/anchor';
+import { NzGridModule } from 'ng-zorro-antd/grid';
 
 @Component({
     selector: 'app-settings',
@@ -25,6 +27,8 @@ import { NzDividerComponent } from "ng-zorro-antd/divider";
     NzSelectModule,
     NzSwitchModule,
     NzAlertModule,
+    NzAnchorModule,
+    NzGridModule,
     ...COMMON_IMPORTS,
     NzDividerComponent
 ],
