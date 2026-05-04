@@ -44,13 +44,13 @@
     "max_tasks": "Max Concurrent Tasks",
     "auto_start": "Start on Boot (Windows)",
     "enable": "Enable",
-    "server_settings": "Server Settings",
     "allow_remote_access": "Allow Remote Access",
     "host": "Host",
     "port": "Port",
     "remote_access_warning": "Warning: Allowing external access poses security risks of arbitrary file read/write and arbitrary code execution!",
     "save": "Save",
-    "saved": "Settings saved successfully!"
+    "saved": "Settings saved successfully!",
+    "local_storage_hint": "Language and theme settings are saved in your browser's local storage."
   },
   "tasks": {
     "title": "Tasks",
@@ -86,7 +86,6 @@
     "actions": "Actions",
     "no_folders": "No folders configured yet",
     "description_placeholder": "Folders define the directories to watch for processing.",
-    "general": "General",
     "scan": "Scan",
     "watch_path_label": "Watch Folder (Absolute path)",
     "browse": "Browse...",
@@ -111,6 +110,7 @@
     "ok": "OK",
     "cancel": "Cancel",
     "close": "Close",
+    "general": "General",
     "view": "View"
   },
   "file_dialog": {

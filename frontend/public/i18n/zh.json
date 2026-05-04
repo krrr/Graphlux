@@ -43,13 +43,13 @@
     "max_tasks": "最大并发任务数",
     "auto_start": "开机自启动 (Windows)",
     "enable": "启用",
-    "server_settings": "服务器设置",
     "allow_remote_access": "允许远程访问",
     "host": "监听主机",
     "port": "端口",
     "remote_access_warning": "警告：允许外部访问会带来任意文件读写和任意代码执行的安全风险！",
     "save": "保存",
-    "saved": "设置保存成功！"
+    "saved": "设置保存成功！",
+    "local_storage_hint": "语言和主题设置保存在浏览器的本地存储中。"
   },
   "tasks": {
     "title": "任务",
@@ -85,7 +85,6 @@
     "actions": "操作",
     "no_folders": "尚未配置文件夹",
     "description_placeholder": "文件夹定义了要监视并处理的目录。",
-    "general": "常规",
     "scan": "扫描",
     "watch_path_label": "监视文件夹 (绝对路径)",
     "browse": "浏览...",
@@ -110,6 +109,7 @@
     "ok": "确定",
     "cancel": "取消",
     "close": "关闭",
+    "general": "常规",
     "view": "查看"
   },
   "file_dialog": {

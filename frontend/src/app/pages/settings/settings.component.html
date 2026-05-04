@@ -26,7 +26,13 @@
                 </nz-form-control>
             </nz-form-item>
 
-            <nz-divider id="server_settings" [nzText]="t('settings.server_settings')" nzOrientation="left"/>
+            <nz-form-item>
+                <nz-form-control [nzSpan]="24">
+                    <nz-alert nzType="info" [nzMessage]="t('settings.local_storage_hint')" nzShowIcon class="nz-alert-sm" nzNoAnimation/>
+                </nz-form-control>
+            </nz-form-item>
+
+            <nz-divider id="general_settings" [nzText]="t('common.general')" nzOrientation="left"/>
 
             <nz-form-item>
                 <nz-form-label [nzSpan]="6" nzLabelAlign="left">{{ t('settings.allow_remote_access') }}</nz-form-label>
@@ -36,13 +42,18 @@
                             <nz-switch [(ngModel)]="allowRemoteAccess" (ngModelChange)="toggleRemoteAccess($event)" name="allow_remote_access"/>
                         </div>
                         <div nz-col [nzSpan]="20">
-                        @if (allowRemoteAccess()) {
-                            <nz-alert nzType="warning" [nzMessage]="t('settings.remote_access_warning')" nzShowIcon class="warn"/>
-                        }
                         </div>
                     </div>
                 </nz-form-control>
             </nz-form-item>
+
+            @if (allowRemoteAccess()) {
+            <nz-form-item>
+                <nz-form-control [nzSpan]="24">
+                    <nz-alert nzType="warning" [nzMessage]="t('settings.remote_access_warning')" nzShowIcon class="nz-alert-sm" nzNoAnimation/>
+                </nz-form-control>
+            </nz-form-item>
+            }
 
             <nz-form-item class="flex1">
                 <nz-form-label [nzSpan]="6" nzLabelAlign="left">{{ t('settings.host') }}</nz-form-label>
@@ -101,7 +112,7 @@
         </div>
         <nz-anchor [nzContainer]="scrollContainer" [nzOffsetTop]="20" class="anchor">
             <nz-link nzHref="#interface" [nzTitle]="t('settings.interface')"></nz-link>
-            <nz-link nzHref="#server_settings" [nzTitle]="t('settings.server_settings')"></nz-link>
+            <nz-link nzHref="#general_settings" [nzTitle]="t('common.general')"></nz-link>
             <nz-link nzHref="#external_tools" [nzTitle]="t('settings.external_tools')"></nz-link>
         </nz-anchor>
     </div>

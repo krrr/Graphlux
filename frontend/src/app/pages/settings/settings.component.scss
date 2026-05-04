@@ -19,10 +19,8 @@
     user-select: none;
 }
 
-.warn {
-    margin-left: 10px;
-}
-.warn ::ng-deep .ant-alert {
+.nz-alert-sm ::ng-deep .ant-alert {
+    font-size: 13px;
     padding: 4px 6px;
 }
 
