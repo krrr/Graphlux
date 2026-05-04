@@ -35,11 +35,20 @@
     "theme_light": "Light",
     "theme_dark": "Dark",
     "theme_system": "System",
+    "interface": "Interface",
+    "external_tools": "External Tools",
+    "performance": "Performance",
+    "system": "System",
     "ffmpeg": "FFmpeg Executable Path",
     "imagemagick": "ImageMagick (magick) Path",
     "max_tasks": "Max Concurrent Tasks",
     "auto_start": "Start on Boot (Windows)",
     "enable": "Enable",
+    "server_settings": "Server Settings",
+    "allow_remote_access": "Allow Remote Access",
+    "host": "Host",
+    "port": "Port",
+    "remote_access_warning": "Warning: Allowing external access poses security risks of arbitrary file read/write and arbitrary code execution!",
     "save": "Save",
     "saved": "Settings saved successfully!"
   },
@@ -101,7 +110,8 @@
   "common": {
     "ok": "OK",
     "cancel": "Cancel",
-    "close": "Close"
+    "close": "Close",
+    "view": "View"
   },
   "file_dialog": {
     "select_folder": "Select Folder",

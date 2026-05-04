@@ -21,7 +21,7 @@
     border-color: var(--primary-color);
 }
 
-.ant-form .ant-form-item:last-child {
+.ant-form > .ant-form-item:last-child {
     margin-bottom: 0;
 }
 
@@ -59,4 +59,8 @@
 
 .flex1 {
     flex: 1;
+}
+
+.flex-box-h {
+    display: flex;
 }

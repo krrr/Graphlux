@@ -8,13 +8,26 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { COMMON_IMPORTS } from '../../shared-imports';
 import { LanguageService } from '../../services/language.service';
 import { ThemeService, ThemeType } from '../../services/theme.service';
-import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzSwitchModule } from 'ng-zorro-antd/switch';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { NzDividerComponent } from "ng-zorro-antd/divider";
 
 @Component({
     selector: 'app-settings',
     standalone: true,
-    imports: [FormsModule, NzFormModule, NzInputModule, NzInputNumberModule, NzSelectModule, ...COMMON_IMPORTS],
+    imports: [
+    FormsModule,
+    NzFormModule,
+    NzInputModule,
+    NzInputNumberModule,
+    NzSelectModule,
+    NzSwitchModule,
+    NzAlertModule,
+    ...COMMON_IMPORTS,
+    NzDividerComponent
+],
     templateUrl: './settings.component.html',
     styleUrls: ['./settings.component.scss'],
 })
@@ -24,8 +37,11 @@ export class SettingsComponent implements OnInit {
         imagemagick_path: 'magick',
         max_concurrent_tasks: 4,
         auto_start: false,
-        theme: 'system' as ThemeType
+        theme: 'system' as ThemeType,
+        host: LOCALHOST as string | null,
+        port: 41001
     });
+    allowRemoteAccess = signal(false);
     
     langService = inject(LanguageService);
     themeService = inject(ThemeService);
@@ -42,17 +58,26 @@ export class SettingsComponent implements OnInit {
 
     loadSettings() {
         this.apiService.getSettings().subscribe((s) => {
-            if (s) {
-                this.settings.set(s);
-                if (s.theme) {
-                    this.themeService.setTheme(s.theme, false);
-                }
+            this.settings.set(s);
+            
+            if (s.host && s.host !== LOCALHOST) {
+                this.allowRemoteAccess.set(true);
+            } else {
+                this.allowRemoteAccess.set(false);
+                s.host = LOCALHOST;
+            }
+            if (s.theme) {
+                this.themeService.setTheme(s.theme, false);
             }
         });
     }
 
     saveSettings() {
-        this.apiService.updateSettings(this.settings()).subscribe(() => {
+        let settings = this.settings();
+        if (settings.host == LOCALHOST) {
+            settings.host = null;
+        }
+        this.apiService.updateSettings(settings).subscribe(() => {
             this.message.success(this.translocoService.translate('settings.saved'));
             this.themeService.setTheme(this.settings().theme);
         });
@@ -61,4 +86,13 @@ export class SettingsComponent implements OnInit {
     updateField(field: string, value: any) {
         this.settings.update((s: any) => ({ ...s, [field]: value }));
     }
+
+    toggleRemoteAccess(enabled: boolean) {
+        this.settings.update((s: any) => ({
+            ...s,
+            host: enabled ? ('0.0.0.0') : LOCALHOST
+        }));
+    }
 }
+
+const LOCALHOST = '127.0.0.1';

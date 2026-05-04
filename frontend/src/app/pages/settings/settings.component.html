@@ -1,7 +1,9 @@
 <div class="settings-container" *transloco="let t">
     <h2>{{ t('menu.settings') }} <small style="font-weight: normal; font-size: 0.6em; color: #888;">v{{apiService.appInfo()?.version}}</small></h2>
     
-    <form nz-form nzLayout="vertical">
+    <div class="ant-form ant-form-vertical">
+        <nz-divider [nzText]="t('settings.interface')"/>
+
         <nz-form-item>
             <nz-form-label>{{ t('settings.language') }}</nz-form-label>
             <nz-form-control>
@@ -23,6 +25,64 @@
             </nz-form-control>
         </nz-form-item>
 
+        <nz-divider [nzText]="t('settings.server_settings')"/>
+
+        <nz-form-item>
+            <nz-form-label>{{ t('settings.allow_remote_access') }}</nz-form-label>
+            <nz-form-control>
+                <div nz-row>
+                    <div nz-col [nzSpan]="4" style="height: 32px; padding-top: 4px">
+                        <nz-switch [(ngModel)]="allowRemoteAccess" (ngModelChange)="toggleRemoteAccess($event)" name="allow_remote_access"/>
+                    </div>
+                    <div nz-col [nzSpan]="20">
+                    @if (allowRemoteAccess()) {
+                        <nz-alert nzType="warning" [nzMessage]="t('settings.remote_access_warning')" nzShowIcon class="warn"/>
+                    }
+                    </div>
+                </div>
+            </nz-form-control>
+        </nz-form-item>
+
+
+        <div class="flex-box-h" style="gap: 20px">
+            <nz-form-item class="flex1">
+                <nz-form-label>{{ t('settings.host') }}</nz-form-label>
+                <nz-form-control>
+                    <input nz-input [ngModel]="settings().host" (ngModelChange)="updateField('host', $event)"
+                        name="host" [disabled]="!allowRemoteAccess()" />
+                </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item class="flex1">
+                <nz-form-label>{{ t('settings.port') }}</nz-form-label>
+                <nz-form-control>
+                    <nz-input-number [ngModel]="settings().port" (ngModelChange)="updateField('port', $event)"
+                        name="port" [nzMin]="1" [nzMax]="65535" [nzStep]="1" style="width: 100%"/>
+                </nz-form-control>
+            </nz-form-item>
+        </div>
+        @if (apiService.appInfo()?.is_packaged) {
+            <nz-form-item>
+                <nz-form-label>{{ t('settings.auto_start') }}</nz-form-label>
+                <nz-form-control>
+                    <input type="checkbox" [ngModel]="settings().auto_start" (ngModelChange)="updateField('auto_start', $event)" name="auto_start" />
+                    <span style="margin-left: 8px;">{{ t('settings.enable') }}</span>
+                </nz-form-control>
+            </nz-form-item>
+        }
+
+        <nz-form-item>
+            <nz-form-label>{{ t('settings.max_tasks') }}</nz-form-label>
+            <nz-form-control>
+                <nz-input-number [ngModel]="settings().max_concurrent_tasks"
+                    (ngModelChange)="updateField('max_concurrent_tasks', $event)" name="max_concurrent_tasks"
+                    [nzMin]="1" [nzStep]="1" style="width: 100%"></nz-input-number>
+            </nz-form-control>
+        </nz-form-item>
+
+
+        <nz-divider [nzText]="t('settings.external_tools')"/>
+
         <nz-form-item>
             <nz-form-label>{{ t('settings.ffmpeg') }}</nz-form-label>
             <nz-form-control>
@@ -39,26 +99,8 @@
             </nz-form-control>
         </nz-form-item>
 
-        <nz-form-item>
-            <nz-form-label>{{ t('settings.max_tasks') }}</nz-form-label>
-            <nz-form-control>
-                <nz-input-number [ngModel]="settings().max_concurrent_tasks"
-                    (ngModelChange)="updateField('max_concurrent_tasks', $event)" name="max_concurrent_tasks"
-                    [nzMin]="1" [nzStep]="1" style="width: 100%"></nz-input-number>
-            </nz-form-control>
-        </nz-form-item>
-
-        @if (apiService.appInfo()?.is_packaged) {
-            <nz-form-item>
-                <nz-form-label>{{ t('settings.auto_start') }}</nz-form-label>
-                <nz-form-control>
-                    <input type="checkbox" [ngModel]="settings().auto_start" (ngModelChange)="updateField('auto_start', $event)" name="auto_start" />
-                    <span style="margin-left: 8px;">{{ t('settings.enable') }}</span>
-                </nz-form-control>
-            </nz-form-item>
-        }
-
-        <button nz-button nzType="primary" (click)="saveSettings()"><nz-icon nzType="save"
-                nzTheme="outline" />{{ t('settings.save') }}</button>
-    </form>
+        <button nz-button nzType="primary" (click)="saveSettings()" style="margin-top: 24px">
+            <nz-icon nzType="save" />{{ t('settings.save') }}
+        </button>
+    </div>
 </div>

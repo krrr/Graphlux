@@ -4,6 +4,24 @@
     height: 100%;
 }
 
-form {
+.ant-form {
     max-width: 600px;
+
+    nz-divider:not(:first-child) {
+        margin-top: 48px;
+    }
+}
+
+.warn {
+    margin-left: 10px;
+}
+.warn ::ng-deep .ant-alert {
+    padding: 4px 6px;
+}
+
+:host ::ng-deep .ant-divider-horizontal.ant-divider-with-text::before {
+    display: none;
+}
+:host ::ng-deep .ant-divider-inner-text {
+    padding-left: 0;
 }

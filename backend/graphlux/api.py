@@ -3,19 +3,40 @@ import sys
 import ctypes
 import asyncio
 import datetime
-from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect, BackgroundTasks, FastAPI
+from fastapi.staticfiles import StaticFiles
+from contextlib import asynccontextmanager
 from sqlalchemy.orm import selectinload, defer
 from sqlmodel import delete, Session, select
 from typing import List, Any, Dict, Optional
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from .db import get_session
+from .db import get_session, init_db
 from .models import Task, Folder, SystemSettings, FolderTaskLink, SettingsResponse, SettingsConfig, ExecutionRecord
 from .engine.executor import TaskExecutor
+from .task_manager import task_manager
+from .tools.imagemagick_wrapper import magick_pool_reaper
+from .logger import setup_logger
 
-router = APIRouter()
 
 __version__ = "0.1.0"
+
+logger = setup_logger('app')
+setup_logger('engine')
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info('Graphlux v' + __version__)
+    init_db()
+    task_manager.start()
+    asyncio.create_task(magick_pool_reaper())
+    asyncio.create_task(log_broadcaster())
+    yield
+    task_manager.stop()
+
+app = FastAPI(title="Graphlux Backend", lifespan=lifespan)
+router = APIRouter()
+
 
 def is_packaged() -> bool:
     # Nuitka sets __compiled__
@@ -474,4 +495,11 @@ def clear_history(session: Session = Depends(get_session)):
     session.exec(delete(ExecutionRecord))
     session.commit()
     return {"message": "History cleared successfully"}
+
+app.include_router(router, prefix='/api')
+
+# Mount the static files for the Angular frontend
+frontend_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
+os.makedirs(frontend_path, exist_ok=True)
+app.mount("/", StaticFiles(directory=frontend_path, html=True), name="static")
 

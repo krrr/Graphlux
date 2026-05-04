@@ -2,6 +2,8 @@ from typing import Optional, Any, Dict, List
 from pydantic import BaseModel
 from sqlmodel import SQLModel, Field, Column, JSON, Relationship
 from datetime import datetime
+from . import DEFAULT_PORT
+
 
 class FolderTaskLink(SQLModel, table=True):
     folder_id: Optional[int] = Field(default=None, foreign_key="folder.id", primary_key=True)
@@ -53,6 +55,8 @@ class SettingsConfig(BaseModel):
     max_concurrent_tasks: int = 4
     auto_start: bool = False
     theme: str = "system"
+    host: Optional[str] = None
+    port: int = DEFAULT_PORT
 
 class SettingsResponse(SettingsConfig):
     id: int = 1
@@ -68,9 +72,9 @@ class SystemSettings(SQLModel, table=True):
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to a flat dictionary for API response."""
-        config = self._get_config().model_dump()
-        config["id"] = self.id
-        return config
+        config_dict = self._get_config().model_dump()
+        config_dict["id"] = self.id
+        return config_dict
 
     def _get_config(self) -> SettingsConfig:
         return SettingsConfig(**(self.value or {}))
@@ -120,4 +124,20 @@ class SystemSettings(SQLModel, table=True):
     @theme.setter
     def theme(self, val: str):
         self._update_value("theme", val)
+
+    @property
+    def host(self) -> Optional[str]:
+        return self._get_config().host
+
+    @host.setter
+    def host(self, val: Optional[str]):
+        self._update_value("host", val)
+
+    @property
+    def port(self) -> int:
+        return self._get_config().port
+
+    @port.setter
+    def port(self, val: int):
+        self._update_value("port", val)
 

@@ -8,20 +8,21 @@ import webview
 import pystray
 import ctypes
 import argparse
-from pystray import MenuItem as item
+from pystray import MenuItem
 
 # Add current dir to sys.path so graphlux can be imported correctly
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from graphlux import app
+from graphlux.api import app
+from graphlux import get_server_config
 
 # Global state
 window = None
 show_requested = threading.Event()
 should_exit = False
 
-def run_server():
-    config = uvicorn.Config(app, host="127.0.0.1", port=8000, log_level="error")
+def run_server(host, port):
+    config = uvicorn.Config(app, host=host, port=port, log_level="error")
     server = uvicorn.Server(config)
     server.run()
 
@@ -36,9 +37,11 @@ def main():
     # Set high DPI awareness, prevent blur tray icon
     ctypes.windll.shcore.SetProcessDpiAwareness(1)
     
+    host, port = get_server_config()
+
     if not args.web_debug:
         # Start FastAPI in a background thread
-        server_thread = threading.Thread(target=run_server, daemon=True)
+        server_thread = threading.Thread(target=run_server, args=(host, port), daemon=True)
         server_thread.start()
 
         # Wait a moment for the server to start
@@ -83,8 +86,8 @@ def main():
 
     def setup_tray():
         icon = pystray.Icon("Graphlux", 'E:\\workspace\\Graphlux\\backend\\dist\\run_gui.dist\\run_gui.exe', "Graphlux", menu=pystray.Menu(
-            item('Open', show_window, default=True),
-            item('Quit', quit_app)
+            MenuItem('Open', show_window, default=True),
+            MenuItem('Quit', quit_app)
         ))
         icon.run()
 
@@ -95,7 +98,7 @@ def main():
     # Initial request to show window
     show_requested.set()
 
-    url = "http://localhost:4200" if args.web_debug else "http://127.0.0.1:8000"
+    url = "http://localhost:4200" if args.web_debug else f"http://{host}:{port}"
 
     # Main loop to manage window lifecycle
     while not should_exit:

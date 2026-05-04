@@ -141,7 +141,7 @@ class TaskManager:
 
         logger.info("Stopping TaskManager...")
         self.observer.stop()
-        self.observer.join()
+        self.observer.join(timeout=30)
 
         for stop_event in self.active_scans.values():
             stop_event.set()

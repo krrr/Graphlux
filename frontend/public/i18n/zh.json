@@ -3,7 +3,7 @@
       "tasks": "任务",
       "folders": "文件夹",
       "history": "执行记录",
-      "settings": "系统设置"
+      "settings": "设置"
   },
   "history": {
       "title": "执行记录",
@@ -34,11 +34,20 @@
     "theme_light": "浅色",
     "theme_dark": "深色",
     "theme_system": "跟随系统",
+    "interface": "界面",
+    "external_tools": "外部工具",
+    "performance": "性能",
+    "system": "系统",
     "ffmpeg": "FFmpeg 可执行文件路径",
     "imagemagick": "ImageMagick (magick) 路径",
     "max_tasks": "最大并发任务数",
     "auto_start": "开机自启动 (Windows)",
     "enable": "启用",
+    "server_settings": "服务器设置",
+    "allow_remote_access": "允许远程访问",
+    "host": "监听主机",
+    "port": "端口",
+    "remote_access_warning": "警告：允许外部访问会带来任意文件读写和任意代码执行的安全风险！",
     "save": "保存",
     "saved": "设置保存成功！"
   },
@@ -100,7 +109,8 @@
   "common": {
     "ok": "确定",
     "cancel": "取消",
-    "close": "关闭"
+    "close": "关闭",
+    "view": "查看"
   },
   "file_dialog": {
     "select_folder": "选择文件夹",
