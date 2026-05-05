@@ -21,6 +21,7 @@ import { COMMON_IMPORTS } from '../../../../shared-imports';
                 <nz-select [ngModel]="config().result_var" (ngModelChange)="updateConfig('result_var', $event)"
                     name="finish_result_var">
                     <nz-option [nzValue]="null" [nzLabel]="t('props.none')" />
+                    <nz-option nzValue="__GRAPHLUX_SKIP__" [nzLabel]="t('props.skip')" />
                     @for (i of availableVariables; track i.value) {
                         <nz-option [nzValue]="i.value" [nzLabel]="i.label"></nz-option>
                     }

@@ -4,6 +4,8 @@ import datetime
 import logging
 from typing import Dict, Any, List, Optional, Tuple
 from sqlmodel import Session
+
+from . import SIGNAL_VAR_SKIP, SIGNAL_SKIP
 from .context import FileContext
 from .nodes import NODE_TYPES, StartNode, FinishNode
 from ..logger import record_id_ctx
@@ -30,6 +32,7 @@ class TaskExecutor:
         self.nodes = {}
         self.edges = {} # source_id -> { branch_name: target_id }
         self.start_node_id = dag_json.get("start_node")
+        self._fixed_inputs = {SIGNAL_VAR_SKIP: SIGNAL_SKIP}
         
         self._parse_dag()
 
@@ -65,7 +68,7 @@ class TaskExecutor:
 
     def _build_inputs_for_node(self, node_id: str, context: FileContext) -> Dict[str, Any]:
         """Collect and merge outputs from all ancestor nodes using node_id:var_name format."""
-        inputs = {}
+        inputs = self._fixed_inputs.copy()
         
         visited = set()
         ordered_ancestors = []
@@ -152,6 +155,13 @@ class TaskExecutor:
                 with Session(engine) as session:
                     if record is None:
                         record = session.get(ExecutionRecord, record_id)
+                    
+                    if success and output_data and output_data.get("result") == SIGNAL_SKIP:
+                        logger.info(f"Execution skipped signal received, deleting record {record_id}")
+                        session.delete(record)
+                        session.commit()
+                        return True
+
                     record.status = "success" if success else "failed"
                     record.end_time = datetime.datetime.now()
                     record.error_message = json.dumps(logs) if logs else None

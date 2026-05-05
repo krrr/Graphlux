@@ -305,7 +305,17 @@ export const NODE_INFO: Record<string, NodeInfo> = {
     FinishNode: {
         icon: 'check-circle', color: '#59b62b', label: 'Finish / Output',
         footerKeys: [],
-        outputVar: (config) => config.result_var ? `result: ${config.result_var.split(':').pop()}` : 'no result'
+        outputVar: (config) => {
+            if (config.result_var) {
+                if (config.result_var === '__GRAPHLUX_SKIP__') {
+                    return 'SKIP'
+                } else {
+                    return config.result_var.split(':').pop();
+                }
+            } else {
+                return 'NONE';
+            }
+        }
     },
     MetadataReadNode: {
         icon: 'tag', color: '#bb63cf', label: 'Read Media Metadata',
@@ -320,7 +330,7 @@ export const NODE_INFO: Record<string, NodeInfo> = {
     CodeEvalNode: {
         icon: 'code', color: '#956ad2', label: 'Code Eval',
         footerKeys: [],
-        outputVar: (config) => config.output_var || 'eval_result'
+        outputVar: (config) => config.output_var || 'EVAL_RESULT'
     },
     ConditionNode: {
         icon: 'icon:branches', color: '#e8a826', label: 'Condition Branch',

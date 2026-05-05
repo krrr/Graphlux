@@ -6,12 +6,15 @@ import send2trash
 import logging
 from typing import Any, Dict, Optional, Tuple, TypedDict
 from sqlmodel import Session
+
+from . import SIGNAL_SKIP
 from .context import FileContext
 from ..tools.ffmpeg_wrapper import FFmpegWrapper
 from ..tools.pyexiv2_wrapper import Pyexiv2Wrapper
 from ..tools.imagemagick_wrapper import ImageMagickWrapper
 from ..db import engine
 from ..models import Task
+
 
 logger = logging.getLogger('engine')
 
@@ -329,7 +332,7 @@ class CodeEvalNode(DAGNode):
         # args dictionary for code access. Now contains prefixed variables!
         args = dict(inputs)
 
-        local_vars = {"args": args, "os": os}
+        local_vars = {"args": args, "os": os, "SKIP_EXECUTION": SIGNAL_SKIP}
 
         try:
             tree = ast.parse(code_str)

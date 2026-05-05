@@ -203,6 +203,7 @@
     "target_file_replace": "要替换的目标文件",
     "placeholder_select_replace": "选择要替换的文件",
     "result": "结果",
+    "skip": "跳过执行",
     "none": "无",
     "enable_single_tag": "启用单个标签读取",
     "read_single_tag": "读取单个标签",

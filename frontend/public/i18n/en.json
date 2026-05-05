@@ -204,6 +204,7 @@
     "target_file_replace": "Target File to Replace",
     "placeholder_select_replace": "Select file to be replaced",
     "result": "Result",
+    "skip": "Skip Execution",
     "none": "None",
     "enable_single_tag": "Enable single tag read",
     "read_single_tag": "Read single tag",
