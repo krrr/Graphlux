@@ -155,7 +155,9 @@
     "msg_enter_file_path": "Please enter a file path",
     "msg_execution_failed": "Execution failed",
     "msg_no_task_id": "No Task ID associated with this editor",
-    "msg_task_saved": "Task saved successfully"
+    "msg_task_saved": "Task saved successfully",
+    "msg_unsaved_changes": "You have unsaved changes. Are you sure you want to leave?",
+    "unsaved_title": "Unsaved Changes"
   },
   "node_types": {
     "StartNode": "Start",

@@ -68,6 +68,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     area!: AreaPlugin<Schemes, AreaExtra>;
     selectedNode = signal<any>(null);
     isPropertyPanelVisible = signal(true);
+    private lastSavedSnapshot: string = '';
 
     task = signal<any>(null);
     taskId?: number;
@@ -96,7 +97,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         private translocoService: TranslocoService,
     ) { }
 
-    ngOnInit() {
+    async ngOnInit() {
         this.routeSub = this.route.paramMap.subscribe((params) => {
             const idStr = params.get('taskId');
             if (idStr) {
@@ -117,13 +118,39 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
 
-    loadTask() {
+    async loadTask() {
         const tid = this.taskId;
         if (!tid) return;
-        this.apiService.getTask(tid).subscribe((task) => {
+        try {
+            const task = await lastValueFrom(this.apiService.getTask(tid));
             this.task.set(task);
-            this.editorService.loadDag(task, true);
+            await this.editorService.loadDag(task, true);
             this.selectedNode.set(null);
+            // Record the initial state
+            this.lastSavedSnapshot = JSON.stringify(this.editorService.serializeDag());
+        } catch (e) {
+            console.error('Failed to load task', e);
+        }
+    }
+
+    async canDeactivate(): Promise<boolean> {
+        // 如果撤销栈只有 1 条（初始状态），说明从 load 后就没动过，直接放行
+        if (this.editorService.undoStack().length <= 1) {
+            return true;
+        }
+        const currentDag = JSON.stringify(this.editorService.serializeDag());
+        if (currentDag === this.lastSavedSnapshot) {
+            return true;
+        }
+
+        return new Promise((resolve) => {
+            this.modal.confirm({
+                nzTitle: this.translocoService.translate('editor.unsaved_title'),
+                nzContent: this.translocoService.translate('editor.msg_unsaved_changes'),
+                nzOkDanger: true,
+                nzOnOk: () => resolve(true),
+                nzOnCancel: () => resolve(false)
+            });
         });
     }
 
@@ -447,6 +474,7 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         try {
             await lastValueFrom(this.apiService.updateTask(this.taskId, { json_data: dagJson }))
             this.message.success(this.translocoService.translate('editor.msg_task_saved'));
+            this.lastSavedSnapshot = JSON.stringify(dagJson);
         } catch (e: any) {
             this.message.error(e.error.detail);
         }
