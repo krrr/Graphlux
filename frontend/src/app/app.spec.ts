@@ -30,7 +30,7 @@ describe('App', () => {
         await TestBed.configureTestingModule({
             imports: [AppComponent, getTranslocoModule()],
             providers: [
-                provideNzIcons([HistoryOutline, FolderOpenOutline, SettingOutline, {name: 'icon:task', icon: '<svg></svg>'}]),
+                provideNzIcons([HistoryOutline, FolderOpenOutline, SettingOutline, {name: 'icon:task', icon: '<svg></svg>'}, {name: 'sidebar-show', icon: '<svg></svg>'}, {name: 'icon:sidebar-hide', icon: '<svg></svg>'}]),
                 {
                     provide: ActivatedRoute,
                     useValue: {},
