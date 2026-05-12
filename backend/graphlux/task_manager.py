@@ -64,7 +64,7 @@ class FolderEventHandler(FileSystemEventHandler):
                     return
 
             self.recently_processed[file_path] = now
-            logger.info(f"Folder {self.folder_id} detected change for: {file_path}")
+            logger.info(f"Folder {self.folder_id} detected change for: '{file_path}'")
 
             tasks = folder.tasks
             if not tasks:
@@ -222,9 +222,11 @@ class TaskManager:
         if not os.path.exists(folder.watch_folder):
             return
 
-        logger.info(f"Scanning files for Folder {folder.name} in {folder.watch_folder} (recursive)")
-        
+        start_time = time.time()
+        file_count = 0
+
         def _recursive_scan(path):
+            nonlocal file_count
             try:
                 with os.scandir(path) as it:
                     for entry in it:
@@ -237,7 +239,8 @@ class TaskManager:
                             
                             if folder.filename_regex and not re.search(folder.filename_regex, entry.name):
                                 continue
-                            
+
+                            file_count += 1
                             try:
                                 # Get stat for fingerprint
                                 info = entry.stat()
@@ -250,6 +253,8 @@ class TaskManager:
                 logger.error(f"Error scanning {path}: {e}")
 
         _recursive_scan(folder.watch_folder)
+        elapsed = time.time() - start_time
+        logger.info(f"Folder '{folder.name}' scan completed: {file_count} files scanned in {elapsed:.1f}s")
 
 # Global singleton
 task_manager = TaskManager()

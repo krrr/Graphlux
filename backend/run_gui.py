@@ -2,12 +2,12 @@ import sys
 import os
 import threading
 import time
-import gc
 import uvicorn
-import webview
+import webbrowser
 import pystray
 import ctypes
 import argparse
+import subprocess
 from pystray import MenuItem
 
 # Add current dir to sys.path so graphlux can be imported correctly
@@ -17,18 +17,46 @@ from graphlux.api import app
 from graphlux import get_server_config
 
 # Global state
-window = None
-show_requested = threading.Event()
 should_exit = False
 
 def run_server(host, port):
-    config = uvicorn.Config(app, host=host, port=port, log_level="error")
+    config = uvicorn.Config(app, host=host, port=port, workers=1, log_level="error")
     server = uvicorn.Server(config)
     server.run()
 
 
+def get_chrome_path():
+    """Detect Chrome installation path from Windows registry."""
+    if sys.platform != 'win32':
+        return None
+
+    import winreg
+    paths = [
+        (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe"),
+        (winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe")
+    ]
+
+    for hkey, subkey in paths:
+        try:
+            with winreg.OpenKey(hkey, subkey) as key:
+                path, _ = winreg.QueryValueEx(key, "")
+                if os.path.exists(path):
+                    return path
+        except OSError:
+            continue
+    return None
+
+
+def open_browser(url):
+    chrome_path = get_chrome_path()
+    if chrome_path:
+        subprocess.Popen([chrome_path, f"--app={url}", "--window-size=1440,900"])
+    else:
+        webbrowser.open(url)
+
+
 def main():
-    global window, should_exit
+    global should_exit
 
     parser = argparse.ArgumentParser(description="Graphlux GUI")
     parser.add_argument("--web-debug", action="store_true", help="Start in web debug mode (no backend, use localhost:4200)")
@@ -36,7 +64,7 @@ def main():
 
     # Set high DPI awareness, prevent blur tray icon
     ctypes.windll.shcore.SetProcessDpiAwareness(1)
-    
+
     host, port = get_server_config()
 
     if not args.web_debug:
@@ -47,69 +75,35 @@ def main():
         # Wait a moment for the server to start
         time.sleep(1)
 
-    def on_closing():
-        global window
-        # Hide immediately to feel responsive
-        if window:
-            window.hide()
-        return True # Allow destruction to save memory
-
-    def on_closed():
-        global window
-        window = None
-        # Explicit garbage collection to minimize memory usage after browser engine shutdown
-        gc.collect()
+    url = "http://localhost:4200" if args.web_debug else f"http://{host}:{port}"
 
     def show_window(icon, item):
-        global window
-        if window:
-            try:
-                window.show()
-                window.restore()
-            except Exception:
-                # Fallback if window was destroyed but reference not cleared
-                window = None
-                show_requested.set()
-        else:
-            show_requested.set()
+        open_browser(url)
 
     def quit_app(icon, item):
         global should_exit
         should_exit = True
         icon.stop()
-        if window:
-            try:
-                window.destroy()
-            except Exception:
-                pass
         os._exit(0)  # Force exit to cleanly kill the uvicorn daemon thread
 
     def setup_tray():
-        icon = pystray.Icon("Graphlux", 'E:\\workspace\\Graphlux\\backend\\dist\\run_gui.dist\\run_gui.exe', "Graphlux", menu=pystray.Menu(
+        icon = pystray.Icon("Graphlux", 'scripts/app.ico', "Graphlux", menu=pystray.Menu(
             MenuItem('Open', show_window, default=True),
             MenuItem('Quit', quit_app)
         ))
         icon.run()
 
+    # Open browser immediately
+    open_browser(url)
+
     # Start tray icon in a background thread
     tray_thread = threading.Thread(target=setup_tray, daemon=True)
     tray_thread.start()
 
-    # Initial request to show window
-    show_requested.set()
-
-    url = "http://localhost:4200" if args.web_debug else f"http://{host}:{port}"
-
-    # Main loop to manage window lifecycle
+    # Keep main thread alive until exit
     while not should_exit:
-        if show_requested.wait(timeout=1):
-            show_requested.clear()
-            if not window:
-                window = webview.create_window("Graphlux", url, width=1424, height=1068, transparent=True)
-                window.events.closing += on_closing
-                window.events.closed += on_closed
-                webview.start()
-        time.sleep(0.1)
+        time.sleep(1)
+
 
 if __name__ == '__main__':
     main()

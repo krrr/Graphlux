@@ -9,6 +9,7 @@ import { TranslocoService } from '@jsverse/transloco';
 export interface VariableInfo {
     value: string; // "node_id:var_name"
     label: string; // "Node Name > var_name"
+    type?: string;
 }
 
 @Injectable({
@@ -176,24 +177,25 @@ export class EditorService {
                 const sourceConfig = this.nodeConfigs()[sourceId];
                 const nodeName = sourceConfig?.name || sourceNode?.label || sourceId;
 
-                const addVar = (varName: string) => {
+                const addVar = (varName: string, type: string = 'any') => {
                     variables.push({
                         value: `${sourceId}:${varName}`,
-                        label: `${nodeName} > ${varName}`
+                        label: `${nodeName} > ${varName}`,
+                        type: type
                     });
                 };
 
                 if (sourceNode?.type === 'StartNode') {
-                    addVar('file');
+                    addVar('file', 'file');
                 } else if (sourceNode?.type === 'CodeEvalNode') {
-                    addVar(sourceConfig?.config?.output_var || 'eval_result');
+                    addVar(sourceConfig?.config?.output_var || 'eval_result', 'any');
                 } else if (sourceNode?.type === 'MetadataReadNode') {
-                    addVar('metadata');
+                    addVar('metadata', 'any');
                 } else if (sourceNode?.type === 'ConvertNode' || sourceNode?.type === 'FileOperationNode' || sourceNode?.type === 'MetadataWriteNode') {
-                    addVar('file');
+                    addVar('file', 'file');
                 } else {
                     if (sourceConfig?.config?.output_var) {
-                        addVar(sourceConfig.config.output_var);
+                        addVar(sourceConfig.config.output_var, 'any');
                     }
                 }
             }

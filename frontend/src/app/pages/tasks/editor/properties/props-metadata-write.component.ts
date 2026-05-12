@@ -83,7 +83,7 @@ export class PropsMetadataWriteComponent extends PropsBase implements OnChanges 
     tagEntries: { key: string, value: string }[] = [];
 
     get availableVariables(): VariableInfo[] {
-        return this.editorService.getAvailableVariables(this.nodeId).filter(v => v.value.endsWith(':file'));
+        return this.editorService.getAvailableVariables(this.nodeId).filter(v => v.type === 'file');
     }
 
     override ngOnChanges(changes: SimpleChanges): void {

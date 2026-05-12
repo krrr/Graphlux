@@ -48,6 +48,6 @@ import { COMMON_IMPORTS } from '../../../../shared-imports';
 })
 export class PropsMetadataReadComponent extends PropsBase implements OnChanges {
     get availableVariables(): VariableInfo[] {
-        return this.editorService.getAvailableVariables(this.nodeId).filter(v => v.value.endsWith(':file'));
+        return this.editorService.getAvailableVariables(this.nodeId).filter(v => v.type === 'file');
     }
 }

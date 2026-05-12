@@ -20,7 +20,6 @@ dependencies = [
     "sqlmodel>=0.0.16",
     "watchdog>=4.0.0",
     "pystray>=0.19.0",
-    "pywebview>=4.0.0",
     "send2trash>=1.8.0",
 ]
 

@@ -69,6 +69,7 @@ import { ThemeService } from './services/theme.service';
             background-size: contain;
             background-repeat: no-repeat;
             background-position: bottom;
+            // transition: background-color 0s;
         }
         .ant-layout-sider-collapsed {
             background-image: none;      
@@ -90,6 +91,9 @@ import { ThemeService } from './services/theme.service';
                 .collapse-trigger {
                     opacity: 0.2;
                     margin-right: 0;
+                }
+                .collapse-trigger:hover {
+                    opacity: 0.8;
                 }
             }
 
