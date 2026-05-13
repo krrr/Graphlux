@@ -9,11 +9,12 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { PropsBase } from './props-base';
 import { COMMON_IMPORTS } from '../../../../shared-imports';
+import { VariableSelectorComponent } from './variable-selector.component';
 
 @Component({
     selector: 'app-condition-props',
     standalone: true,
-    imports: [CommonModule, FormsModule, NzFormModule, NzInputModule, NzSelectModule, NzButtonModule, NzIconModule, ...COMMON_IMPORTS],
+    imports: [CommonModule, FormsModule, NzFormModule, NzInputModule, NzSelectModule, NzButtonModule, NzIconModule, VariableSelectorComponent, ...COMMON_IMPORTS],
     template: `
         <ng-container *transloco="let t">
           <nz-form-item>
@@ -36,23 +37,20 @@ import { COMMON_IMPORTS } from '../../../../shared-imports';
               <strong>{{ t('props.condition') }} {{ $index + 1 }}</strong>
               <button nz-button nzType="text" nzDanger nzSize="small" (click)="removeCondition($index)" [attr.aria-label]="t('props.remove_condition')" [title]="t('props.remove_condition')"><span nz-icon nzType="delete"></span></button>
             </div>
-            <nz-form-item style="margin-bottom: 8px;">
-              <nz-form-label>{{ t('editor.name') }}</nz-form-label>
+            <nz-form-item>
+              <nz-form-label>{{ t('common.var') }}</nz-form-label>
               <nz-form-control>
-                <nz-select [ngModel]="cond.variable"
-                  (ngModelChange)="updateCondition($index, 'variable', $event)"
-                  name="cond_var_{{$index}}"
-                >
-                  @for (i of availableVariables; track i.value) {
-                      <nz-option [nzValue]="i.value" [nzLabel]="i.label"></nz-option>
-                  }
-                </nz-select>
+                <app-variable-selector
+                  [nodeId]="nodeId"
+                  [value]="cond.variable"
+                  (valueChange)="updateCondition($index, 'variable', $event)"
+                />
               </nz-form-control>
             </nz-form-item>
-            <nz-form-item style="margin-bottom: 8px;">
+            <nz-form-item>
               <nz-form-label>{{ t('props.operator') }}</nz-form-label>
               <nz-form-control>
-                <nz-select
+                <nz-select nzSize="small"
                   [ngModel]="cond.operator"
                   (ngModelChange)="updateCondition($index, 'operator', $event)"
                   name="cond_op_{{$index}}"
@@ -67,7 +65,7 @@ import { COMMON_IMPORTS } from '../../../../shared-imports';
               <nz-form-label>{{ t('props.target') }}</nz-form-label>
               <nz-form-control>
                 <input
-                  nz-input
+                  nz-input nzSize="small"
                   [ngModel]="cond.target"
                   (ngModelChange)="updateCondition($index, 'target', $event)"
                   name="cond_thresh_{{$index}}"
@@ -86,19 +84,18 @@ import { COMMON_IMPORTS } from '../../../../shared-imports';
       .add-btn {
         margin-bottom: 12px;
       }
-      .cond-div {
+      :host .cond-div {
         border: 1px solid var(--border-color-split);
         padding: 10px;
         margin-bottom: 10px;
         border-radius: 4px;
+        > .ant-form-item {
+          margin-bottom: 2px;
+        }
       }
     `]
 })
 export class PropsConditionComponent extends PropsBase implements OnChanges {
-    get availableVariables(): VariableInfo[] {
-        return this.editorService.getAvailableVariables(this.nodeId);
-    }
-    
     addCondition() {
         const conditions = this.config().conditions ? [...this.config().conditions] : [];
         conditions.push({});

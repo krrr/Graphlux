@@ -180,7 +180,7 @@ export class EditorService {
                 const addVar = (varName: string, type: string = 'any') => {
                     variables.push({
                         value: `${sourceId}:${varName}`,
-                        label: `${nodeName} > ${varName}`,
+                        label: `${nodeName} ❯ ${varName}`,
                         type: type
                     });
                 };

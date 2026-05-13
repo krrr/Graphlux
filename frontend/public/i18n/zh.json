@@ -110,7 +110,9 @@
     "cancel": "取消",
     "close": "关闭",
     "general": "常规",
-    "view": "查看"
+    "view": "查看",
+    "var": "变量",
+    "path": "路径"
   },
   "file_dialog": {
     "select_folder": "选择文件夹",

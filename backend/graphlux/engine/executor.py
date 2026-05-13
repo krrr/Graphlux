@@ -6,7 +6,7 @@ from typing import Dict, Any, List, Optional, Tuple
 from sqlmodel import Session
 
 from . import SIGNAL_VAR_SKIP, SIGNAL_SKIP
-from .context import FileContext
+from .context import FileContext, NodeInputs
 from .nodes import NODE_TYPES, StartNode, FinishNode
 from ..logger import record_id_ctx
 from ..db import engine
@@ -66,9 +66,9 @@ class TaskExecutor:
                 self.reverse_edges[target] = []
             self.reverse_edges[target].append((source, branch))
 
-    def _build_inputs_for_node(self, node_id: str, context: FileContext) -> Dict[str, Any]:
+    def _build_inputs_for_node(self, node_id: str, context: FileContext) -> NodeInputs:
         """Collect and merge outputs from all ancestor nodes using node_id:var_name format."""
-        inputs = self._fixed_inputs.copy()
+        inputs = NodeInputs(self._fixed_inputs)
         
         visited = set()
         ordered_ancestors = []
@@ -203,6 +203,8 @@ class TaskExecutor:
         """
         if context is None:
             context = FileContext()
+
+        inputs = NodeInputs(inputs)
         current_node_id = self.start_node_id
         
         if not current_node_id:

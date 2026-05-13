@@ -111,7 +111,8 @@
     "cancel": "Cancel",
     "close": "Close",
     "general": "General",
-    "view": "View"
+    "view": "View",
+    "var": "Variable"
   },
   "file_dialog": {
     "select_folder": "Select Folder",

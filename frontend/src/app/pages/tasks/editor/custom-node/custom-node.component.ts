@@ -111,7 +111,7 @@ export class CustomNodeComponent implements OnChanges {
             const [nodeId, varName] = val.split(':');
             const nodeName = this.editorService.nodeConfigs()[nodeId]?.name;
             if (nodeName) {
-                val = `${nodeName} > ${varName}`;
+                val = `${nodeName} ❯ ${varName}`;
             }
         }
         if (String(val).length > 20) {
