@@ -58,6 +58,9 @@ import {
     ClearOutline,
     ExceptionOutline,
     EyeOutline,
+    SunOutline,
+    MoonOutline,
+    DesktopOutline,
 } from '@ant-design/icons-angular/icons';
 import { TranslocoHttpLoader } from './transloco-loader';
 import { provideTransloco, TranslocoService } from '@jsverse/transloco';
@@ -114,6 +117,9 @@ const icons: IconDefinition[] = [
     HistoryOutline,
     ClearOutline,
     ExceptionOutline,
+    SunOutline,
+    MoonOutline,
+    DesktopOutline,
 ];
 
 export const appConfig: ApplicationConfig = {
