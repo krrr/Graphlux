@@ -183,7 +183,7 @@ export class EditorService {
                         label: `${nodeName} ❯ ${varName}`,
                         type: type
                     });
-                };
+                }
 
                 if (sourceNode?.type === 'StartNode') {
                     addVar('file', 'file');
@@ -354,6 +354,18 @@ export const NODE_INFO: Record<string, NodeInfo> = {
         outputVar: 'result'
     },
 };
+
+export interface VarTypeInfo {
+    name: string;
+    color: string;
+}
+
+export const VAR_TYPE_INFO: Record<string, VarTypeInfo> = {
+    int: { name: 'int', color: 'blue' },
+    str: { name: 'str', color: 'orange' },
+    file: { name: 'file', color: 'green' },
+    any: { name: 'any', color: 'default' },
+}
 
 export class TaskNode extends ClassicPreset.Node {
     type: string

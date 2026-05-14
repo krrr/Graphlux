@@ -43,6 +43,7 @@ import { VariableSelectorComponent } from './variable-selector.component';
                 <app-variable-selector
                   [nodeId]="nodeId"
                   [value]="cond.variable"
+                  size="small"
                   (valueChange)="updateCondition($index, 'variable', $event)"
                 />
               </nz-form-control>
