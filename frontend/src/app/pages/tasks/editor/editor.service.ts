@@ -362,6 +362,7 @@ export interface VarTypeInfo {
 
 export const VAR_TYPE_INFO: Record<string, VarTypeInfo> = {
     int: { name: 'int', color: 'blue' },
+    float: { name: 'float', color: 'geekblue' },
     str: { name: 'str', color: 'orange' },
     file: { name: 'file', color: 'green' },
     any: { name: 'any', color: 'default' },

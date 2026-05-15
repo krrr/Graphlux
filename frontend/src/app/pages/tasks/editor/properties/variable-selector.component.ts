@@ -41,6 +41,9 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
                 <div class="flex1"></div>
                 <nz-tag [nzColor]="getTypeColor(option.type)" nzSize="small" class="type-tag">{{ option.type }}</nz-tag>
             }
+            @if (option.isVar && !option.children) {
+                <div class="placeholder"></div>
+            }
         </ng-template>
     `,
     styles: `
@@ -57,6 +60,9 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
             font-size: 12px;
             margin-right: 0;
             align-self: center;
+        }
+        .placeholder {
+            width: 14px;
         }
     `
 })
@@ -81,13 +87,14 @@ export class VariableSelectorComponent {
                 label: v.label,
                 value: v.value,
                 type: v.type,
+                isVar: true,
             };
 
             if (v.type === 'file') {
                 option.children = [
                     { label: 'path', value: `${v.value}.path`, isLeaf: true, type: 'str' },
                     { label: 'size', value: `${v.value}.size`, isLeaf: true, type: 'int' },
-                    { label: 'create_time', value: `${v.value}.ctime`, isLeaf: true, type: 'str' }
+                    { label: 'create_time', value: `${v.value}.create_time`, isLeaf: true, type: 'float' }
                 ];
             }
 

@@ -189,7 +189,7 @@ class TaskExecutor:
         file_obj = {
             "path": file_path,
             "size": os.path.getsize(file_path) if os.path.exists(file_path) else 0,
-            "ctime": os.path.getctime(file_path),
+            "create_time": os.path.getctime(file_path),
         }
         return file_obj
 
