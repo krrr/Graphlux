@@ -136,7 +136,10 @@
     .config-value {
         color: #6f6f6f;
     }
-    .node-wrapper {
+    .node-wrapper:not(.selected) {
         border-color: #383838;
+    }
+    .node-wrapper.selected {
+        box-shadow: 0 4px 16px var(--primary-color-a06);
     }
 }
