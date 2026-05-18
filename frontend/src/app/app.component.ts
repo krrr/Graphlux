@@ -139,11 +139,10 @@ export class AppComponent implements OnInit {
     ngOnInit() {
         this.langService.init();
         this.themeService.loadTheme(true);
-        this.apiService.getSettings().subscribe(s => {
-            if (s && s.theme) {
-                this.themeService.setTheme(s.theme, false);
+        this.apiService.refreshAppInfo().then(() => {
+            if (this.apiService.appInfo()?.settings.theme) {
+                this.themeService.setTheme(this.apiService.appInfo()?.settings.theme, false);
             }
         });
-        this.apiService.appInfo();  // preload, trigger manually
     }
 }

@@ -9,7 +9,7 @@ export interface SystemConfig {
     imagemagick_path: string;
     max_concurrent_tasks: number;
     auto_start: boolean;
-    theme: string;
+    theme: any;
     host: string | null;
     port: number;
     editor_bg: string;

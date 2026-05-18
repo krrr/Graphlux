@@ -20,10 +20,11 @@ describe('Settings', () => {
                 ffmpeg_path: '/usr/bin/ffmpeg',
                 imagemagick_path: '/usr/bin/magick'
             })),
-            appInfo: vi.fn().mockReturnValue(of({
+            appInfo: vi.fn().mockReturnValue({
                 is_packaged: false
-            })),
-            updateSettings: vi.fn().mockReturnValue(of({}))
+            }),
+            updateSettings: vi.fn().mockReturnValue(of({})),
+            refreshAppInfo: vi.fn()
         };
 
 
@@ -63,6 +64,7 @@ describe('Settings', () => {
             host: null
         }));
         expect(messageServiceSpy.success).toHaveBeenCalledWith('Settings saved successfully!');
+        expect(apiServiceSpy.refreshAppInfo).toHaveBeenCalled();
     });
 
     it('should update field', () => {

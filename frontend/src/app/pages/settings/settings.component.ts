@@ -78,6 +78,7 @@ export class SettingsComponent implements OnInit {
         this.apiService.updateSettings(settings).subscribe(() => {
             this.message.success(this.translocoService.translate('settings.saved'));
             this.themeService.setTheme(this.settings().theme as any);
+            this.apiService.refreshAppInfo();
         });
     }
 

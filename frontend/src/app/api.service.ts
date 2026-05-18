@@ -1,7 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop'
 import { HttpClient } from '@angular/common/http';
-import { Observable, Subject } from 'rxjs';
+import { lastValueFrom, Observable, Subject } from 'rxjs';
 import { Folder } from './interfaces/folder.interface';
 import { Task } from './interfaces/task.interface';
 import { AppInfo } from './interfaces/app-info.interface';
@@ -13,9 +12,13 @@ export class ApiService {
     private socket: WebSocket | null = null;
     public logs$ = new Subject<any>();
     private http = inject(HttpClient);
-    public appInfo = toSignal(this.getAppInfo());
+    public appInfo = signal<AppInfo | undefined>(undefined);
 
     constructor() {}
+
+    async refreshAppInfo() {
+        this.appInfo.set(await lastValueFrom(this.getAppInfo()));
+    }
 
     executeTask(task: any, filePath: string, taskId?: number) {
         return this.http.post<any>('/api/execute', { task, task_id: taskId, file_path: filePath });

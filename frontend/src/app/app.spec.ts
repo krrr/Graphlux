@@ -14,7 +14,8 @@ describe('App', () => {
     beforeEach(async () => {
         const apiServiceSpy = {
             getSettings: vi.fn().mockReturnValue(of({ theme: 'light' })),
-            appInfo: vi.fn().mockReturnValue(of({ version: '1.0.0', is_packaged: false })),
+            appInfo: vi.fn().mockReturnValue({ version: '1.0.0', is_packaged: false }),
+            refreshAppInfo: vi.fn(),
         };
 
         const themeServiceSpy = {

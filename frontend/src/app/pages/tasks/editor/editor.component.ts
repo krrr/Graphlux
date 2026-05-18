@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ViewChild, ElementRef, OnInit, Injector, OnDestroy, signal, effect } from '@angular/core';
+import { Component, AfterViewInit, ViewChild, ElementRef, OnInit, Injector, OnDestroy, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { NodeEditor, GetSchemes, ClassicPreset } from 'rete';
@@ -97,13 +97,10 @@ export class EditorComponent implements AfterViewInit, OnInit, OnDestroy {
         public editorService: EditorService,
         private translocoService: TranslocoService,
     ) {
-        effect(() => {
-            console.log('Editor background pattern:', this.bgPattern());
-            this.bgPattern.set(apiService.appInfo()?.settings.editor_bg || 'none');
-        });
     }
 
     async ngOnInit() {
+        this.bgPattern.set(this.apiService.appInfo()?.settings.editor_bg || 'none');
         this.routeSub = this.route.paramMap.subscribe((params) => {
             const idStr = params.get('taskId');
             if (idStr) {
