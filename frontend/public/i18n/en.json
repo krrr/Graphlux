@@ -36,6 +36,7 @@
     "theme_dark": "Dark",
     "theme_system": "System",
     "interface": "Interface",
+    "editor_bg": "Editor Background",
     "external_tools": "External Tools",
     "performance": "Performance",
     "system": "System",
@@ -112,7 +113,8 @@
     "close": "Close",
     "general": "General",
     "view": "View",
-    "var": "Variable"
+    "var": "Variable",
+    "none":"None"
   },
   "file_dialog": {
     "select_folder": "Select Folder",

@@ -37,6 +37,17 @@
             </nz-form-item>
 
             <nz-form-item>
+                <nz-form-label [nzSpan]="6" nzLabelAlign="left">{{ t('settings.editor_bg') }}</nz-form-label>
+                <nz-form-control [nzSpan]="6">
+                    <nz-select [ngModel]="settings().editor_bg" (ngModelChange)="updateField('editor_bg', $event)" name="editor_bg">
+                        <nz-option nzValue="none" [nzLabel]="t('common.none')"/>
+                        <nz-option nzValue="dot" nzLabel="Dot"/>
+                        <nz-option nzValue="grid" nzLabel="Grid"/>
+                    </nz-select>
+                </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item>
                 <nz-form-control [nzSpan]="24">
                     <nz-alert nzType="info" [nzMessage]="t('settings.local_storage_hint')" nzShowIcon class="nz-alert-sm" nzNoAnimation/>
                 </nz-form-control>

@@ -15,6 +15,7 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzDividerComponent } from "ng-zorro-antd/divider";
 import { NzAnchorModule } from 'ng-zorro-antd/anchor';
 import { NzGridModule } from 'ng-zorro-antd/grid';
+import { SystemConfig } from '../../interfaces/app-info.interface';
 
 @Component({
     selector: 'app-settings',
@@ -37,14 +38,7 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
 })
 export class SettingsComponent implements OnInit {
     settings = signal({
-        ffmpeg_path: 'ffmpeg',
-        imagemagick_path: 'magick',
-        max_concurrent_tasks: 4,
-        auto_start: false,
-        theme: 'system' as ThemeType,
-        host: LOCALHOST as string | null,
-        port: 41001
-    });
+    } as SystemConfig);
     allowRemoteAccess = signal(false);
     
     langService = inject(LanguageService);
@@ -83,7 +77,7 @@ export class SettingsComponent implements OnInit {
         }
         this.apiService.updateSettings(settings).subscribe(() => {
             this.message.success(this.translocoService.translate('settings.saved'));
-            this.themeService.setTheme(this.settings().theme);
+            this.themeService.setTheme(this.settings().theme as any);
         });
     }
 

@@ -57,6 +57,7 @@ class SettingsConfig(BaseModel):
     theme: str = "system"
     host: Optional[str] = None
     port: int = DEFAULT_PORT
+    editor_bg: str = "grid"
 
 class SettingsResponse(SettingsConfig):
     id: int = 1
@@ -141,3 +142,10 @@ class SystemSettings(SQLModel, table=True):
     def port(self, val: int):
         self._update_value("port", val)
 
+    @property
+    def editor_bg(self) -> str:
+        return self._get_config().editor_bg
+
+    @editor_bg.setter
+    def editor_bg(self, val: str):
+        self._update_value("editor_bg", val)

@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { Folder } from './interfaces/folder.interface';
 import { Task } from './interfaces/task.interface';
+import { AppInfo } from './interfaces/app-info.interface';
 
 @Injectable({
     providedIn: 'root',
@@ -78,7 +79,7 @@ export class ApiService {
     }
 
     getAppInfo() {
-        return this.http.get<{ version: string; is_packaged: boolean }>('/api/info');
+        return this.http.get<AppInfo>('/api/info');
     }
 
     updateSettings(settings: any): Observable<any> {

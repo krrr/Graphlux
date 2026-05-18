@@ -26,7 +26,7 @@
         <button nz-button routerLink="/tasks/" [title]="t('editor.back')"><nz-icon nzType="icon:back"/> {{ t('editor.back') }}</button>
     </div>
     <div class="main-content">
-        <div class="rete-area" #rete></div>
+        <div [class]="'rete-area bg-pattern-' + bgPattern()" #rete></div>
 
         <div class="floating-toolbar">
             <div class="toolbar-group">

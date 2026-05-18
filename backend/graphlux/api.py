@@ -45,10 +45,12 @@ def is_packaged() -> bool:
 class AppInfo(BaseModel):
     version: str
     is_packaged: bool
+    settings: Dict[str, Any]
 
 @router.get("/info", response_model=AppInfo)
-def get_app_info():
-    return AppInfo(version=__version__, is_packaged=is_packaged())
+def get_app_info(session: Session = Depends(get_session)):
+    settings = session.get(SystemSettings, 1)
+    return AppInfo(version=__version__, is_packaged=is_packaged(), settings=settings.to_dict() if settings else {})
 
 def update_autostart_registry(enable: bool):
     import winreg

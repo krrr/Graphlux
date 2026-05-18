@@ -56,14 +56,20 @@
     position: relative;
     overflow: hidden;
     
-    &::before {
+    @mixin bg-before() {
         content: "";
         position: absolute;
         inset: 0;
-        background-image: url("/assets/tile.svg");
-        background-size: 24px 24px;
         pointer-events: none;
         z-index: 0;
+    }
+    &.bg-pattern-dot::before {
+        background-image: url("/assets/tile-dot.svg");
+        @include bg-before;
+    }
+    &.bg-pattern-grid::before {
+        background-image: url("/assets/tile.svg");
+        @include bg-before;
     }
 }
 .floating-toolbar {
@@ -126,7 +132,8 @@
         background: #282828;
     }
 
-    .rete-area::before {
+    .rete-area.bg-pattern-dot::before,
+    .rete-area.bg-pattern-grid::before {
         filter: invert(1);
     }
 }

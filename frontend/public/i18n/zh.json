@@ -35,6 +35,7 @@
     "theme_dark": "深色",
     "theme_system": "跟随系统",
     "interface": "界面",
+    "editor_bg": "编辑器背景",
     "external_tools": "外部工具",
     "performance": "性能",
     "system": "系统",
@@ -112,7 +113,8 @@
     "general": "常规",
     "view": "查看",
     "var": "变量",
-    "path": "路径"
+    "path": "路径",
+    "none": "无"
   },
   "file_dialog": {
     "select_folder": "选择文件夹",
