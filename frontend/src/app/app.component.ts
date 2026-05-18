@@ -140,8 +140,12 @@ export class AppComponent implements OnInit {
         this.langService.init();
         this.themeService.loadTheme(true);
         this.apiService.refreshAppInfo().then(() => {
-            if (this.apiService.appInfo()?.settings.theme) {
-                this.themeService.setTheme(this.apiService.appInfo()?.settings.theme, false);
+            const settings = this.apiService.appInfo()?.settings;
+            if (settings?.theme) {
+                this.themeService.setTheme(settings.theme, true);
+            }
+            if (settings?.language) {
+                this.langService.setLanguage(settings.language);
             }
         });
     }

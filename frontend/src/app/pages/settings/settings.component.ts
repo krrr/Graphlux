@@ -64,21 +64,25 @@ export class SettingsComponent implements OnInit {
                 this.allowRemoteAccess.set(false);
                 s.host = LOCALHOST;
             }
-            if (s.theme) {
-                this.themeService.setTheme(s.theme, false);
-            }
         });
     }
 
     saveSettings() {
+        const oldLang = this.langService.currentLang;
         let settings = this.settings();
         if (settings.host == LOCALHOST) {
             settings.host = null;
         }
+
         this.apiService.updateSettings(settings).subscribe(() => {
             this.message.success(this.translocoService.translate('settings.saved'));
-            this.themeService.setTheme(this.settings().theme as any);
+            this.themeService.setTheme(this.settings().theme as any, true);
+            this.langService.setLanguage(this.settings().language);
             this.apiService.refreshAppInfo();
+
+            if (oldLang !== this.settings().language) {
+                window.location.reload();
+            }
         });
     }
 

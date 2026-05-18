@@ -14,8 +14,8 @@ describe('App', () => {
     beforeEach(async () => {
         const apiServiceSpy = {
             getSettings: vi.fn().mockReturnValue(of({ theme: 'light' })),
-            appInfo: vi.fn().mockReturnValue({ version: '1.0.0', is_packaged: false }),
-            refreshAppInfo: vi.fn(),
+            appInfo: vi.fn().mockReturnValue({ version: '1.0.0', is_packaged: false, settings: { theme: 'light', language: 'en' } }),
+            refreshAppInfo: vi.fn().mockResolvedValue(undefined),
         };
 
         const themeServiceSpy = {
@@ -26,6 +26,7 @@ describe('App', () => {
 
         const languageServiceSpy = {
             init: vi.fn(),
+            setLanguage: vi.fn(),
         };
 
         await TestBed.configureTestingModule({

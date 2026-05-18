@@ -55,6 +55,7 @@ class SettingsConfig(BaseModel):
     max_concurrent_tasks: int = 4
     auto_start: bool = False
     theme: str = "system"
+    language: str = "en"
     host: Optional[str] = None
     port: int = DEFAULT_PORT
     editor_bg: str = "grid"
@@ -125,6 +126,14 @@ class SystemSettings(SQLModel, table=True):
     @theme.setter
     def theme(self, val: str):
         self._update_value("theme", val)
+
+    @property
+    def language(self) -> str:
+        return self._get_config().language
+
+    @language.setter
+    def language(self, val: str):
+        self._update_value("language", val)
 
     @property
     def host(self) -> Optional[str]:

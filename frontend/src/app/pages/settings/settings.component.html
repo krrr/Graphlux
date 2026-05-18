@@ -8,7 +8,7 @@
             <nz-form-item>
                 <nz-form-label [nzSpan]="6" nzLabelAlign="left">{{ t('settings.language') }}</nz-form-label>
                 <nz-form-control [nzSpan]="6">
-                    <nz-select [ngModel]="langService.currentLang" (ngModelChange)="langService.setLanguage($event)" name="language">
+                    <nz-select [ngModel]="settings().language" (ngModelChange)="updateField('language', $event)" name="language">
                         <nz-option nzValue="en" nzLabel="English"/>
                         <nz-option nzValue="zh" nzLabel="简体中文"/>
                     </nz-select>

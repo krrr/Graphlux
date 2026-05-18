@@ -10,6 +10,7 @@ export interface SystemConfig {
     max_concurrent_tasks: number;
     auto_start: boolean;
     theme: any;
+    language: string;
     host: string | null;
     port: number;
     editor_bg: string;
